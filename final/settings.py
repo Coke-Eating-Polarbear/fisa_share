@@ -22,8 +22,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-lef4=u5csax2(45hvmtt4uw#vhk9zsc&=jh&9s2lw$xw!xv%^y"
+
+
+SECRET_KEY = os.getenv("SECRET_KEY", "default-secret-key")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -92,6 +93,10 @@ DATABASES = {
         "PASSWORD":  os.getenv('PASSWD'),
         "HOST":  os.getenv('HOST'),
         "USER":  os.getenv('USER'),
+        'OPTIONS': {
+             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'" #  MySQL 데이터베이스의 초기 설정 명령어
+         },                                                       # STRICT_TRANS_TABLES: 트랜잭션을 지원하는 테이블, 
+                                                                  # 잘못된 데이터가 삽입되거나 업데이트될 때 경고 대신 오류를 발생
     }
 }
 
