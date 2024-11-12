@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.hashers import make_password
 
 class UserProfile(models.Model):
     CustomerID = models.CharField(max_length=100, unique=True)  # 아이디
@@ -9,6 +10,12 @@ class UserProfile(models.Model):
     SerialNum = models.CharField(max_length=1)                  # 주민번호 뒷자리
     Phone = models.CharField(max_length=11)                     # 전화번호
     sex = models.CharField(max_length=1, blank=True)            # 성별 (M, F)
+
+    def save(self, *args, **kwargs):
+        # 비밀번호가 이미 해시되지 않은 경우에만 해시화
+        if not self.Pw.startswith('pbkdf2_'):
+            self.Pw = make_password(self.Pw)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.CustomerID
