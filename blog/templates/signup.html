@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>회원가입</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f5f5f5;
+            margin: 0;
+        }
+        .signup-form {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+        .signup-form h2 {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .form-group input,
+        .form-group select,
+        .form-group button {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        .form-group input {
+            width: 100%;
+        }
+        .form-group button {
+            background-color: #00b3ff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+        }
+        .form-group button:hover {
+            background-color: #00b3ff;
+        }
+        .gender-selection {
+            display: flex;
+            justify-content: space-between;
+        }
+        .gender-selection input {
+            width: auto;
+        }
+        .terms {
+            display: flex;
+            align-items: center;
+        }
+        .terms input {
+            margin-right: 5px;
+        }
+        .id-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .id-group input {
+            flex: 3;
+        }
+        .id-group button {
+            flex: 1;
+            padding: 8px;
+        }
+        .password-check-message {
+            margin-top: 5px;
+            font-size: 0.9em;
+        }
+        .ssn-group {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .ssn-group input
+        {
+          width: 14%;
+        }
+        .ssn-group input:first-child { width: 50%; flex: none; }
+        .ssn-group span {
+            font-size: 1.8em;
+        }
+        .masked-ssn {
+            display: inline-block;
+            width: 80%;
+            font-size: 1.1em;
+            letter-spacing: 0.2em;
+        }
+    </style>
+    <script>
+        function checkPasswords() {
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirm-password').value;
+            const message = document.getElementById('password-message');
+
+            if (password && confirmPassword) {
+                if (password === confirmPassword) {
+                    message.textContent = '서로 일치합니다.';
+                    message.style.color = 'green';
+                } else {
+                    message.textContent = '서로 일치하지 않습니다.';
+                    message.style.color = 'red';
+                }
+            } else {
+                message.textContent = '';
+            }
+        }
+
+        function autoMoveToNextField(current, next) {
+            if (current.value.length === current.maxLength) {
+                document.getElementById(next).focus();
+            }
+        }
+
+        function maskSSN() {
+            const serialField = document.getElementById('serial');
+            const maskedField = document.getElementById('masked-serial');
+
+            serialField.addEventListener('input', function() {
+                if (serialField.value.length > 1) {
+                    serialField.value = serialField.value.slice(0, 1);
+                }
+                maskedField.textContent = '●●●●●●';
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', maskSSN);
+    </script>
+</head>
+<body>
+    <form method="post" class="signup-form">
+        {% csrf_token %}
+        <h2>회원가입</h2>
+        <div class="form-group">
+            <label for="CustomerID">아이디</label>
+            {{ form.CustomerID }}
+            <button type="button">중복확인</button>
+        </div>
+        <div class="form-group">
+            <label for="Pw">비밀번호</label>
+            {{ form.Pw }}
+        </div>
+        <div class="form-group">
+            <label for="confirm-password">비밀번호 확인</label>
+            <input type="password" id="confirm-password" placeholder="비밀번호 확인" oninput="checkPasswords()">
+            <div id="password-message" class="password-check-message"></div>
+        </div>
+        <div class="form-group">
+            <label for="Email">이메일주소</label>
+            {{ form.Email }}
+        </div>
+        <div class="form-group">
+            <label for="username">이름</label>
+            {{ form.username }}
+        </div>
+        <div class="form-group">
+            <label>주민번호</label>
+            {{ form.Birth }} - <input type="text" id="serial" name="SerialNum" maxlength="1" placeholder="S" oninput="maskSSN()">
+            <span id="masked-serial" class="masked-ssn">●●●●●●</span>
+        </div>
+        <div class="form-group">
+            <label for="Phone">휴대전화번호</label>
+            {{ form.Phone }}
+        </div>
+        <div class="form-group">
+            <button type="submit">회원가입</button>
+        </div>
+    </form>    
+</body>
+</html>

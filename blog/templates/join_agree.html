@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>회원가입</title>
+    <style>
+
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #139aac; /* 원하는 색상으로 변경 */
+        }
+        .terms-container {
+            margin: 20px auto;
+            width: 50%;
+            text-align: left;
+        }
+        .terms-container input[type="checkbox"] {
+            margin-right: 10px;
+        }
+        .terms-details {
+            display: none;
+            margin-top: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            background-color: #f9f9f9;
+        }
+        .expand-btn {
+            display: block;
+            margin: 10px 0;
+            cursor: pointer;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .form-box {
+            border: 2px solid #ccc;
+            border-radius: 10px;
+            padding: 10px;
+            width: 50%;
+            margin: 0 auto;
+            background-color: #fdfdfd;
+        }
+    </style>
+</head>
+<body>
+    <div class="header" style="display: flex; align-items: center; justify-content: space-between; padding: 10px 20px; background-color: #f0f0f0;">
+        <div style="flex: 0 0 auto;">
+            <a href="./">
+                <img src="./static/img/fisa_logo_after.png" style="max-width: 150px; height: auto;" alt="우리 FISA 로고">
+            </a>
+        </div>
+        <div style="margin-left: auto; display: flex; align-items: center;">
+            <div class="nav-box" style="border: 1px solid #ccc; padding: 10px;">
+                <nav>
+                    <a href="./report.html">금융분석 리포트</a> |
+                    <a href="#">예/적금 추천</a> |
+                    <a href="#">소비MBTI</a>
+                </nav>
+            </div>
+        </div>
+    </div>
+    <div class="form-box">
+        <form id="signupForm" onsubmit="return validateForm()">
+            <h2 style="text-align: center;">회원가입 약관 동의</h2>
+            <div class="terms-container">
+                <label><input type="checkbox" id="selectAll" onclick="selectAllCheckboxes()"> 모든 약관에 동의</label>
+            </div>
+            <div class="terms-container">
+                <label><input type="checkbox" id="term1"> 금융분야 마이데이터 통합인증을 위한 인증서 본인확인서비스 이용약관 동의</label>
+                <button type="button" class="expand-btn" onclick="toggleDetails('details1')">자세히 보기</button>
+                <div class="terms-details" id="details1">이 약관은 금융분야의 마이데이터 통합인증 서비스를 위한 본인확인 서비스에 대한 내용입니다...</div>
+            </div>
+            <div class="terms-container">
+                <label><input type="checkbox" id="term2"> 금융분야 마이데이터 통합인증(인증서 본인확인)을 위한 개인정보 처리 동의</label>
+                <button type="button" class="expand-btn" onclick="toggleDetails('details2')">자세히 보기</button>
+                <div class="terms-details" id="details2">개인정보 처리 동의에 대한 상세한 내용입니다...</div>
+            </div>
+            <div class="terms-container">
+                <label><input type="checkbox" id="term3"> 금융분야 마이데이터 통합인증(인증서 본인확인)을 위한 고유 식별정보 수집·이용 및 위탁 동의</label>
+                <button type="button" class="expand-btn" onclick="toggleDetails('details3')">자세히 보기</button>
+                <div class="terms-details" id="details3">고유 식별정보 수집 및 이용에 대한 상세한 내용입니다...</div>
+            </div>
+            <div class="terms-container">
+                <label><input type="checkbox" id="term4"> 로그 동의</label>
+                <button type="button" class="expand-btn" onclick="toggleDetails('details4')">자세히 보기</button>
+                <div class="terms-details" id="details4">로그 동의에 대한 선택적 내용입니다...</div>
+            </div>
+            <div class="terms-container">
+                <label><input type="checkbox" id="term5"> 마케팅 동의</label>
+                <button type="button" class="expand-btn" onclick="toggleDetails('details5')">자세히 보기</button>
+                <div class="terms-details" id="details5">마케팅 동의에 대한 선택적 내용입니다...</div>
+            </div>
+            <div class="button-container">
+                <button type="button" onclick="window.location.href='login.html'">뒤로가기</button>
+                <button type="button" onclick="window.location.href='signup.html'">가입하기</button>
+            </div>
+        </form>
+    </div>
+    <script>
+        function validateForm() {
+            const term1 = document.getElementById('term1').checked;
+            const term2 = document.getElementById('term2').checked;
+            const term3 = document.getElementById('term3').checked;
+
+            const term4 = document.getElementById('term4').checked;
+            const term5 = document.getElementById('term5').checked;
+            if (!term1 || !term2 || !term3 || !term4 || !term5) {
+                alert('필수 약관에 모두 동의해주셔야 합니다.');
+                return false;
+            }
+            alert('회원가입이 완료되었습니다!');
+            return true;
+        }
+
+        function toggleDetails(id) {
+            const details = document.getElementById(id);
+            if (details.style.display === 'none' || details.style.display === '') {
+                details.style.display = 'block';
+            } else {
+                details.style.display = 'none';
+            }
+        }
+
+        function selectAllCheckboxes() {
+            const selectAll = document.getElementById('selectAll').checked;
+            const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+            checkboxes.forEach(checkbox => {
+                if (!checkbox.disabled) {
+                    checkbox.checked = selectAll;
+                }
+            });
+        }
+    </script>
+</body>
+</html>
