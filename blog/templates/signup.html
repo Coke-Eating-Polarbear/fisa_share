@@ -1,109 +1,11 @@
 <!DOCTYPE html>
 <html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>회원가입</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #f5f5f5;
-            margin: 0;
-        }
-        .signup-form {
-            background-color: #ffffff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 400px;
-        }
-        .signup-form h2 {
-            margin-bottom: 20px;
-            text-align: center;
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-        }
-        .form-group input,
-        .form-group select,
-        .form-group button {
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            box-sizing: border-box;
-        }
-        .form-group input {
-            width: 100%;
-        }
-        .form-group button {
-            background-color: #00b3ff;
-            color: white;
-            border: none;
-            cursor: pointer;
-            width: 100%;
-        }
-        .form-group button:hover {
-            background-color: #00b3ff;
-        }
-        .gender-selection {
-            display: flex;
-            justify-content: space-between;
-        }
-        .gender-selection input {
-            width: auto;
-        }
-        .terms {
-            display: flex;
-            align-items: center;
-        }
-        .terms input {
-            margin-right: 5px;
-        }
-        .id-group {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .id-group input {
-            flex: 3;
-        }
-        .id-group button {
-            flex: 1;
-            padding: 8px;
-        }
-        .password-check-message {
-            margin-top: 5px;
-            font-size: 0.9em;
-        }
-        .ssn-group {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        .ssn-group input
-        {
-          width: 14%;
-        }
-        .ssn-group input:first-child { width: 50%; flex: none; }
-        .ssn-group span {
-            font-size: 1.8em;
-        }
-        .masked-ssn {
-            display: inline-block;
-            width: 80%;
-            font-size: 1.1em;
-            letter-spacing: 0.2em;
-        }
-    </style>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>회원가입</title>
+        <link rel="stylesheet" href="./static/css/signup.css">
+    
     <script>
         function checkPasswords() {
             const password = document.getElementById('password').value;
@@ -145,48 +47,68 @@
     </script>
 </head>
 <body>
-    <form class="signup-form">
-        <h2>회원가입</h2>
-        <div class="form-group">
-            <label for="id">아이디</label>
-            <div class="id-group">
-                <input type="text" id="id" placeholder="아이디">
-                <button type="button">중복확인</button>
+    <div class="header">
+        <div style="flex: 0 0 auto;">
+            <a href="./">
+                <img src="./static/img/fisa_logo_after.png" style="max-width: 150px; height: auto;" alt="우리 FISA 로고">
+            </a>
+        </div>
+        <div style="margin-left: auto; display: flex; align-items: center;">
+            <div class="nav-box">
+                <nav>
+                    <a href="./report.html">금융분석 리포트</a> |
+                    <a href="#">예/적금 추천</a> |
+                    <a href="#">소비MBTI</a>
+                </nav>
             </div>
         </div>
+    </div>
+    
+
+    <div class="container">
+    <form method="post" class="signup-form">
+        {% csrf_token %}
+        <h2>회원가입</h2>
+        <div class="form-group CustomerID-group">
+            <label for="CustomerID">아이디</label>
+            {{ form.CustomerID }}
+            <button type="button" class="duplicate-check-button">중복확인</button>
+        </div>
         <div class="form-group">
-            <label for="password">비밀번호</label>
-            <input type="password" id="password" placeholder="비밀번호" oninput="checkPasswords()">
+            <label for="Pw">비밀번호</label>
+            {{ form.Pw }}
         </div>
         <div class="form-group">
             <label for="confirm-password">비밀번호 확인</label>
-            <input type="password" id="confirm-password" placeholder="비밀번호" oninput="checkPasswords()">
+            <input type="password" id="confirm-password" oninput="checkPasswords()">
             <div id="password-message" class="password-check-message"></div>
         </div>
         <div class="form-group">
-            <label for="email">이메일주소</label>
-            <input type="email" id="email" placeholder="이메일주소">
+            <label for="Email">이메일주소</label>
+            {{ form.Email }}
         </div>
         <div class="form-group">
-            <label for="name">이름</label>
-            <input type="text" id="name" placeholder="이름">
+            <label for="username">이름</label>
+            {{ form.username }}
         </div>
-        <div class="form-group">
+        <div class="form-group ssn-group">
             <label>주민번호</label>
-            <div class="ssn-group">
-                <input type="text" id="birthdate" placeholder="YYMMDD" maxlength="6" oninput="autoMoveToNextField(this, 'serial')">
-                <span>-</span>
-                <input type="text" id="serial" maxlength="1">
-                <span id="masked-serial" class="masked-ssn">●●●●●●</span>
-            </div>
+            {{ form.Birth }}
+            {% if form.Birth.errors %}
+            <div class="error">{{ form.Birth.errors.0 }}</div>
+            {% endif %}
+            <span class="hyphen"> &nbsp;-&nbsp; </span>
+            <input type="text" id="serial" name="SerialNum" maxlength="1" oninput="maskSSN()">
+            <span id="masked-serial" class="masked-ssn">●●●●●●</span>
         </div>
         <div class="form-group">
-            <label for="phone">휴대전화번호</label>
-            <input type="tel" id="phone" placeholder="01012345678">
+            <label for="Phone">휴대전화번호</label>
+            {{ form.Phone }}
         </div>
         <div class="form-group">
             <button type="submit">회원가입</button>
         </div>
     </form>
+    </div>
 </body>
 </html>
