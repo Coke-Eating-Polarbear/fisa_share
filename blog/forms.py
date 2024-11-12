@@ -1,5 +1,7 @@
 from django import forms
 from .models import UserProfile
+from datetime import datetime
+from django.core.exceptions import ValidationError
 
 class UserProfileForm(forms.ModelForm):
     class Meta:
@@ -19,6 +21,7 @@ class UserProfileForm(forms.ModelForm):
             self.add_error('SerialNum', '유효하지 않은 주민등록번호 뒷자리입니다.')
 
         return cleaned_data
+
 
 
 class SignupForm(forms.ModelForm):

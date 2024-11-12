@@ -94,6 +94,9 @@
         <div class="form-group ssn-group">
             <label>주민번호</label>
             {{ form.Birth }}
+            {% if form.Birth.errors %}
+            <div class="error">{{ form.Birth.errors.0 }}</div>
+            {% endif %}
             <span class="hyphen"> &nbsp;-&nbsp; </span>
             <input type="text" id="serial" name="SerialNum" maxlength="1" oninput="maskSSN()">
             <span id="masked-serial" class="masked-ssn">●●●●●●</span>

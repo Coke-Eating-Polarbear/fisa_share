@@ -182,3 +182,9 @@ ssn-group {
     font-size: 1.5em !important;/* 하이픈 크기 */
     display: inline-block;
 }
+
+.error {
+    color: red;
+    font-size: 0.9em;
+    margin-top: 5px;
+} 

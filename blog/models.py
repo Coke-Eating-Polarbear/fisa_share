@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.hashers import make_password
 
 class UserProfile(models.Model):
-    CustomerID = models.CharField(max_length=100, unique=True)  # 아이디
+    CustomerID = models.CharField(max_length=100, unique=True,primary_key=True)  # 아이디
     Pw = models.CharField(max_length=100)                       # 비밀번호
     Email = models.EmailField(unique=True)                      # 이메일
     username = models.CharField(max_length=100)                 # 이름
