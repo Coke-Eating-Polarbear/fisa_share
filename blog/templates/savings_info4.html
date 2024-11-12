@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>우대사항 선택</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body, html {
+            width: 100%;
+            height: 100%;
+            font-family: Arial, sans-serif;
+        }
+        .navbar {
+            width: 100%;
+            background-color: #f8f9fa;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            font-size: 1rem;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+        }
+        .navbar .logo-section {
+            display: flex;
+            align-items: center;
+        }
+        .navbar .logo {
+            width: 40px;
+            height: 40px;
+            margin-right: 10px;
+        }
+        .navbar .service-name {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #333;
+        }
+        .navbar .nav-links {
+            display: flex;
+            gap: 30px;
+        }
+        .navbar .nav-links a {
+            text-decoration: none;
+            color: #333;
+            font-weight: bold;
+        }
+        .navbar .mypage-button {
+            padding: 8px 15px;
+            background-color: #4caf50;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 80px; /* 네비게이션 바 높이 고려 */
+            width: 100%;
+        }
+        .content {
+            width: 80%;
+            max-width: 600px;
+            padding: 20px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            margin-top: 20px;
+            text-align: center;
+        }
+        .character-image {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 20px;
+            display: block;
+        }
+        .toggle-button {
+            margin: 10px 0;
+            padding: 8px 12px;
+            font-size: 0.9rem;
+            color: #fff;
+            background-color: #007bff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .toggle-content {
+            display: none;
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #f1f1f1;
+            border-radius: 5px;
+            text-align: left;
+            font-size: 0.9rem;
+            color: #555;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 12px;
+            background-color: #e0e0e0;
+            border-radius: 5px;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        .progress {
+            width: 60%;
+            height: 100%;
+            background-color: #4caf50;
+            border-radius: 5px;
+        }
+        .preference-box {
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        .preference-box h3 {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        .preference-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+        .preference-options label {
+            padding: 8px 15px;
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .next-button {
+            margin-top: 20px;
+            padding: 12px 30px;
+            font-size: 1rem;
+            background-color: #4caf50;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .footer {
+            width: 100%;
+            padding: 15px;
+            background-color: #f8f9fa;
+            text-align: center;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+        }
+        .footer p {
+            font-size: 0.8rem;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <div class="navbar">
+        <div class="logo-section">
+            <img src="logo.png" alt="로고" class="logo">
+            <div class="service-name">저축 목표 설정 서비스</div>
+        </div>
+        <div class="nav-links">
+            <a href="#">금융분석 리포트</a>
+            <a href="#">예/적금 비교</a>
+            <a href="#">소비 MBTI</a>
+        </div>
+        <button class="mypage-button">마이페이지</button>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div class="content">
+            <img src="character.png" alt="캐릭터" class="character-image">
+            
+            <!-- Toggle Button for 우대사항 설명 -->
+            <button class="toggle-button" onclick="toggleDescription()">우대사항 설명 보기</button>
+            
+            <!-- Hidden Description Content -->
+            <div class="toggle-content" id="description">
+                우대사항은 고객이 특정 조건을 만족할 때 추가 금리를 제공하거나 특별 혜택을 제공하는 제도입니다. 예를 들어 비대면 가입, 첫 거래, 자동이체 등의 조건이 해당됩니다.
+            </div>
+
+            <div class="progress-bar">
+                <div class="progress"></div>
+            </div>
+
+            <div class="preference-box">
+                <h3>적용 가능한 우대사항을 선택해주세요 (중복 가능)</h3>
+                <div class="preference-options">
+                    <label><input type="checkbox" name="preference" value="비대면가입"> 비대면가입</label>
+                    <label><input type="checkbox" name="preference" value="앱사용"> 앱사용</label>
+                    <label><input type="checkbox" name="preference" value="급여연동"> 급여연동</label>
+                    <label><input type="checkbox" name="preference" value="연금"> 연금</label>
+                    <label><input type="checkbox" name="preference" value="공과금출금"> 공과금출금</label>
+                    <label><input type="checkbox" name="preference" value="카드사용"> 카드사용</label>
+                    <label><input type="checkbox" name="preference" value="첫거래"> 첫거래</label>
+                    <label><input type="checkbox" name="preference" value="입출금통장"> 입출금통장</label>
+                    <label><input type="checkbox" name="preference" value="재예치"> 재예치</label>
+                    <label><input type="checkbox" name="preference" value="청약보유"> 청약보유</label>
+                    <label><input type="checkbox" name="preference" value="추천쿠폰"> 추천쿠폰</label>
+                    <label><input type="checkbox" name="preference" value="자동이체"> 자동이체</label>
+                </div>
+                <button class="next-button">다음</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <p>회사 정보 | 주소: 서울특별시 예시구 예시로 123 | 전화: 02-123-4567 | 이메일: info@company.com</p>
+    </div>
+
+    <script>
+        function toggleDescription() {
+            var description = document.getElementById("description");
+            if (description.style.display === "none" || description.style.display === "") {
+                description.style.display = "block";
+            } else {
+                description.style.display = "none";
+            }
+        }
+    </script>
+</body>
+</html>

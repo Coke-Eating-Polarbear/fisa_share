@@ -6,51 +6,118 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>메인 페이지</title>
     <link rel="stylesheet" href="./static/css/main.css">
+    <style>
+        /* 기본 스타일 */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 20px;
+            background-color: #f0f0f0;
+        }
+
+        .nav-box {
+            border: 1px solid #ccc;
+            padding: 10px;
+        }
+
+        /* 드롭다운 메뉴 스타일 */
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background-color: #fff;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            padding: 10px 0;
+            min-width: 150px;
+            z-index: 1;
+            border: 1px solid #ddd;
+        }
+
+        .dropdown-content a {
+            padding: 8px 20px;
+            display: block;
+            color: #333;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #f1f1f1;
+        }
+
+        /* 마우스를 올렸을 때 드롭다운 표시 */
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        /* 링크 스타일 */
+        .nav-box nav a {
+            color: #333;
+            margin: 0 10px;
+            text-decoration: none;
+        }
+
+        .nav-box nav a:hover {
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
-    <div class="header" style="display: flex; align-items: center; justify-content: space-between; padding: 10px 20px; background-color: #f0f0f0;">
-        <div style="flex: 0 0 auto;">
+    <div class="header">
+        <div>
             <a href="./">
                 <img src="./static/img/fisa_logo_after.png" style="max-width: 150px; height: auto;" alt="우리 FISA 로고">
             </a>
         </div>
         <div style="margin-left: auto; display: flex; align-items: center;">
-            <div class="nav-box" style="border: 1px solid #ccc; padding: 10px;">
+            <div class="nav-box">
                 <nav>
                     <a href="./report.html">금융분석 리포트</a> |
-                    <a href="#">예/적금 추천</a> |
+                    <div class="dropdown">
+                        <a href="#">예/적금 추천</a>
+                        <div class="dropdown-content">
+                            <a href="savings_info1.html">신규적금추천</a>
+                            <a href="compare_products.html">기존상품비교</a>
+                        </div>
+                    </div> |
                     <a href="#">소비MBTI</a>
                 </nav>
             </div>
         </div>
     </div>
 
-<div class="container">
-    <div class="image-container" style="position: relative;">
-        <img src="./static/img/images.jpeg" alt="메인 이미지" style="width: 100%; height: 500px;">
-        <div class="text-overlay" style="position: absolute; top: 35%; left: 15%; transform: translateX(-50%); color: #fff; font-size: 24px; font-weight: bold;">
-            여기에 글을 작성하는데 <br> 얼마나 길게 쓸수 있을까? <br> 실험중입니다.
-        </div>
-        <div class="button-container" style="position: absolute; bottom: 13%; left: 15%; transform: translateX(-50%); background-color: rgba(68, 207, 232, 0.8); padding: 10px 20px; border-radius: 10px;">
-            <a href="login.html#login" style="color: #fff;"> 사용하러가기</a>
-        </div>
-    </div>        
-</div>
+    <div class="container">
+        <div class="image-container" style="position: relative;">
+            <img src="./static/img/images.jpeg" alt="메인 이미지" style="width: 100%; height: 500px;">
+            <div class="text-overlay" style="position: absolute; top: 35%; left: 15%; transform: translateX(-50%); color: #fff; font-size: 24px; font-weight: bold;">
+                여기에 글을 작성하는데 <br> 얼마나 길게 쓸수 있을까? <br> 실험중입니다.
+            </div>
+            <div class="button-container" style="position: absolute; bottom: 13%; left: 15%; transform: translateX(-50%); background-color: rgba(68, 207, 232, 0.8); padding: 10px 20px; border-radius: 10px;">
+                <a href="login.html#login" style="color: #fff;"> 사용하러가기</a>
+            </div>
+        </div>        
+    </div>
 
-<div class="footer" style="display: flex; justify-content: space-between; padding: 20px; border-top: 1px solid #ccc; width: 100%; box-sizing: border-box;">
-    <div class="box" style="flex: 1; margin: 5px; min-width: 30%; height: 150px; box-sizing: border-box;">
-        뉴스 워드클라우드
+    <div class="footer" style="display: flex; justify-content: space-between; padding: 20px; border-top: 1px solid #ccc; width: 100%; box-sizing: border-box;">
+        <div class="box" style="flex: 1; margin: 5px; min-width: 30%; height: 150px; box-sizing: border-box;">
+            뉴스 워드클라우드
+        </div>
+        <div class="box" style="flex: 1; margin: 5px; min-width: 150px; height: 150px; box-sizing: border-box;">
+            top 1
+        </div>
+        <div class="box" style="flex: 1; margin: 5px; min-width: 150px; height: 150px; box-sizing: border-box;">
+            top 2
+        </div>
+        <div class="box" style="flex: 1; margin: 5px; min-width: 150px; height: 150px; box-sizing: border-box;">
+            top 3
+        </div>
     </div>
-    <div class="box" style="flex: 1; margin: 5px; min-width: 150px; height: 150px; box-sizing: border-box;">
-        top 1
-    </div>
-    <div class="box" style="flex: 1; margin: 5px; min-width: 150px; height: 150px; box-sizing: border-box;">
-        top 2
-    </div>
-    <div class="box" style="flex: 1; margin: 5px; min-width: 150px; height: 150px; box-sizing: border-box;">
-        top 3
-    </div>
-</div>
-
 </body>
 </html>

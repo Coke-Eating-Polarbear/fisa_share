@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>금융 리포트</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* 기본 스타일 */
+        body {
+            background-color: #f8f9fa;
+        }
+        .header {
+            background-color: #e9ecef;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .nav-box {
+            border: 1px solid #ccc;
+            padding: 10px;
+        }
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background-color: #fff;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            padding: 10px 0;
+            min-width: 150px;
+            z-index: 1;
+            border: 1px solid #ddd;
+        }
+        .dropdown-content a {
+            padding: 8px 20px;
+            display: block;
+            color: #333;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+        .nav-box nav a {
+            color: #333;
+            margin: 0 10px;
+            text-decoration: none;
+        }
+        .nav-box nav a:hover {
+            font-weight: bold;
+        }
+        .summary {
+            background-color: #ffffff;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 20px 0;
+            position: relative;
+        }
+        /* 요약 섹션 자세히 보기 버튼 */
+        .summary .details-button {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            padding: 5px 15px;
+            background-color: #44cfe8;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        .summary .details-button:hover {
+            background-color: #34a8c5;
+        }
+        /* 맞춤 상품 섹션 */
+        .product-section {
+            position: relative;
+            background-color: #67d1e5;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            color: white;
+            overflow: hidden;
+        }
+        .product-list {
+            display: flex;
+            justify-content: space-around;
+            gap: 10px;
+            padding-bottom: 80px;
+            position: relative;
+        }
+        .product {
+            width: 18%;
+            height: 120px; /* 이미지 상단 일부만 보여주기 위해 제한 */
+            background-image: url('https://via.placeholder.com/150');
+            background-size: cover;
+            border-radius: 5px 5px 0 0;
+        }
+        /* 그라데이션 블러 효과 */
+        .product-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 10%, rgba(103, 209, 229, 1) 40%);
+            z-index: 1;
+        }
+        /* 자세히 알아보기 버튼 */
+        .learn-more-button {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 10px 20px;
+            background-color: #44cfe8;
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            z-index: 2;
+        }
+        .learn-more-button:hover {
+            background-color: #34a8c5;
+        }
+        .footer {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px;
+            border-top: 1px solid #ccc;
+            box-sizing: border-box;
+            background-color: #f0f0f0;
+        }
+        .footer .box {
+            flex: 1;
+            margin: 5px;
+            min-width: 150px;
+            height: 150px;
+            box-sizing: border-box;
+            background-color: #e9ecef;
+            text-align: center;
+            line-height: 150px;
+            font-size: 18px;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 상단 헤더 -->
+    <div class="header">
+        <div>
+            <a href="./">
+                <img src="./static/img/fisa_logo_after.png" style="max-width: 150px; height: auto;" alt="우리 FISA 로고">
+            </a>
+        </div>
+        <div style="margin-left: auto; display: flex; align-items: center;">
+            <div class="nav-box">
+                <nav>
+                    <a href="./report.html">금융분석 리포트</a> |
+                    <div class="dropdown">
+                        <a href="#">예/적금 추천</a>
+                        <div class="dropdown-content">
+                            <a href="new_savings.html">신규적금추천</a>
+                            <a href="compare_products.html">기존상품비교</a>
+                        </div>
+                    </div> |
+                    <a href="#">소비MBTI</a>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <!-- 중앙 금융 리포트 내용 -->
+    <div class="container">
+        <div class="summary">
+            <h2>금융리포트 요약</h2>
+            <p>자세히 보기를 누르면 금융리포트 창으로 넘어갑니다.</p>
+            <a href="./report.html" class="details-button">자세히 보기</a>
+        </div>
+
+        <!-- 맞춤 예측 상품 TOP 5 섹션 -->
+        <div class="product-section">
+            <h2>내가 맞춤 예측한 상품 TOP 5!</h2>
+            <div class="product-list">
+                <div class="product"></div>
+                <div class="product"></div>
+                <div class="product"></div>
+                <div class="product"></div>
+                <div class="product"></div>
+            </div>
+            <div class="product-overlay"></div>
+            <a href="learn_more.html" class="learn-more-button">자세히 알아보기</a>
+        </div>
+    </div>
+
+    <!-- 하단 푸터 -->
+    <div class="footer">
+        <div class="box">뉴스 워드클라우드</div>
+        <div class="box">Top 1</div>
+        <div class="box">Top 2</div>
+        <div class="box">Top 3</div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
