@@ -11,6 +11,9 @@ from django.http import HttpResponse
 def main(request):
     return render(request, 'main.html')
 
+def maintwo(request):
+    return render(request, 'maintwo.html')
+
 def report(request):
     return render(request, 'report.html')
 
@@ -30,7 +33,7 @@ def login_view(request):  # 이름을 login_view로 변경
             if check_password(password, user.Pw):
                 # 세션에 사용자 정보 저장하기
                 request.session['user_id'] = user.CustomerID
-                return redirect('main')  # main.html로 리디렉션
+                return redirect('maintwo.html')  # main.html로 리디렉션
             else:
                 # 비밀번호가 틀린 경우
                 return render(request, 'login.html', {'error': 'Invalid ID or password.'})

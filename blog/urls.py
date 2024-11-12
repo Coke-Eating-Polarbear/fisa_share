@@ -7,4 +7,5 @@ urlpatterns = [
     path('report.html', views.report,name='report'),
     path('join_agree.html', views.agree,name='agree'),
     path('signup.html', views.signup,name='signup'),
+    path('maintwo.html', views.maintwo,name='signup'),
 ]
