@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>예/적금 추천 페이지</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        background-color: #f5f5f5;
+        min-height: 100vh;
+        position: relative;
+    }
+    header, footer {
+        background-color: #dde8f5;
+        padding: 10px;
+        text-align: center;
+        width: 100%;
+    }
+    header {
+        position: fixed; 
+        top: 0; 
+        z-index: 1; 
+    }
+    footer {
+        position: fixed; 
+        bottom: 0; 
+        left: 0; 
+        width: 100%;
+    }
+    .container {
+        padding-top: 120px;
+        padding-bottom: 150px;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+    .navbar {
+        display: flex;
+        justify-content: flex-end; /* 오른쪽 정렬 */
+        align-items: center;
+    }
+    .nav-links {
+        margin-right: 20px; /* 회원 정보와의 구분 */
+    }
+    .navbar a {
+        margin-left: 15px; /* 각 링크 사이의 간격 */
+        text-decoration: none;
+        color: #333;
+    }
+
+    /* 본문 스타일 */
+    .content {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    /* 상품 체크리스트 스타일 */
+    .checklist {
+        background-color: white;
+        border-radius: 10px;
+        border: 1px solid #ddd;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+
+    .checklist h2 {
+       font-size: 20px;
+       margin-bottom: 10px;
+       display:flex ;
+       align-items:center ;
+     }
+
+     .checklist h2 img{
+         width :24 px ;
+         height :24 px ;
+         margin-left :10 px ;
+     }
+
+     .checklist ul {
+         list-style-type :decimal ;
+         padding-left :20 px ;
+     }
+
+     .checklist ul li{
+         margin-bottom :10 px ;
+     }
+
+     /* 숨겨진 상품 정보 스타일 */
+     .details-content {
+         display:none; /* 기본적으로 숨김 */
+         background-color:#e9e9e9; 
+         padding :10px; 
+         border-radius :5px; 
+         margin-top :10px; 
+     }
+
+     /* 만덕이가 알기 쉽게 정리했덕-!!! 요약 설명 */
+     .summary-box{
+         background-color:white ;
+         border-radius :15 px ;
+         border :1 px solid #ddd ;
+         padding :15 px ;
+         width: 30 % ;
+         text-align:center ; 
+         margin-bottom: 20px;
+     }
+
+     .summary-box h3{
+          font-size :18 px ;
+          margin-bottom :10 px ;
+          padding :15 px ;
+          width: 30 % ;
+          display:flex ;
+          align-items:center ; 
+      }
+
+      /* 상품 리스트 스타일 */
+      .product-list{
+          display:flex ;
+          justify-content :space-between ;
+      }
+
+      .product-box{
+          background-color:#f5f5f5 ;
+          border-radius :10 px ; 
+          border :1 px solid #ddd ; 
+          padding :15 px ; 
+          width :30 % ; 
+          text-align:center ; 
+      }
+
+      .details-btn{
+          display:inline-block ; 
+          padding :8px ; 
+          background-color:#4CAF50 ; 
+          color:white ; 
+          text-decoration:none ; 
+          border-radius :5px ; 
+          text-align:center ; 
+          margin-top :10px ; 
+      }
+</style>
+<script>
+   // "자세히보기" 버튼 클릭 시 상세 설명 표시/숨기기
+   function toggleDetails(id) {
+       var content = document.getElementById(id);
+       if (content.style.display === "none" || content.style.display === "") {
+           content.style.display = "block";
+       } else {
+           content.style.display = "none";
+       }
+   }
+</script>
+</head>
+<body>
+
+<header>
+<div class="navbar">
+   <!-- 네비게이션 링크 -->
+   <div class="nav-links">
+       <a href="#report">금융분석 리포트</a>
+       <a href="#recommendation">예/적금 비교</a>
+       <a href="#spending">소비 MBTI</a>
+   </div>
+
+   <!-- 회원 정보 및 마이페이지 -->
+   <div class="user-info">
+       <span>회원이름님</span> | <a href="#mypage">마이페이지</a>
+   </div>
+</div>
+</header>
+
+<div class="container">
+
+<!-- 예적금 가입 전 체크리스트 -->
+<div class="checklist">
+   <h2>예적금 가입 전 체크했덕? 🦆</h2>
+   <ul>
+       <li>상품의 가입대상, 가입금액(최소금액 및 한도), 계약기간 등 주요 거래조건을 확인하세요.</li>
+       <li>비과세 상품 또는 세율 우대 가입가능한지 알아보세요.</li>
+       <!-- 자세히보기 버튼 -->
+        <button class="details-btn" onclick="toggleDetails('details-content')">자세히보기</button>
+                <!-- 숨겨진 세부 정보 -->
+                <div id="details-content" class="details-content">
+                <!-- 상품1 -->
+                <h4>상품명 : 상품1</h4>
+                <p>은행명 : OO은행</p>
+                </div>
+       <li>예금자보호 대상이 되는지 확인하세요.</li>
+   </ul>
+</div>
+   
+   <!-- 상품 세부 정보 -->
+   <div class="checklist">
+       <img src="https://via.placeholder.com/100" alt="은행 로고 이미지">
+       <h3>상품 이름 | 은행 이름</h3>
+       <p>[표 형식으로 금리 / 우대금리 간단 정리]</p>
+       <p>우대조건 간단하게 나열</p>
+   </div>
+
+<!-- 만덕이가 알기 쉽게 정리했덕-!!! 요약 설명 -->
+<div class="checklist">
+   <h3>만덕이가 알기 쉽게 정리했덕-!!!</h3>
+
+   ## 상품들은 기본적으로 3.0%의 금리를 제공해!<br><br>
+
+   추가로 **은행에서 한 번도 거래한 적 없는 사람이라면** 최대 **0.5%의 금리를 더 받을 수 있어~!**<br><br>
+
+   ## 상품은 예금자보호가 되는 상품이기 때문에 해당 상품에 가입할 때 마음 놓고 예치할 수 있어!<br><br>
+
+   ## 만기가 긴 적금을 선택할 때는 이자가 더 높아질 수 있으니 장기적으로 돈을 묶어두는 것도 좋은 방법이야!<br><br>
+</div>
+
+
+
+</div><!-- product-list 끝 -->
+
+</div><!-- container 끝 -->
+
+<footer>
+<p>고객지원 :1234-5678 | 이메일:support@finance.com </p >
+<p >©2024 YourCompany.All rights reserved.</p >
+</footer >
+
+</body >
+</html >
