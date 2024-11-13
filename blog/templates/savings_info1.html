@@ -121,20 +121,31 @@
         }
     </style>
     <script>
-        function activateButton(groupSelector, clickedButton) {
-            const buttons = document.querySelectorAll(groupSelector + ' button');
-            buttons.forEach(button => button.classList.remove('active'));
-            clickedButton.classList.add('active');
+        let selectedGoal = '';
+
+        function selectGoal(button, goal) {
+            document.querySelectorAll('.goal-options button').forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+            selectedGoal = goal;
+
+            if (goal === '직접입력') {
+                document.getElementById('customInput').style.display = 'block';
+            } else {
+                document.getElementById('customInput').style.display = 'none';
+                document.getElementById('goalInput').value = goal;
+            }
         }
 
-        function toggleCustomInput(button, isDirectInput) {
-            const customInput = document.getElementById("customInput");
-            activateButton('.goal-options', button);
+        function selectSavingMethod(button, savingMethod) {
+            document.querySelectorAll('.saving-method-options button').forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+            document.getElementById('savingMethodInput').value = savingMethod;
+        }
 
-            if (isDirectInput) {
-                customInput.style.display = "block";
-            } else {
-                customInput.style.display = "none";
+        function submitForm() {
+            if (selectedGoal === '직접입력') {
+                const customGoal = document.getElementById('customGoalInput').value;
+                document.getElementById('goalInput').value = customGoal;
             }
         }
     </script>
@@ -144,12 +155,11 @@
     <!-- 상단 네비게이션 -->
     <div class="header">
         <nav>
-            <a href="#">로그인</a>
             <a href="#">금융분석 리포트</a>
             <a href="#">예/적금 비교</a>
             <a href="#">소비MBTI</a>
         </nav>
-        <div>OOO님 | 마이페이지</div>
+        <div>{{ user_name }}님 | 마이페이지</div> <!-- 여기에서 user_name 사용 -->
     </div>
 
     <!-- 메인 콘텐츠 -->
@@ -157,56 +167,62 @@
         <!-- 제목과 이미지 -->
         <div class="title-container">
             <img src="https://via.placeholder.com/50" class="cat-image" alt="천냥이 이미지">
-            <div class="title">천냥이와 함께 @@ 님의 맞춤 저축 방법을 찾으러 떠나볼까요?</div>
+            <div class="title">천냥이와 함께 {{ user_name }}님의 맞춤 저축 방법을 찾으러 떠나볼까요?</div>
         </div>
 
         <!-- 이미지 및 진행바 -->
         <div class="progress-bar-container">
             <div class="progress">
-                <div class="progress-bar" role="progressbar" style="width: 50%;" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
+                <div class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
             </div>
         </div>
 
         <!-- 목적 입력 안내 텍스트 -->
         <div class="goal-prompt">어떤 목적으로 저축을 하실건가요?</div>
 
-        <!-- 목적 옵션 버튼 -->
-        <div class="goal-options">
-            <button onclick="toggleCustomInput(this, false)">내집 마련</button>
-            <button onclick="toggleCustomInput(this, false)">비상금</button>
-            <button onclick="toggleCustomInput(this, false)">노후대비</button>
-            <button onclick="toggleCustomInput(this, true)">직접입력</button>
-        </div>
+        <form id="infoForm" action="{% url 'info1' %}" method="POST" onsubmit="submitForm()">
+            {% csrf_token %}
+            <input type="hidden" name="goal" id="goalInput">
+            <input type="hidden" name="saving_method" id="savingMethodInput">
 
-        <!-- 사용자 정의 입력 필드 -->
-        <div id="customInput" class="custom-input">
-            <input type="text" class="form-control" placeholder="어떤 목적으로 저축을 하실건가요?">
-        </div>
-
-        <!-- 저축 방식 선택 섹션 -->
-        <div class="saving-method-container">
-            <div class="saving-method">원하시는 저축방식을 선택해주세요</div>
+            <!-- 목적 옵션 버튼 -->
+            <div class="goal-options">
+                <button type="button" onclick="selectGoal(this, '내집 마련')">내집 마련</button>
+                <button type="button" onclick="selectGoal(this, '비상금')">비상금</button>
+                <button type="button" onclick="selectGoal(this, '노후대비')">노후대비</button>
+                <button type="button" onclick="selectGoal(this, '직접입력')">직접입력</button>
+            </div>
             
-            <div class="saving-method-options">
-                <div>
-                    <div class="text-container">시작이 반이다!<br>지금부터 꾸준히<br>목돈을 모아봐요-!</div>
-                    <button onclick="activateButton('.saving-method-options', this)">목돈 모으기</button>
-                </div>
-                <div>
-                    <div class="text-container">깨진 독에 물 붓기!<br>이미 가지고 있는 현금은<br>현명하게 활용해봐요.</div>
-                    <button onclick="activateButton('.saving-method-options', this)">목돈 굴리기</button>
-                </div>
-                <div>
-                    <div class="text-container">더 큰 목표를 향해!<br>보유 현금을 굴리면서 새로운<br>목돈 마련을 시작해요-!</div>
-                    <button onclick="activateButton('.saving-method-options', this)">목돈 모으기 + 목돈 굴리기</button>
+            <!-- 사용자 정의 입력 필드 -->
+            <div id="customInput" class="custom-input">
+                <input type="text" id="customGoalInput" class="form-control" placeholder="어떤 목적으로 저축을 하실건가요?">
+            </div>
+            
+            <!-- 저축 방식 선택 섹션 -->
+            <div class="saving-method-container">
+                <div class="saving-method">원하시는 저축방식을 선택해주세요</div>
+                
+                <div class="saving-method-options">
+                    <div>
+                        <div class="text-container">시작이 반이다!<br>지금부터 꾸준히<br>목돈을 모아봐요-!</div>
+                        <button type="button" onclick="selectSavingMethod(this, '목돈 모으기')">목돈 모으기</button>
+                    </div>
+                    <div>
+                        <div class="text-container">깨진 독에 물 붓기!<br>이미 가지고 있는 현금은<br>현명하게 활용해봐요.</div>
+                        <button type="button" onclick="selectSavingMethod(this, '목돈 굴리기')">목돈 굴리기</button>
+                    </div>
+                    <div>
+                        <div class="text-container">더 큰 목표를 향해!<br>보유 현금을 굴리면서 새로운<br>목돈 마련을 시작해요-!</div>
+                        <button type="button" onclick="selectSavingMethod(this, '목돈 모으기 + 목돈 굴리기')">목돈 모으기 + 목돈 굴리기</button>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- 다음 버튼 -->
-        <div class="next-button-container">
-            <button class="next-button">다음</button>
-        </div>
+            <!-- 다음 버튼 -->
+            <div class="next-button-container">
+                <button type="submit" class="next-button">다음</button>
+            </div>
+        </form>
     </div>
 
 </body>

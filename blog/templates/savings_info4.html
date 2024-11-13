@@ -112,7 +112,7 @@
             position: relative;
         }
         .progress {
-            width: 60%;
+            width: 75%;
             height: 100%;
             background-color: #4caf50;
             border-radius: 5px;
@@ -172,16 +172,13 @@
 <body>
     <!-- Navigation Bar -->
     <div class="navbar">
-        <div class="logo-section">
-            <img src="logo.png" alt="로고" class="logo">
-            <div class="service-name">저축 목표 설정 서비스</div>
-        </div>
-        <div class="nav-links">
+        <nav>
+            <a href="#">로그인</a>
             <a href="#">금융분석 리포트</a>
             <a href="#">예/적금 비교</a>
-            <a href="#">소비 MBTI</a>
-        </div>
-        <button class="mypage-button">마이페이지</button>
+            <a href="#">소비MBTI</a>
+        </nav>
+        <div>{{ user_name }}님 | 마이페이지</div>
     </div>
 
     <!-- Main Content -->
@@ -201,24 +198,27 @@
                 <div class="progress"></div>
             </div>
 
-            <div class="preference-box">
-                <h3>적용 가능한 우대사항을 선택해주세요 (중복 가능)</h3>
-                <div class="preference-options">
-                    <label><input type="checkbox" name="preference" value="비대면가입"> 비대면가입</label>
-                    <label><input type="checkbox" name="preference" value="앱사용"> 앱사용</label>
-                    <label><input type="checkbox" name="preference" value="급여연동"> 급여연동</label>
-                    <label><input type="checkbox" name="preference" value="연금"> 연금</label>
-                    <label><input type="checkbox" name="preference" value="공과금출금"> 공과금출금</label>
-                    <label><input type="checkbox" name="preference" value="카드사용"> 카드사용</label>
-                    <label><input type="checkbox" name="preference" value="첫거래"> 첫거래</label>
-                    <label><input type="checkbox" name="preference" value="입출금통장"> 입출금통장</label>
-                    <label><input type="checkbox" name="preference" value="재예치"> 재예치</label>
-                    <label><input type="checkbox" name="preference" value="청약보유"> 청약보유</label>
-                    <label><input type="checkbox" name="preference" value="추천쿠폰"> 추천쿠폰</label>
-                    <label><input type="checkbox" name="preference" value="자동이체"> 자동이체</label>
+            <form action="{% url 'info4' %}" method="POST">
+                {% csrf_token %}
+                <div class="preference-box">
+                    <h3>적용 가능한 우대사항을 선택해주세요 (중복 가능)</h3>
+                    <div class="preference-options">
+                        <label><input type="checkbox" name="preferences" value="비대면가입"> 비대면가입</label>
+                        <label><input type="checkbox" name="preferences" value="앱사용"> 앱사용</label>
+                        <label><input type="checkbox" name="preferences" value="급여연동"> 급여연동</label>
+                        <label><input type="checkbox" name="preferences" value="연금"> 연금</label>
+                        <label><input type="checkbox" name="preferences" value="공과금출금"> 공과금출금</label>
+                        <label><input type="checkbox" name="preferences" value="카드사용"> 카드사용</label>
+                        <label><input type="checkbox" name="preferences" value="첫거래"> 첫거래</label>
+                        <label><input type="checkbox" name="preferences" value="입출금통장"> 입출금통장</label>
+                        <label><input type="checkbox" name="preferences" value="재예치"> 재예치</label>
+                        <label><input type="checkbox" name="preferences" value="청약보유"> 청약보유</label>
+                        <label><input type="checkbox" name="preferences" value="추천쿠폰"> 추천쿠폰</label>
+                        <label><input type="checkbox" name="preferences" value="자동이체"> 자동이체</label>
+                    </div>
+                    <button type="submit" class="next-button">다음</button>
                 </div>
-                <button class="next-button">다음</button>
-            </div>
+            </form>
         </div>
     </div>
 

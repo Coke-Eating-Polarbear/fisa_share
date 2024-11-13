@@ -4,6 +4,7 @@ from django.contrib import messages
 from .forms import UserProfileForm  # UserProfileForm을 가져옵니다
 from .models import UserProfile  # UserProfile 모델도 가져옵니다
 from django.contrib.auth.hashers import check_password
+from django.views.decorators.http import require_POST
 from django.http import HttpResponse
 from .models import Recommend, DsProduct
 from django.db.models import F
@@ -104,3 +105,127 @@ def summary_view(request):
     }
     
     return render(request, 'maintwo.html', context)
+
+def info1(request):
+    # 세션에서 CustomerID 가져오기
+    customer_id = request.session.get('user_id')  
+    user_name = "사용자"  # 기본값 설정
+
+    if customer_id:
+        try:
+            # CustomerID로 UserProfile 조회
+            user = UserProfile.objects.get(CustomerID=customer_id)
+            user_name = user.username  # 사용자 이름 설정
+        except UserProfile.DoesNotExist:
+            pass  # 사용자가 없을 경우 기본값 유지
+
+    context = {
+        'user_name': user_name,
+    }
+    
+    # POST 요청일 경우 info1의 goal과 saving_method를 세션에 저장 후 리디렉션
+    if request.method == 'POST':
+        goal = request.POST.get('goal')
+        saving_method = request.POST.get('saving_method')
+        
+        # 세션에 선택한 데이터 저장
+        request.session['info1_goal'] = goal
+        request.session['info1_saving_method'] = saving_method
+
+        # 'savings_info2' 페이지로 리디렉션
+        return redirect('savings_info2')
+    
+    # GET 요청일 경우 템플릿 렌더링
+    return render(request, 'savings_info1.html', context)
+
+
+def info2(request):
+    customer_id = request.session.get('user_id')  
+    user_name = "사용자"  # 기본값 설정
+
+    if customer_id:
+        try:
+            # CustomerID로 UserProfile 조회
+            user = UserProfile.objects.get(CustomerID=customer_id)
+            user_name = user.username  # 사용자 이름 설정
+        except UserProfile.DoesNotExist:
+            pass  # 사용자가 없을 경우 기본값 유지
+
+    if request.method == 'POST':
+        # POST 요청에서 info2의 폼 데이터 가져오기
+        goal = request.POST.get('goal')
+        period = request.POST.get('period')
+        amount = request.POST.get('amount')
+
+        # 세션에 데이터 저장
+        request.session['info2_goal'] = goal
+        request.session['info2_period'] = period
+        request.session['info2_amount'] = amount
+
+        # 다음 페이지로 리디렉션
+        return redirect('savings_info3')  # 다음 페이지 URL 이름에 맞게 수정
+
+    context = {
+        'user_name': user_name,
+    }
+    return render(request, 'savings_info2.html', context)
+
+
+def info3(request):
+    customer_id = request.session.get('user_id')
+    user_name = "사용자"  # 기본값 설정
+
+    if customer_id:
+        try:
+            # CustomerID로 UserProfile 조회
+            user = UserProfile.objects.get(CustomerID=customer_id)
+            user_name = user.username  # 사용자 이름 설정
+        except UserProfile.DoesNotExist:
+            pass  # 사용자가 없을 경우 기본값 유지
+
+    if request.method == 'POST':
+        # POST 요청에서 금융권 옵션 가져오기
+        bank_option = request.POST.get('bank_option')
+        
+        # 세션에 금융권 옵션 저장 (겹치지 않도록 명확한 키 이름 사용)
+        request.session['info3_bank_option'] = bank_option
+
+        # 다음 페이지로 리디렉션
+        return redirect('savings_info4.html')  # 다음 페이지 URL 이름에 맞게 수정
+
+    context = {
+        'user_name': user_name,
+    }
+    return render(request, 'savings_info3.html', context)
+
+def info4(request):
+    customer_id = request.session.get('user_id')
+    user_name = "사용자"  # 기본값 설정
+
+    if customer_id:
+        try:
+            # CustomerID로 UserProfile 조회
+            user = UserProfile.objects.get(CustomerID=customer_id)
+            user_name = user.username  # 사용자 이름 설정
+        except UserProfile.DoesNotExist:
+            pass  # 사용자가 없을 경우 기본값 유지
+
+    if request.method == 'POST':
+        # POST 요청에서 선택한 우대사항을 리스트로 가져옵니다.
+        selected_preferences = request.POST.getlist('preferences')
+        
+        # 세션에 우대사항을 저장합니다.
+        request.session['selected_preferences'] = selected_preferences
+
+        # 다음 페이지로 리디렉션합니다.
+        return redirect('recommend_savings_top5.html')
+
+    context = {
+        'user_name': user_name,
+    }
+    # GET 요청 시 페이지 렌더링
+    return render(request, 'savings_info4.html', context)
+
+
+def top5(request):
+    return render(request, 'recommend_savings_top5.html')

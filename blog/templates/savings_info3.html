@@ -6,6 +6,7 @@
     <title>맞춤 저축 방법 찾기</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
+        /* 스타일 설정 부분은 기존 코드와 동일합니다 */
         body {
             background-color: #f8f9fa;
             font-family: Arial, sans-serif;
@@ -45,12 +46,6 @@
             font-weight: bold;
             text-align: center;
             margin: 0;
-        }
-        .subtitle {
-            font-size: 14px;
-            color: #666;
-            text-align: center;
-            margin-bottom: 20px;
         }
         .progress-bar-container {
             display: flex;
@@ -133,15 +128,9 @@
             align-items: center;
             gap: 5px;
         }
-        .buttons button::before {
-            content: "○";
-            font-size: 12px;
-            color: #007bff;
-            transition: color 0.3s, content 0.3s;
-        }
-        .buttons button.selected::before {
-            content: "●";
-            color: #007bff;
+        .buttons button.selected {
+            background-color: #007bff;
+            color: #fff;
         }
         .next-button-container {
             display: flex;
@@ -158,9 +147,15 @@
         }
     </style>
     <script>
-        function selectOption(button) {
+        function selectOption(optionValue, button) {
+            // 모든 버튼에서 'selected' 클래스를 제거하여 비활성화 스타일을 제거합니다
             document.querySelectorAll('.buttons button').forEach(btn => btn.classList.remove('selected'));
+            
+            // 클릭한 버튼에 'selected' 클래스를 추가하여 활성화 스타일을 적용합니다
             button.classList.add('selected');
+
+            // 선택된 옵션을 hidden input에 저장하여 폼과 함께 전송할 수 있도록 합니다
+            document.getElementById("bankOptionInput").value = optionValue;
         }
     </script>
 </head>
@@ -174,7 +169,7 @@
             <a href="#">예/적금 비교</a>
             <a href="#">소비MBTI</a>
         </nav>
-        <div>OOO님 | 마이페이지</div>
+        <div>{{ user_name }}님 | 마이페이지</div>
     </div>
 
     <!-- 메인 콘텐츠 -->
@@ -182,7 +177,7 @@
         <!-- 제목과 이미지 -->
         <div class="title-container">
             <img src="https://via.placeholder.com/50" class="cat-image" alt="천냥이 이미지">
-            <div class="title">천냥이와 함께 @@ 님의 맞춤 저축 방법을 찾으러 떠나볼까요?</div>
+            <div class="title">천냥이와 함께 {{ user_name }}님의 맞춤 저축 방법을 찾으러 떠나볼까요?</div>
         </div>
 
         <!-- 이미지 및 진행바 -->
@@ -206,17 +201,22 @@
                 <p class="note">금융회사별 SOLAR의 인증으로 안정성이<br>우수한 저축은행을 선택해 보세요!</p>
             </div>
         </div>
-        
-        <!-- 옵션 선택 버튼 -->
-        <div class="buttons">
-            <button onclick="selectOption(this)">일반은행</button>
-            <button onclick="selectOption(this)">일반은행 + 저축은행</button>
-        </div>
 
-        <!-- 다음 버튼 -->
-        <div class="next-button-container">
-            <button class="next-button">다음</button>
-        </div>
+        <!-- 옵션 선택 버튼 -->
+        <form id="infoForm" action="{% url 'info3' %}" method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="bank_option" id="bankOptionInput"> <!-- 선택된 금융권 옵션 저장 -->
+            
+            <div class="buttons">
+                <button type="button" onclick="selectOption('일반은행', this)">일반은행</button>
+                <button type="button" onclick="selectOption('일반은행 + 저축은행', this)">일반은행 + 저축은행</button>
+            </div>
+
+            <!-- 다음 버튼 -->
+            <div class="next-button-container">
+                <button type="submit" class="next-button">다음</button>
+            </div>
+        </form>
     </div>
 
 </body>
