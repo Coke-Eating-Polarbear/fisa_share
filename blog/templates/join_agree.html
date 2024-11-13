@@ -80,27 +80,27 @@
             </div>
             <div class="terms-container">
                 <label><input type="checkbox" id="term1"> 금융분야 마이데이터 통합인증을 위한 인증서 본인확인서비스 이용약관 동의</label>
-                <button type="button" class="expand-btn" onclick="toggleDetails('details1')">자세히 보기</button>
+                <button type="button" class="expand-btn"onclick="openPdfPopup()" data-static-url="{./static/pdf/mydata_form1.pdf}">자세히 보기</button>
                 <div class="terms-details" id="details1">이 약관은 금융분야의 마이데이터 통합인증 서비스를 위한 본인확인 서비스에 대한 내용입니다...</div>
             </div>
             <div class="terms-container">
                 <label><input type="checkbox" id="term2"> 금융분야 마이데이터 통합인증(인증서 본인확인)을 위한 개인정보 처리 동의</label>
-                <button type="button" class="expand-btn" onclick="toggleDetails('details2')">자세히 보기</button>
+                <button type="button" class="expand-btn" onclick="openPopup('terms2')">자세히 보기</button>
                 <div class="terms-details" id="details2">개인정보 처리 동의에 대한 상세한 내용입니다...</div>
             </div>
             <div class="terms-container">
                 <label><input type="checkbox" id="term3"> 금융분야 마이데이터 통합인증(인증서 본인확인)을 위한 고유 식별정보 수집·이용 및 위탁 동의</label>
-                <button type="button" class="expand-btn" onclick="toggleDetails('details3')">자세히 보기</button>
-                <div class="terms-details" id="details3">고유 식별정보 수집 및 이용에 대한 상세한 내용입니다...</div>
+                <button type="button" class="expand-btn" onclick="openPopup('terms3')">자세히 보기</button>
+                <div class="terms-details" id="details3" style="display: none;"></div>
             </div>
             <div class="terms-container">
                 <label><input type="checkbox" id="term4"> 로그 동의</label>
-                <button type="button" class="expand-btn" onclick="toggleDetails('details4')">자세히 보기</button>
+                <button type="button" class="expand-btn" onclick="openPopup('details4')">자세히 보기</button>
                 <div class="terms-details" id="details4">로그 동의에 대한 선택적 내용입니다...</div>
             </div>
             <div class="terms-container">
                 <label><input type="checkbox" id="term5"> 마케팅 동의</label>
-                <button type="button" class="expand-btn" onclick="toggleDetails('details5')">자세히 보기</button>
+                <button type="button" class="expand-btn" onclick="openPopup('details5')">자세히 보기</button>
                 <div class="terms-details" id="details5">마케팅 동의에 대한 선택적 내용입니다...</div>
             </div>
             <div class="button-container">
@@ -121,18 +121,20 @@
                 alert('필수 약관에 모두 동의해주셔야 합니다.');
                 return false;
             }
-            alert('회원가입이 완료되었습니다!');
-            return true;
         }
 
-        function toggleDetails(id) {
-            const details = document.getElementById(id);
-            if (details.style.display === 'none' || details.style.display === '') {
-                details.style.display = 'block';
-            } else {
-                details.style.display = 'none';
-            }
-        }
+        function openPopup(url) {
+    // 팝업 창 크기 지정
+    const width = 500;
+    const height = 600;
+    
+    // 화면 가운데에 창이 뜨도록 위치 계산
+    const left = (window.screen.width / 2) - (width / 2);
+    const top = (window.screen.height / 2) - (height / 2);
+
+    // 팝업 창 열기
+    window.open(url, 'termsPopup', `width=${width},height=${height},top=${top},left=${left},resizable=yes,scrollbars=yes`);
+    }
 
         function selectAllCheckboxes() {
             const selectAll = document.getElementById('selectAll').checked;
@@ -142,6 +144,11 @@
                     checkbox.checked = selectAll;
                 }
             });
+        }
+
+        function openPdfPopup() {
+        // 팝업 창을 열고 PDF 파일을 iframe으로 표시
+        window.open('https://www.signgate.com/doc/mydata/%EB%B3%B8%EC%9D%B8%ED%99%95%EC%9D%B8%EC%84%9C%EB%B9%84%EC%8A%A4_%EC%9D%B4%EC%9A%A9%EC%95%BD%EA%B4%80.pdf', '_blank', 'width=800,height=600');
         }
     </script>
 </body>

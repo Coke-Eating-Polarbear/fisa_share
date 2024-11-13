@@ -13,6 +13,12 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+def terms_content3(request):
+    return render(request, 'mydata_form3.html')
+
+def terms_content2(request):
+    return render(request, 'mydata_form2.html')
+
 def main(request):
     return render(request, 'main.html')
 
@@ -20,7 +26,21 @@ def maintwo(request):
     return render(request, 'maintwo.html')
 
 def report(request):
-    return render(request, 'report.html')
+    customer_id = request.session.get('user_id')  
+    user_name = "사용자"  # 기본값 설정
+
+    if customer_id:
+        try:
+            # CustomerID로 UserProfile 조회
+            user = UserProfile.objects.get(CustomerID=customer_id)
+            user_name = user.username  # 사용자 이름 설정
+        except UserProfile.DoesNotExist:
+            pass  # 사용자가 없을 경우 기본값 유지
+
+    context = {
+        'user_name': user_name,
+    }
+    return render(request, 'report.html', context)
 
 def agree(request):
     return render(request, 'join_agree.html')
@@ -133,7 +153,7 @@ def info1(request):
         request.session['info1_saving_method'] = saving_method
 
         # 'savings_info2' 페이지로 리디렉션
-        return redirect('savings_info2')
+        return redirect('savings_info2.html')
     
     # GET 요청일 경우 템플릿 렌더링
     return render(request, 'savings_info1.html', context)
@@ -163,7 +183,7 @@ def info2(request):
         request.session['info2_amount'] = amount
 
         # 다음 페이지로 리디렉션
-        return redirect('savings_info3')  # 다음 페이지 URL 이름에 맞게 수정
+        return redirect('savings_info3.html')  # 다음 페이지 URL 이름에 맞게 수정
 
     context = {
         'user_name': user_name,
@@ -228,4 +248,19 @@ def info4(request):
 
 
 def top5(request):
-    return render(request, 'recommend_savings_top5.html')
+    customer_id = request.session.get('user_id')  
+    user_name = "사용자"  # 기본값 설정
+
+    if customer_id:
+        try:
+            # CustomerID로 UserProfile 조회
+            user = UserProfile.objects.get(CustomerID=customer_id)
+            user_name = user.username  # 사용자 이름 설정
+        except UserProfile.DoesNotExist:
+            pass  # 사용자가 없을 경우 기본값 유지
+
+    context = {
+        'user_name': user_name,
+    }
+
+    return render(request, 'recommend_savings_top5.html', context)
