@@ -5,8 +5,12 @@ from .forms import UserProfileForm  # UserProfileForm을 가져옵니다
 from .models import UserProfile  # UserProfile 모델도 가져옵니다
 from django.contrib.auth.hashers import check_password
 from django.http import HttpResponse
+from .models import Recommend, DsProduct
+from django.db.models import F
+import random
+import logging
 
-
+logger = logging.getLogger(__name__)
 
 def main(request):
     return render(request, 'main.html')
@@ -59,3 +63,44 @@ def signup(request):
     else:
         form = UserProfileForm()
     return render(request, 'signup.html', {'form': form})
+
+def summary_view(request):
+    customer_id = request.session.get('user_id')  # 세션에서 CustomerID 가져오기
+
+    # CustomerID가 세션에 없으면 로그인 페이지로 리디렉션
+    if not customer_id:
+        return redirect('login')  # 로그인 페이지 URL로 수정 필요
+
+    # 추천 테이블에서 CustomerID에 해당하는 추천 상품 가져오기
+    recommended_products = Recommend.objects.filter(customerid=customer_id).values('dsid')
+    recommended_count = recommended_products.count()
+    recommended_dsid_list = []
+
+    # 추천된 상품이 있을 경우 해당 dsid로 ds_product에서 정보 가져오기
+    recommended_product_details = []
+    if recommended_count > 0:
+        recommended_dsid_list = [rec['dsid'] for rec in recommended_products]
+        recommended_product_details = list(
+            DsProduct.objects.filter(dsid__in=recommended_dsid_list)
+            .values('dsname', 'bank', 'baser', 'maxir')
+        )
+
+    # 추천 상품이 5개 미만인 경우, 부족한 개수만큼 중복되지 않게 ds_product에서 랜덤한 상품 가져오기
+    if recommended_count < 5:
+        remaining_count = 5 - recommended_count
+        random_products = DsProduct.objects.exclude(dsid__in=recommended_dsid_list).order_by('?')[:remaining_count]
+        random_product_details = random_products.values('dsname', 'bank', 'baser', 'maxir')
+
+        # 추천 상품 + 랜덤 상품을 결합하여 총 5개의 상품을 보여줍니다.
+        product_details = recommended_product_details + list(random_product_details)
+    else:
+        product_details = recommended_product_details
+
+    # 로그에 product_details 출력
+    logger.info("Product details: %s", product_details)
+
+    context = {
+        'product_details': product_details,
+    }
+    
+    return render(request, 'maintwo.html', context)

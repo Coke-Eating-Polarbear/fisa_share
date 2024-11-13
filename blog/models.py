@@ -22,3 +22,22 @@ class UserProfile(models.Model):
 
     class Meta:
         db_table = 'usertable'
+
+
+class Recommend(models.Model):
+    customerid = models.CharField(max_length=256, primary_key=True)
+    dsid = models.CharField(max_length=256)
+
+    class Meta:
+        db_table = 'recommend'
+
+class DsProduct(models.Model):
+    dsid = models.CharField(max_length=256, primary_key=True)
+    bank = models.CharField(max_length=256)
+    baser = models.TextField()
+    maxir = models.TextField()
+    dstype = models.CharField(max_length=256)
+    dsname = models.CharField(max_length=256)
+
+    class Meta:
+        db_table = 'ds_product'
