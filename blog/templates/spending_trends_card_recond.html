@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>소비 성향 및 소비 예측</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            padding: 20px;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 20px;
+            background-color: #e9ecef;
+            border-bottom: 1px solid #dee2e6;
+            margin-bottom: 20px;
+        }
+        .header a {
+            margin: 0 10px;
+            color: #333;
+            text-decoration: none;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+        }
+        .title {
+            font-size: 24px;
+            font-weight: bold;
+            text-align: left;
+            margin-bottom: 20px;
+        }
+        .content-row {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+        }
+        .chart-container {
+            width: 40%;
+            text-align: center;
+        }
+        .chart {
+            width: 100%;
+            max-width: 300px;
+            height: auto;
+            margin-bottom: 10px;
+        }
+        .description {
+            width: 60%;
+            font-size: 16px;
+            line-height: 1.6;
+            color: #333;
+        }
+        .highlight {
+            font-weight: bold;
+            color: #007bff;
+        }
+        .prediction-section {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+        }
+        .card-container {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .card-box {
+            display: flex;
+            border: 1px solid #dee2e6;
+            border-radius: 10px;
+            overflow: hidden;
+            width: 100%;
+            background-color: #f8f9fa;
+        }
+        .card-image-box {
+            width: 40%;
+            text-align: center;
+            padding: 15px;
+            background-color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-right: 1px solid #dee2e6;
+        }
+        .card-image-box img {
+            width: 80px;
+            height: 50px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .card-name {
+            font-size: 14px;
+            font-weight: bold;
+            color: #333;
+        }
+        .card-description-box {
+            width: 60%;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+        }
+        .card-description {
+            font-size: 14px;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 상단 네비게이션 -->
+    <div class="header">
+        <a href="#">로그인</a>
+        <a href="#">금융분석 리포트</a>
+        <a href="#">예/적금 비교</a>
+        <a href="#">소비MBTI</a>
+        <a href="#">OOO님 | 마이페이지</a>
+    </div>
+
+    <!-- 메인 콘텐츠 -->
+    <div class="container">
+        <div class="title">@@님의 소비 성향입니다!</div>
+        
+        <div class="content-row">
+            <!-- 차트 섹션 -->
+            <div class="chart-container">
+                <canvas id="frequencyChart" class="chart"></canvas>
+                <p>지출 빈도별 소비 차트</p>
+                <canvas id="amountChart" class="chart"></canvas>
+                <p>지출 금액별 소비 차트</p>
+            </div>
+
+            <!-- 설명 섹션 -->
+            <div class="description">
+                <p>@@님은 전체적으로 <span class="highlight">1. 식비</span> 2. 쇼핑에서 가장 소비가 많은 행복추구형~!!</p>
+                <p>식비 분야가 가장 많은 빈도로 사용</p>
+                <p>쇼핑 분야가 가장 큰 금액 결제...?</p>
+                <p>다음 달 예상 소비 금액은 <span class="highlight">##원</span> 입니다~</p>
+                <br>
+                <p>@@님, <span class="highlight">##</span> 분야의 혜택이 큰 카드를 사용하면 소비를 줄일 수 있다~</p>
+                <p>⇒ 이건 뒤에 보여줄 카드 중 해당 분야 혜택이 가장 큰 카드 기준으로 계산해서 보여주기</p>
+            </div>
+        </div>
+
+        <!-- 소비 예측 섹션 -->
+        <div class="prediction-section">
+            <div class="title">다음 달 예측 소비</div>
+            <div class="content-row">
+                <div class="chart-container">
+                    <canvas id="predictionChart" class="chart"></canvas>
+                    <p>예측 소비 차트</p>
+                </div>
+                <div class="description">
+                    <p>다음 달 예상 소비 금액은 <span class="highlight">##원</span>입니다. </p>
+                    <p><span class="highlight">식비</span>와 <span class="highlight">쇼핑</span> 항목에서 가장 큰 소비가 예상됩니다.</p>
+                    <p>이 분야에서 소비를 줄이려면, 혜택이 큰 카드를 사용해보세요!</p>
+                    <p>예상 절감 금액: <span class="highlight">##원</span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 데이터는 예시입니다. 필요에 따라 실제 데이터를 사용하세요.
+        const frequencyData = {
+            labels: ['식비', '쇼핑', '교통', '취미', '카페'],
+            datasets: [{
+                data: [30, 20, 15, 25, 10],
+                backgroundColor: ['#ff6384', '#36a2eb', '#ffce56', '#4bc0c0', '#9966ff']
+            }]
+        };
+
+        const amountData = {
+            labels: ['식비', '쇼핑', '교통', '취미', '카페'],
+            datasets: [{
+                data: [35, 25, 10, 20, 10],
+                backgroundColor: ['#ff6384', '#36a2eb', '#ffce56', '#4bc0c0', '#9966ff']
+            }]
+        };
+
+        const predictionData = {
+            labels: ['식비', '쇼핑', '교통', '취미', '카페'],
+            datasets: [{
+                data: [28, 30, 12, 18, 12],
+                backgroundColor: ['#ff6384', '#36a2eb', '#ffce56', '#4bc0c0', '#9966ff']
+            }]
+        };
+
+        // 차트 생성
+        new Chart(document.getElementById('frequencyChart'), {
+            type: 'pie',
+            data: frequencyData,
+            options: { responsive: true }
+        });
+
+        new Chart(document.getElementById('amountChart'), {
+            type: 'pie',
+            data: amountData,
+            options: { responsive: true }
+        });
+
+        new Chart(document.getElementById('predictionChart'), {
+            type: 'pie',
+            data: predictionData,
+            options: { responsive: true }
+        });
+    </script>
+
+     <!-- 카드 추천 섹션 -->
+     <div class="container">
+        <div class="title">카드 추천</div>
+        
+        <!-- 카드 1 -->
+        <div class="card-container">
+            <div class="card-box">
+                <a href="https://card-website1.com" target="_blank" class="card-image-box">
+                    <img src="https://via.placeholder.com/80x50" alt="카드 이미지">
+                    <div class="card-name">은행사 이름 - 카드 이름</div>
+                </a>
+                <div class="card-description-box">
+                    <div class="card-description">
+                        카드 설명: 식비 혜택이 풍부하여 외식을 즐기는 분들에게 적합합니다. <br>
+                        카드 혜택: 외식 시 10% 할인, 영화관 5% 캐시백 제공
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 카드 2 -->
+        <div class="card-container">
+            <div class="card-box">
+                <a href="https://card-website2.com" target="_blank" class="card-image-box">
+                    <img src="https://via.placeholder.com/80x50" alt="카드 이미지">
+                    <div class="card-name">은행사 이름 - 카드 이름</div>
+                </a>
+                <div class="card-description-box">
+                    <div class="card-description">
+                        카드 설명: 쇼핑과 의류 구매에 대한 할인 혜택이 제공됩니다. <br>
+                        카드 혜택: 백화점 및 온라인 쇼핑 10% 할인
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 카드 3 -->
+        <div class="card-container">
+            <div class="card-box">
+                <a href="https://card-website3.com" target="_blank" class="card-image-box">
+                    <img src="https://via.placeholder.com/80x50" alt="카드 이미지">
+                    <div class="card-name">은행사 이름 - 카드 이름</div>
+                </a>
+                <div class="card-description-box">
+                    <div class="card-description">
+                        카드 설명: 교통비와 대중교통 이용 시 추가 적립 혜택이 있습니다. <br>
+                        카드 혜택: 지하철 및 버스 요금 5% 적립
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
