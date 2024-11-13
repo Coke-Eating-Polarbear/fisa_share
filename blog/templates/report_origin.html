@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>금융 분석 리포트</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        background-color: #f3f3f3;
+    }
+    header, footer {
+        background-color: #f8f8f8;
+        padding: 10px;
+        text-align: center;
+        position: fixed;
+        width: 100%;
+        z-index: 1;
+    }
+    header { top: 0; }
+    footer { bottom: 0; }
+    .container {
+        padding-top: 80px;
+        padding-bottom: 80px;
+        width: 100%;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+    .navbar {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        margin-right: 20px;
+    }
+    .navbar a {
+        margin: 0 10px;
+        text-decoration: none;
+        color: #333;
+    }
+    .content {
+        text-align: center;
+        margin-top: 40px;
+    }
+    .box {
+        background-color: white;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        margin: 20px auto;
+        padding: 20px;
+        width: 90%;
+        max-width: 1000px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    .score-summary {
+        font-size: 18px;
+    }
+    .graphs {
+        display: flex;
+        justify-content: space-around;
+        flex-wrap: wrap;
+    }
+    .graph {
+        width: 22%;
+        margin: 10px;
+        padding: 15px;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        background-color: #fafafa;
+    }
+    .report-summary {
+        font-size: 16px;
+    }
+</style>
+</head>
+<body>
+
+<header>
+    <div class="navbar">
+        <div class="nav-links">
+            <a href="#report">금융분석 리포트</a>
+            <a href="#recommendation">예/적금 추천</a>
+            <a href="#spending">소비MBTI</a>
+        </div>
+        <div class="user-info">
+            <span>회원이름님</span> | <a href="#mypage">마이페이지</a>
+        </div>
+    </div>
+</header>
+
+<div class="container">
+    <div class="content">
+        <div class="box">
+            <h2>@@님의 금융분석 리포트입니다 😊</h2>
+        </div>
+
+        <div class="box score-summary">
+            <p>금융 자산 분석 점수: <span id="analysis-score">88점</span> 🔍 | 한 줄 요약: <span id="summary">키워드로? 아님 진짜 한줄 요약으로</span></p>
+        </div>
+
+        <div class="box graphs">
+            <div class="graph" id="assets-graph">총자산 그래프</div>
+            <div class="graph" id="liquid-assets-graph">현금자산 그래프</div>
+            <div class="graph" id="income-expense-graph">수입 지출 그래프</div>
+            <div class="graph" id="pie-chart">자산 분포 파이 차트</div>
+        </div>
+
+        <div class="box report-summary">
+            <h3>금융 리포트 종합 요약</h3>
+            <p id="full-report">
+                생성형 AI로 분석한 전체 자산 요약 내용이 들어갑니다. 회원의 자산 상태를 설명하는 구체적인 분석 내용이 표시됩니다.
+            </p>
+        </div>
+    </div>
+</div>
+
+<footer>
+    <p>회사명 | 주소 | 연락처</p>
+</footer>
+
+</body>
+</html>

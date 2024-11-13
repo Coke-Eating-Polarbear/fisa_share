@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>예/적금 추천 페이지</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        background-color: #b9bff6;
+        min-height: 100vh;
+        position: relative;
+    }
+    header, footer {
+        background-color: #dde8f5;
+        padding: 10px;
+        text-align: center;
+        width: 100%;
+    }
+    header { 
+        position: fixed; 
+        top: 0; 
+        z-index: 1; 
+    }
+    footer {
+        position: fixed; 
+        bottom: 0; 
+        left: 0; 
+        width: 100%;
+    }
+    .container {
+        padding-top: 120px;
+        padding-bottom: 150px;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+    .navbar {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        margin-right: 20px;
+    }
+    .navbar a {
+        margin: 0 10px;
+        text-decoration: none;
+        color: #333;
+    }
+    .content {
+        display: flex;
+        gap: 20px;
+        justify-content: space-between;
+        margin-top: 40px;
+    }
+    .box {
+        background-color: white;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        padding: 20px;
+        width: 32%;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    .product-selection {
+        background-color: white;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    .product-selection label {
+        display: inline-block;
+        margin-right: 15px;
+    }
+    .product-selection input[type="radio"] {
+        margin-right: 5px;
+    }
+    .recommendation-container {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+    .details {
+        display: none;
+        margin-top: 10px;
+    }
+    .page-title {
+        text-align: center;
+        font-size: 24px;
+        margin-bottom: 20px;
+        color: #333;
+    }
+</style>
+<script>
+   document.addEventListener('DOMContentLoaded', function () {
+       document.querySelector('input[name="product"][value="상품1"]').checked = true;
+       updateProductContent('상품1');
+   });
+
+   function updateProductContent(selectedProduct) {
+       const productDetails = {
+           '상품1': { 은행명:'OO은행', 상품명:'상품1', 기본금리:'1.5%', 우대금리:'0.5%', 현재모은금액:'1,000,000원', 적용금리:'2.0%', 만기시예상금액:'1,030,000원'},
+           '상품2': { 은행명:'XX은행', 상품명:'상품2', 기본금리:'2.0%', 우대금리:'0.7%', 현재모은금액:'2,000,000원', 적용금리:'2.5%', 만기시예상금액:'2,100,000원'},
+           '상품3': { 은행명:'ZZ은행', 상품명:'상품3', 기본금리:'1.8%', 우대금리:'0.4%', 현재모은금액:'1,500,000원', 적용금리:'2.3%', 만기시예상금액:'1,700,000원'}
+       };
+
+       const selectedDetails = productDetails[selectedProduct];
+       
+       document.querySelector('.product-details').innerHTML = `
+           <p>은행명: ${selectedDetails.은행명}</p>
+           <p>상품명: ${selectedDetails.상품명}</p>
+           <p>기본금리: ${selectedDetails.기본금리}</p>
+           <p>우대금리: ${selectedDetails.우대금리}</p>
+           <p>현재 모은 금액: ${selectedDetails.현재모은금액}</p>
+           <p>적용 금리: ${selectedDetails.적용금리}</p>
+           <p>만기시 예상 금액: ${selectedDetails.만기시예상금액}</p>`;
+   }
+
+   function toggleRecommendationDetails(id) {
+       const details = document.getElementById(id);
+       details.style.display = details.style.display === 'block' ? 'none' : 'block';
+   }
+
+   function toggleFavorite(button) {
+       button.innerHTML = button.innerHTML === '♡' ? '♥' : '♡';
+   }
+</script>
+</head>
+<body>
+<header>
+    <div class="navbar">
+        <div class="nav-links">
+            <a href="#report">금융분석 리포트</a>
+            <a href="#recommendation">예/적금 비교</a>
+            <a href="#spending">소비 MBTI</a>
+        </div>
+        <div class="user-info">
+            <span>회원이름님</span> | <a href="#mypage">마이페이지</a>
+        </div>
+    </div>
+</header>
+
+<div class="container">
+    <h2 class="page-title">더 맞춤형인 상품을 추천해드릴게요-😆</h2>
+
+    <div class="product-selection">
+       <label><input type="radio" name="product" value="상품1" onclick="updateProductContent('상품1')"> 상품 1</label>
+       <label><input type="radio" name="product" value="상품2" onclick="updateProductContent('상품2')"> 상품 2</label>
+       <label><input type="radio" name="product" value="상품3" onclick="updateProductContent('상품3')"> 상품 3</label>
+    </div>
+
+    <div class="content">
+        <div class="box">
+            <h3>기존 예/적금 상품명</h3>
+            <div class="product-details"></div>
+        </div>
+
+        <div class="box">
+            <h3>추천 상품</h3>
+            <div class="recommendation-container">
+                <div class="recommendation">
+                    <p>상품명: 추천 예금상품1</p>
+                    <p>금리: 2.1%</p>
+                    <button class="details-btn" onclick="toggleRecommendationDetails('rec1')">자세히보기</button>
+                    <button class="favorite" onclick="toggleFavorite(this)">♡</button>
+                    <div class="details" id="rec1">
+                        <p>은행명: OO은행</p>
+                        <table>
+                            <tr><td>항목1</td><td>상세정보1</td></tr>
+                            <tr><td>항목2</td><td>상세정보2</td></tr>
+                        </table>
+                        <p>추가 설명 텍스트 ...</p>
+                    </div>
+                </div>
+
+                <div class="recommendation">
+                    <p>상품명: 추천 예금상품2</p>
+                    <p>금리: 2.3%</p>
+                    <button class="details-btn" onclick="toggleRecommendationDetails('rec2')">자세히보기</button>
+                    <button class="favorite" onclick="toggleFavorite(this)">♡</button>
+                    <div class="details" id="rec2">
+                        <p>은행명: XX은행</p>
+                        <table>
+                            <tr><td>항목1</td><td>상세정보1</td></tr>
+                            <tr><td>항목2</td><td>상세정보2</td></tr>
+                        </table>
+                        <p>추가 설명 텍스트 ...</p>
+                    </div>
+                </div>
+
+                <div class="recommendation">
+                    <p>상품명: 추천 적금상품1</p>
+                    <p>금리: 2.5%</p>
+                    <button class="details-btn" onclick="toggleRecommendationDetails('rec3')">자세히보기</button>
+                    <button class="favorite" onclick="toggleFavorite(this)">♡</button>
+                    <div class="details" id="rec3">
+                        <p>은행명: YY은행</p>
+                        <table>
+                            <tr><td>항목1</td><td>상세정보1</td></tr>
+                            <tr><td>항목2</td><td>상세정보2</td></tr>
+                        </table>
+                        <p>추가 설명 텍스트 ...</p>
+                    </div>
+                </div>
+
+                <div class="recommendation">
+                    <p>상품명: 추천 적금상품2</p>
+                    <p>금리: 2.7%</p>
+                    <button class="details-btn" onclick="toggleRecommendationDetails('rec4')">자세히보기</button>
+                    <button class="favorite" onclick="toggleFavorite(this)">♡</button>
+                    <div class="details" id="rec4">
+                        <p>은행명: ZZ은행</p>
+                        <table>
+                            <tr><td>항목1</td><td>상세정보1</td></tr>
+                            <tr><td>항목2</td><td>상세정보2</td></tr>
+                        </table>
+                        <p>추가 설명 텍스트 ...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="box">
+            <h3>금리 비교</h3>
+            <p>기존 그대로 유지했을 시 총 적금 금액</p>
+            <p>추천 상품을 선택했을 시 총 적금 금액</p>
+            <p>추천 상품으로 변경했을 때의 혜택 예상 금액</p>
+        </div>
+    </div>
+</div>
+
+<footer>
+    <p>고객지원: 1234-5678 | 이메일: support@finance.com</p>
+    <p>©2024 YourCompany. All rights reserved.</p>
+</footer>
+</body>
+</html>

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>찜한 상품 목록</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .container {
+            max-width: 900px;
+            margin: 20px auto;
+            background-color: #ffffff;
+            padding: 20px;
+            border: 1px solid #dee2e6;
+            border-radius: 10px;
+        }
+        .favorite-item {
+            border-bottom: 1px solid #ddd;
+            padding: 10px 0;
+        }
+    </style>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+            const container = document.getElementById("favoritesContainer");
+
+            if (favorites.length > 0) {
+                favorites.forEach(id => {
+                    const item = document.createElement("div");
+                    item.classList.add("favorite-item");
+                    item.innerHTML = `<strong>${id}</strong> - 이 상품을 찜했습니다.`;
+                    container.appendChild(item);
+                });
+            } else {
+                container.innerHTML = "<p>찜한 상품이 없습니다.</p>";
+            }
+        });
+    </script>
+</head>
+<body>
+
+    <div class="container">
+        <h2>찜한 상품 목록</h2>
+        <div id="favoritesContainer"></div>
+    </div>
+
+</body>
+</html>
