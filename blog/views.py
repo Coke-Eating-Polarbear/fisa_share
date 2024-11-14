@@ -18,6 +18,11 @@ from django.http import JsonResponse
 from elasticsearch import Elasticsearch
 from django.views.decorators.csrf import csrf_exempt
 import json
+import os
+from dotenv import load_dotenv
+
+
+load_dotenv()
 
 logger = logging.getLogger(__name__)
 
@@ -308,7 +313,16 @@ def top5(request):
 
 
 def main_view(request):
-    user_id = request.user.id if request.user.is_authenticated else "anonymous"
+    if request.user.is_authenticated:
+        try:
+            # usertable에서 username을 기준으로 조회하여 CustomerID 가져오기
+            user = UserProfile.objects.get(username=request.user.username)
+            user_id = user.CustomerID  # MySQL 데이터베이스의 CustomerID 필드를 user_id로 사용
+        except UserProfile.DoesNotExist:
+            user_id = "anonymous"  # 사용자가 없을 경우 기본값 설정
+    else:
+        user_id = "anonymous"
+
     session_id = request.session.session_key
 
     # 메인 페이지 접근 로그 기록
@@ -319,7 +333,7 @@ def main_view(request):
 
 
 
-es = Elasticsearch(['http://localhost:9200'])  # Elasticsearch 설정
+es = Elasticsearch([os.getenv('ES')])  # Elasticsearch 설정
 
 @csrf_exempt
 def log_click_event(request):

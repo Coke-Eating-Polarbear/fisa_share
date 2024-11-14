@@ -158,10 +158,10 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
 # Elasticsearch 연결 설정
-connections.create_connection(alias="default", hosts=["http://localhost:9200"])
+connections.create_connection(alias="default", hosts=[os.getenv('ES')])
 
 ELASTICSEARCH_DSL = {
     'default': {
-        'hosts': 'http://localhost:9200'
+        'hosts': os.getenv('ES')
     },
 }

@@ -1,3 +1,4 @@
+# 테스트 
 # app_name/logging.py
 from datetime import datetime
 from .documents import UserFlowLogDocument  # documents.py에서 UserFlowLogDocument 가져오기
