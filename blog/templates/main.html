@@ -67,6 +67,47 @@
         .nav-box nav a:hover {
             font-weight: bold;
         }
+
+        .container_news {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            width: 100%;
+            padding: 20px;
+        }
+        
+        .news-summary {
+            display: flex;
+            flex-direction: row ;
+            width: 75%;
+            gap: 20px;
+        }
+        
+        .word-cloud {
+            width: 20%;
+            text-align: center;
+            padding: 20px;
+            border: 1px solid black;
+        }
+        
+        .summary-box {
+            flex: 1;
+            border: 1px solid black;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .title {
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .summary {
+            font-size: 1em;
+            color: #555;
+        }
     </style>
 </head>
 <body>
@@ -105,19 +146,23 @@
         </div>        
     </div>
 
-    <div class="footer" style="display: flex; justify-content: space-between; padding: 20px; border-top: 1px solid #ccc; width: 100%; box-sizing: border-box;">
-        <div class="box" style="flex: 1; margin: 5px; min-width: 30%; height: 150px; box-sizing: border-box;">
+    <div class="container_news">
+        <div class="news-summary">
+            <div class="summary-box">
+                <div class="title">top 1 뉴스 제목</div>
+                <div class="summary">top 1 뉴스 줄글 요약 내용이 들어갑니다.</div>
+            </div>
+            <div class="summary-box">
+                <div class="title">top 2 뉴스 제목</div>
+                <div class="summary">top 2 뉴스 줄글 요약 내용이 들어갑니다.</div>
+            </div>
+            <div class="summary-box">
+                <div class="title">top 3 뉴스 제목</div>
+                <div class="summary">top 3 뉴스 줄글 요약 내용이 들어갑니다.</div>
+            </div>
+        </div>
+        <div class="word-cloud">
             뉴스 워드클라우드
         </div>
-        <div class="box" style="flex: 1; margin: 5px; min-width: 150px; height: 150px; box-sizing: border-box;">
-            top 1
-        </div>
-        <div class="box" style="flex: 1; margin: 5px; min-width: 150px; height: 150px; box-sizing: border-box;">
-            top 2
-        </div>
-        <div class="box" style="flex: 1; margin: 5px; min-width: 150px; height: 150px; box-sizing: border-box;">
-            top 3
-        </div>
-    </div>
 </body>
 </html>

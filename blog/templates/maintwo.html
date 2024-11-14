@@ -150,6 +150,47 @@
             font-size: 18px;
             color: #333;
         }
+
+        .container_news {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            width: 100%;
+            padding: 20px;
+        }
+        
+        .news-summary {
+            display: flex;
+            flex-direction: row ;
+            width: 75%;
+            gap: 20px;
+        }
+        
+        .word-cloud {
+            width: 20%;
+            text-align: center;
+            padding: 20px;
+            border: 1px solid black;
+        }
+        
+        .summary-box {
+            flex: 1;
+            border: 1px solid black;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .title {
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .summary {
+            font-size: 1em;
+            color: #555;
+        }
     </style>
 </head>
 <body>
@@ -206,12 +247,24 @@
     </div>
     
 
-    <!-- 하단 푸터 -->
-    <div class="footer">
-        <div class="box">뉴스 워드클라우드</div>
-        <div class="box">Top 1</div>
-        <div class="box">Top 2</div>
-        <div class="box">Top 3</div>
+    <div class="container_news">
+    <div class="news-summary">
+        <div class="summary-box">
+            <div class="title">top 1 뉴스 제목</div>
+            <div class="summary">top 1 뉴스 줄글 요약 내용이 들어갑니다.</div>
+        </div>
+        <div class="summary-box">
+            <div class="title">top 2 뉴스 제목</div>
+            <div class="summary">top 2 뉴스 줄글 요약 내용이 들어갑니다.</div>
+        </div>
+        <div class="summary-box">
+            <div class="title">top 3 뉴스 제목</div>
+            <div class="summary">top 3 뉴스 줄글 요약 내용이 들어갑니다.</div>
+        </div>
+    </div>
+    <div class="word-cloud">
+        뉴스 워드클라우드
+    </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
