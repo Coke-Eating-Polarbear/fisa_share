@@ -165,3 +165,4 @@ ELASTICSEARCH_DSL = {
         'hosts': os.getenv('ES')
     },
 }
+
