@@ -1,12 +1,15 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
+from django.utils import timezone
+from datetime import timedelta
+import base64
 from django.contrib import messages
 from .forms import UserProfileForm  # UserProfileForm을 가져옵니다
 from .models import UserProfile  # UserProfile 모델도 가져옵니다
 from django.contrib.auth.hashers import check_password
 from django.views.decorators.http import require_POST
 from django.http import HttpResponse
-from .models import Recommend, DsProduct
+from .models import Recommend, DsProduct, Wc, News
 from django.db.models import F
 import random
 import logging
@@ -25,10 +28,27 @@ def terms_content2(request):
     return render(request, 'mydata_form2.html')
 
 def main(request):
-    return render(request, 'main.html')
+    today = timezone.now().date()
+    yesterday = today - timedelta(days=1)
 
-def maintwo(request):
-    return render(request, 'maintwo.html')
+    # 어제 날짜의 이미지 데이터 가져오기
+    try:
+        wc_entry = Wc.objects.get(date=yesterday)
+        image_base64 = base64.b64encode(wc_entry.image).decode('utf-8')
+    except Wc.DoesNotExist:
+        image_base64 = None
+
+    # 어제 날짜의 뉴스 데이터에서 title과 summary만 가져오기
+    news_entries = News.objects.filter(ndate=yesterday, summary__isnull=False).values('title', 'summary')
+    
+    # 디버그 출력
+
+    context = {
+        'image_base64': image_base64,
+        'news_entries': news_entries,
+    }
+    
+    return render(request, 'main.html', context)
 
 def report(request):
     customer_id = request.session.get('user_id')  
@@ -92,6 +112,16 @@ def signup(request):
 
 def summary_view(request):
     customer_id = request.session.get('user_id')  # 세션에서 CustomerID 가져오기
+    today = timezone.now().date()
+    yesterday = today - timedelta(days=1)
+    # 오늘 날짜의 이미지 데이터 가져오기
+    try:
+        wc_entry = Wc.objects.get(date=yesterday)
+        image_base64 = base64.b64encode(wc_entry.image).decode('utf-8')  # base64 인코딩
+    except Wc.DoesNotExist:
+        image_base64 = None  # 이미지가 없을 경우 처리
+
+    news_entries = News.objects.filter(ndate=yesterday, summary__isnull=False).values('title', 'summary')
 
     # CustomerID가 세션에 없으면 로그인 페이지로 리디렉션
     if not customer_id:
@@ -125,8 +155,11 @@ def summary_view(request):
     # 로그에 product_details 출력
     logger.info("Product details: %s", product_details)
 
+    # 모든 데이터를 하나의 context 딕셔너리로 전달
     context = {
         'product_details': product_details,
+        'image_base64': image_base64,
+        'news_entries': news_entries,
     }
     
     return render(request, 'maintwo.html', context)
