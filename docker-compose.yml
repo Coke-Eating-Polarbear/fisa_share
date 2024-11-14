@@ -9,7 +9,7 @@ services:
       - ES_JAVA_OPTS=-Xms512m -Xmx512m
       - xpack.security.enabled=false  # 보안 기능 비활성화 (테스트 목적)
     ports:
-      - "9200:9200"
+      - "9203:9200"
     volumes:
       - es_data:/usr/share/elasticsearch/data
 
@@ -19,7 +19,7 @@ services:
     environment:
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
     ports:
-      - "5601:5601"
+      - "5603:5601"
 
 volumes:
   es_data:
