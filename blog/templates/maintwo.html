@@ -248,22 +248,25 @@
     
 
     <div class="container_news">
-    <div class="news-summary">
-        <div class="summary-box">
-            <div class="title">top 1 뉴스 제목</div>
-            <div class="summary">top 1 뉴스 줄글 요약 내용이 들어갑니다.</div>
+        <div class="news-summary">
+            {% if news_entries %}
+                {% for news in news_entries %}
+                    <div class="summary-box">
+                        <div class="title">{{ news.title }}</div>
+                        <div class="summary">{{ news.summary }}</div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>뉴스가 없습니다.</p>
+            {% endif %}
         </div>
-        <div class="summary-box">
-            <div class="title">top 2 뉴스 제목</div>
-            <div class="summary">top 2 뉴스 줄글 요약 내용이 들어갑니다.</div>
-        </div>
-        <div class="summary-box">
-            <div class="title">top 3 뉴스 제목</div>
-            <div class="summary">top 3 뉴스 줄글 요약 내용이 들어갑니다.</div>
-        </div>
-    </div>
     <div class="word-cloud">
-        뉴스 워드클라우드
+        <h2>뉴스 워드클라우드</h2>
+        {% if image_base64 %}
+            <img src="data:image/png;base64,{{ image_base64 }}" alt="Word Cloud Image">
+        {% else %}
+            <p>오늘의 워드클라우드 이미지가 없습니다.</p>
+        {% endif %}
     </div>
     </div>
 

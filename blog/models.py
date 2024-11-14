@@ -41,3 +41,21 @@ class DsProduct(models.Model):
 
     class Meta:
         db_table = 'ds_product'
+
+class Wc(models.Model):
+    date = models.DateField()  # 날짜 필드
+    image = models.BinaryField()  # BLOB 형태의 이미지 필드
+
+    class Meta:
+        db_table = 'Wc'
+
+class News(models.Model):
+    norder = models.IntegerField()  # 뉴스 순서
+    ndate = models.DateField()  # 뉴스 날짜
+    title = models.CharField(max_length=256)  # 뉴스 제목
+    content = models.TextField()  # 뉴스 내용
+    url = models.CharField(max_length=256)  # 뉴스 URL
+    summary = models.TextField()  # 뉴스 요약
+
+    class Meta:
+        db_table = 'news'
