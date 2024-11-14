@@ -77,6 +77,9 @@
         border-radius: 13px;
         overflow: hidden;
         margin: 10px 0;
+        text-align: center;
+        color: white;
+        line-height: 20px;
         height: 20px;
         width: 100%;
     }
@@ -146,9 +149,9 @@
         <h2>OOO님</h2>
         <div class="info">
             <p>이번달 목표 소비액 : <span id="goalAmount">500,000</span>원</p>
-            <p>실제 이번달 지출 총액 : <span id="spentAmount">1,000,000</span>원</p>
+            <p>실제 이번달 지출 총액 : <span id="spentAmount">200,000</span>원</p>
             <div class="progress-bar">
-                <div class="progress-bar-inner" id="progressBarInner">60%</div>
+                <div class="progress-bar-inner" id="savingsProgressBar">50%</div>
             </div>
             <p id="result">목표 소비액보다 200,000원 덜 쓰셨어요<br>
             잘하고 있어요~ 지금처럼만 ✨<br></p>
@@ -169,7 +172,7 @@
         <div class="goal">
             <div class="goal-progress">
                 <div class="progress-bar">
-                    <div class="progress-bar-inner" id="savingsProgressBar">10%</div>
+                    <div class="progress-bar-inner" id="savingsProgressBar">20%</div>
                 </div>
                 <div>
                     <p>저축 상품명: <span id="productName">적금 상품명</span></p>
@@ -205,7 +208,7 @@
     // 소비 진행률 바 설정
     const goalAmount = parseFloat(document.getElementById('goalAmount').innerText.replace(/,/g, ''));
     const spentAmount = parseFloat(document.getElementById('spentAmount').innerText.replace(/,/g, ''));
-    const progressBarInner = document.getElementById('progressBarInner');
+    const progressBarInner = document.getElementById('savingsProgressBar');
     const result = document.getElementById('result');
 
     const progress = (spentAmount / goalAmount) * 100;
@@ -241,7 +244,8 @@
     const savingsResult = document.getElementById('savingsResult');
 
     const savingsProgress = (currentAmount / targetAmount) * 100;
-    savingsProgressBar.style.width = savingsProgress
+    savingsProgressBar.style.width = savingsProgress + '%' ;
+    savingsProgressBar.innerText = Math.floor(progress) + '%';
 
     const pieChart = new Chart(ctx, {
         type: 'pie',
@@ -269,12 +273,8 @@
                         }
                     }
                 },
-                datalabels: {
-                display : false
-            }
         }
-    },
-    plugins: [ChartDataLabels] // Data Labels 플러그인 활성화
+    },// Data Labels 플러그인 활성화
     });
 
     //파이차트 클릭 이벤트 추가
