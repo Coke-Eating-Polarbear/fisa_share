@@ -2,7 +2,10 @@ from django.apps import AppConfig
 # app_name/apps.py
 from django.apps import AppConfig
 from elasticsearch_dsl import connections
+import os
+from dotenv import load_dotenv
 
+load_dotenv()
 
 class BlogConfig(AppConfig):
     default_auto_field = "django.db.models.BigAutoField"
@@ -14,4 +17,4 @@ class AppNameConfig(AppConfig):
 
     def ready(self):
         # 'default' 연결을 생성하여 Elasticsearch에 연결
-        connections.create_connection(alias='default', hosts=['http://localhost:9200'])
+        connections.create_connection(alias='default', hosts=[os.getenv('ES')])

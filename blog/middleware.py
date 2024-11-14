@@ -4,10 +4,13 @@ from django.contrib.auth.middleware import get_user
 import datetime
 from elasticsearch import Elasticsearch
 from .logging import log_user_action
+import os
+from dotenv import load_dotenv
 
+load_dotenv()
 
 # Elasticsearch 연결 설정
-es = Elasticsearch(hosts=["http://localhost:9200"])
+es = Elasticsearch(hosts=[os.getenv('ES')])
 
 class LogOnlyLoggedInMiddleware(MiddlewareMixin):
     def process_request(self, request):

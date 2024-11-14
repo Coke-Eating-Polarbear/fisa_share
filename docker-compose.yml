@@ -2,7 +2,7 @@
 version: '3'
 services:
   elasticsearch:
-    image: elasticsearch:7.17.9  # 버전은 필요에 따라 조정
+    image: elasticsearch:8.14.2  # 버전은 필요에 따라 조정
     container_name: elasticsearch
     environment:
       - discovery.type=single-node
@@ -14,7 +14,7 @@ services:
       - es_data:/usr/share/elasticsearch/data
 
   kibana:
-    image: kibana:7.17.9
+    image: kibana:8.14.2
     container_name: kibana
     environment:
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
