@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>금융 분석 페이지</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        background-color: #f5f5f5;
+    }
+    header, footer {
+        background-color: #ffffff;
+        padding: 10px;
+        text-align: center;
+        position: fixed;
+        width: 100%;
+        z-index: 1;
+        border-bottom: 1px solid #ddd;
+    }
+    header {
+        top: 0;
+    }
+    footer {
+        position: fixed; 
+        bottom: 0; 
+        left: 0; 
+        width: 100%;
+    }
+    .navbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin: 0 20px;
+    }
+    .navbar div a {
+        margin: 0 10px;
+        text-decoration: none;
+        color: #333;
+        font-size: 14px;
+    }
+    .container {
+        padding-top: 80px;
+        padding-bottom: 50px; /* footer 높이만큼 하단 여백 추가 */
+        max-width: 1000px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: 2fr 3fr;
+        gap: 20px;
+    }
+    .left-box, .right-box {
+        background-color: #ffffff;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        padding: 20px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    .left-box h2, .right-box h2 {
+        font-size: 16px;
+        margin-bottom: 10px;
+        font-weight: normal;
+    }
+    .info {
+        background-color: #f9f9f9;
+        padding: 10px;
+        border-radius: 5px;
+        font-size: 14px;
+        line-height: 1.5;
+    }
+    .progress-bar {
+        background-color: #ddd;
+        border-radius: 13px;
+        overflow: hidden;
+        margin: 10px 0;
+        height: 20px;
+        width: 100%;
+    }
+    .progress-bar-inner {
+        height: 100%;
+        border-radius: 13px;
+        background-color: #4caf50;
+        text-align: center;
+        color: white;
+        line-height: 20px;
+    }
+    .goal-progress img {
+        width: 100%;
+    }
+    .calendar {
+        margin-top: 10px;
+        font-size: 14px;
+    }
+    .calendar table {
+        width: 100%;
+        margin-top: 10px;
+        border-collapse: collapse;
+        font-size: 14px;
+    }
+    .calendar td {
+        padding: 5px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+    .footer-box {
+        grid-column: 1 / span 2;
+        background-color: #ffffff;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        padding: 15px;
+        text-align: center;
+        font-size: 14px;
+    }
+    #pieChart {
+        width: 100%;
+        height: 300px;
+    }
+    hr {
+        border: 0;
+        border-top: 1px solid #ddd;
+        margin: 20px 0;
+    }
+</style>
+</head>
+<body>
+
+<header>
+    <div class="navbar">
+        <a href="#login">로그인</a>
+        <div>
+            <a href="#report">금융분석 리포트</a> |
+            <a href="#comparison">예/적금 비교</a> |
+            <a href="#spending">소비MBTI</a>
+        </div>
+        <a href="#mypage">OOO님 | 마이페이지</a>
+    </div>
+</header>
+
+<div class="container">
+    <!-- Left Box -->
+    <div class="left-box">
+        <h2>OOO님</h2>
+        <div class="info">
+            <p>이번달 목표 소비액 : <span id="goalAmount">500,000</span>원</p>
+            <p>실제 이번달 지출 총액 : <span id="spentAmount">1,000,000</span>원</p>
+            <div class="progress-bar">
+                <div class="progress-bar-inner" id="progressBarInner">60%</div>
+            </div>
+            <p id="result">목표 소비액보다 200,000원 덜 쓰셨어요<br>
+            잘하고 있어요~ 지금처럼만 ✨<br></p>
+        </div>
+        <div class="calendar">
+            <h2>1월 금융일정</h2>
+            <table>
+                <tr><td>10일</td><td>우리카드 납입예정 7만 6500원</td></tr>
+                <tr><td>15일</td><td>000 보험료 5만 500원</td></tr>
+                <tr><td>20일</td><td>OO은행 00대출 1만 3500원</td></tr>
+            </table>
+        </div>
+    </div>
+
+    <!-- Right Box -->
+    <div class="right-box">
+        <h2>저축 목표 현황</h2>
+        <div class="goal">
+            <div class="goal-progress">
+                <div class="progress-bar">
+                    <div class="progress-bar-inner" id="savingsProgressBar">10%</div>
+                </div>
+                <div>
+                    <p>저축 상품명: <span id="productName">적금 상품명</span></p>
+                    <p>현재 금액: <span id="currentAmount">1,000,000</span>원</p>
+                    <p>목표 금액: <span id="targetAmount">10,000,000</span>원</p>
+                    <p>현재 적용금리: <span id="currentInterestRate">2.5</span>%</p>
+                    <p>목표 기간: <span id="goalPeriod">2024-10-20 ~ 2025-10-20</span></p>
+                    <p>만기 시 예상 금액: <span id="expectedAmount">10,250,000</span>원</p>
+                </div>
+            </div>
+            <p id="savingsResult">저축 목표 10% 달성! 축하드립니다 🎉</p>
+        </div>
+
+        <!-- 구분선 추가 -->
+        <hr>
+
+        <!-- 카드 사용 비율 파이차트 -->
+        <h2>카드 결제 내역 분석</h2>
+        <p>카테고리별 카드 사용 비율</p>
+        <div class="pie-chart">
+            <canvas id="pieChart"></canvas>
+        </div>
+
+    </div>
+
+    <!-- Footer Box -->
+    <div class="footer-box">
+        목표 달성 90% 정도 (예/적금 만기) 다가오면 만기 시 고려 사항 제공
+    </div>
+</div>
+
+<script>
+    // 소비 진행률 바 설정
+    const goalAmount = parseFloat(document.getElementById('goalAmount').innerText.replace(/,/g, ''));
+    const spentAmount = parseFloat(document.getElementById('spentAmount').innerText.replace(/,/g, ''));
+    const progressBarInner = document.getElementById('progressBarInner');
+    const result = document.getElementById('result');
+
+    const progress = (spentAmount / goalAmount) * 100;
+    progressBarInner.style.width = progress + '%';
+    progressBarInner.innerText = Math.floor(progress) + '%';
+
+    if (progress < 100) {
+        result.innerHTML = `목표 소비액보다 ${goalAmount - spentAmount}원 덜 쓰셨어요<br>잘하고 있어요~ 지금처럼만 ✨<br>`;
+    } else {
+        result.innerHTML = `이번달 목표 예산을 초과했어요 😡`;
+    }
+
+    // 파이차트 데이터 설정 및 생성
+    const ctx = document.getElementById('pieChart').getContext('2d');
+    // 예시 데이터 (DB에서 불러온 데이터를 대체)
+    const cardData = {
+        categories: ['식비', '쇼핑', '교통', '유흥', '기타'],
+        amounts: [200000, 150000, 80000, 5000, 70000] // 각각의 카테고리별 사용 금액
+    };
+    const totalAmount = cardData.amounts.reduce((acc, curr) => acc + curr, 0);
+
+    // 저축 진행률 바 설정 및 만기 시 예상 금액 계산
+    const productName = "적금 상품명"; // 데이터베이스에서 가져온 값
+    const currentAmount = parseFloat(document.getElementById('currentAmount').innerText.replace(/,/g, ''));
+    const targetAmount = parseFloat(document.getElementById('targetAmount').innerText.replace(/,/g, ''));
+    const currentInterestRate = parseFloat(document.getElementById('currentInterestRate').innerText.replace(/,/g, ''));
+    const goalPeriodMonths = 12; // 데이터베이스에서 가져온 값
+    const goalPeriod = new Date('2024-10-20'); // 데이터베이스에서 가져온 시작 날짜
+    goalPeriod.setMonth(goalPeriod.getMonth() + goalPeriodMonths);
+    document.getElementById('goalPeriod').innerText = `2024-10-20 ~ ${goalPeriod.getFullYear()}-${(goalPeriod.getMonth() + 1).toString().padStart(2, '0')}-${goalPeriod.getDate().toString().padStart(2, '0')}`;
+
+    const savingsProgressBar = document.getElementById('savingsProgressBar');
+    const savingsResult = document.getElementById('savingsResult');
+
+    const savingsProgress = (currentAmount / targetAmount) * 100;
+    savingsProgressBar.style.width = savingsProgress
+
+    const pieChart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: cardData.categories,
+            datasets: [{
+                label: '카테고리별 카드 사용 비율',
+                data: cardData.amounts,
+                backgroundColor: ['#ff6384', '#36a2eb', '#ffce56', '#4caf50', '#ff9f40'],
+                hoverOffset: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'right' // 범례를 오른쪽으로 이동
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const amount = context.raw;
+                            const percentage = ((amount / totalAmount) * 100).toFixed(2);
+                            return `${context.label}: ${amount.toLocaleString()}원 (${percentage}%)`;
+                        }
+                    }
+                },
+                datalabels: {
+                display : false
+            }
+        }
+    },
+    plugins: [ChartDataLabels] // Data Labels 플러그인 활성화
+    });
+
+    //파이차트 클릭 이벤트 추가
+    document.getElementById('pieChart').onclick = function(evt) {
+        const points = pieChart.getElementsAtEventForMode(evt, 'nearest', { intersect: true }, true);
+        if (points.length) {
+            const index = points[0].index;
+            const amount = cardData.amounts[index];
+            const percentage = ((amount / totalAmount) * 100).toFixed(2);
+            alert(`${cardData.categories[index]}: ${amount.toLocaleString()}원 (${percentage}%)`);
+        }}
+</script>
+
+<footer>
+    <p>고객지원: 1234-5678 | 이메일: support@finance.com</p>
+    <p>©2024 YourCompany. All rights reserved.</p>
+</footer>
+
+</body>
+</html>
