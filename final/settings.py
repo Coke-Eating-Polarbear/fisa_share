@@ -14,6 +14,7 @@ from pathlib import Path
 import os
 from dotenv import load_dotenv
 import ssl
+from elasticsearch_dsl import connections
 
 load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -53,6 +54,8 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    'blog.middleware.LogOnlyLoggedInMiddleware', # 로그인 한 유저만 로그 수집 가능하게 하는 미들웨어
+    'blog.middleware.UserActionLoggingMiddleware', # 페이지가 넘어갈 때 로그가 남을 수 있도록 하는 미들웨어
 ]
 
 
@@ -89,7 +92,7 @@ WSGI_APPLICATION = "final.wsgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": "mysql.connector.django",
+        "ENGINE": "django.db.backends.mysql",
         "NAME":  os.getenv('NAME'),
         "PORT":  os.getenv('PORT'),
         "PASSWORD":  os.getenv('PASSWD'),
@@ -151,3 +154,14 @@ STATICFILES_DIRS = [
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+
+
+# Elasticsearch 연결 설정
+connections.create_connection(alias="default", hosts=["http://localhost:9200"])
+
+ELASTICSEARCH_DSL = {
+    'default': {
+        'hosts': 'http://localhost:9200'
+    },
+}

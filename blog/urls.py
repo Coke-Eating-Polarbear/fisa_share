@@ -15,4 +15,5 @@ urlpatterns = [
     path('savings_info3.html', views.info3,name='info3'),
     path('savings_info4.html', views.info4,name='info4'),
     path('recommend_savings_top5.html', views.top5,name='top5'),
+    path('log_click_event', views.log_click_event, name='log_click_event'),
 ]

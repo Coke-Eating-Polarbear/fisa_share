@@ -1,0 +1,26 @@
+# docker-compose.yml
+version: '3'
+services:
+  elasticsearch:
+    image: elasticsearch:7.17.9  # 버전은 필요에 따라 조정
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+      - xpack.security.enabled=false  # 보안 기능 비활성화 (테스트 목적)
+    ports:
+      - "9200:9200"
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
+
+  kibana:
+    image: kibana:7.17.9
+    container_name: kibana
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    ports:
+      - "5601:5601"
+
+volumes:
+  es_data:
+    driver: local

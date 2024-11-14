@@ -10,6 +10,11 @@ from .models import Recommend, DsProduct
 from django.db.models import F
 import random
 import logging
+from .logging import *
+from django.http import JsonResponse
+from elasticsearch import Elasticsearch
+from django.views.decorators.csrf import csrf_exempt
+import json
 
 logger = logging.getLogger(__name__)
 
@@ -264,3 +269,34 @@ def top5(request):
     }
 
     return render(request, 'recommend_savings_top5.html', context)
+
+
+# 테스트
+
+
+def main_view(request):
+    user_id = request.user.id if request.user.is_authenticated else "anonymous"
+    session_id = request.session.session_key
+
+    # 메인 페이지 접근 로그 기록
+    log_user_action(user_id=user_id, session_id=session_id, action="page_view", page="main")
+
+    return render(request, 'main.html')
+
+
+
+
+es = Elasticsearch(['http://localhost:9200'])  # Elasticsearch 설정
+
+@csrf_exempt
+def log_click_event(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        event_data = {
+            "event": data.get("event"),
+            "timestamp": data.get("timestamp")
+        }
+        # Elasticsearch에 로그 저장
+        es.index(index="django_logs", body=event_data)
+        return JsonResponse({"status": "success"})
+    return JsonResponse({"status": "failed"}, status=400)
