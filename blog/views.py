@@ -32,6 +32,23 @@ def terms_content3(request):
 def terms_content2(request):
     return render(request, 'mydata_form2.html')
 
+def spending_trends_card_recond(request):
+    customer_id = request.session.get('user_id')  
+    user_name = "사용자"
+    if customer_id:
+        try:
+            # CustomerID로 UserProfile 조회
+            user = UserProfile.objects.get(CustomerID=customer_id)
+            user_name = user.username  # 사용자 이름 설정
+        except UserProfile.DoesNotExist:
+            pass  # 사용자가 없을 경우 기본값 유지
+
+    context = {
+        'user_name': user_name,
+    }
+    return render(request, 'spending_trends_card_recond.html', context)
+
+
 def main(request):
     today = timezone.now().date()
     yesterday = today - timedelta(days=1)
@@ -330,9 +347,6 @@ def main_view(request):
 
     return render(request, 'main.html')
 
-
-
-
 es = Elasticsearch([os.getenv('ES')])  # Elasticsearch 설정
 
 @csrf_exempt
@@ -347,3 +361,60 @@ def log_click_event(request):
         es.index(index="django_logs", body=event_data)
         return JsonResponse({"status": "success"})
     return JsonResponse({"status": "failed"}, status=400)
+
+
+#----------------------------------------------------------------------
+def temp(request):
+    # 예시 데이터 (실제 데이터는 데이터베이스나 API에서 가져올 수 있음)
+    stats = {
+        "max_rate": "5.05%",
+        "total_products": 127,
+        "total_banks": 23
+    }
+    conditions = [
+        '비대면가입', '앱사용', '급여연동', '연금',
+        '공과금출금', '카드사용', '첫거래', '입출금통장',
+        '재예치', '청약보유', '추천쿠폰', '자동이체'
+    ]
+    products = [
+        {
+            "bank": "우리은행",
+            "title": "첫거래 우대 정기예금",
+            "base_rate": "3.95%",
+            "preferential_rate": "4.95%",
+            "recommend": True,
+            "conditions": ["첫거래", "앱사용"]
+        },
+                {
+            "bank": "국민은행",
+            "title": "첫거래 우대 정기예금",
+            "base_rate": "3.95%",
+            "preferential_rate": "4.95%",
+            "recommend": True,
+            "conditions": ["첫거래", "급여연동"]
+        },
+                {
+            "bank": "IM은행",
+            "title": "첫거래 우대 정기예금",
+            "base_rate": "3.95%",
+            "preferential_rate": "4.95%",
+            "recommend": True,
+            "conditions": ["첫거래", "급여연동", "앱사용"]
+        },
+                {
+            "bank": "새마을은행",
+            "title": "첫거래 우대 정기예금",
+            "base_rate": "3.95%",
+            "preferential_rate": "4.95%",
+            "recommend": True,
+            "conditions": ["첫거래", "급여연동", "앱사용"]
+        },
+        # 더 많은 상품 데이터를 추가 가능
+    ]
+
+    # 템플릿에 데이터 전달
+    return render(request, 'temp.html', {
+        'stats': stats,
+        'conditions': conditions,
+        'products': products
+    })

@@ -16,4 +16,6 @@ urlpatterns = [
     path('savings_info4.html', views.info4,name='info4'),
     path('recommend_savings_top5.html', views.top5,name='top5'),
     path('log_click_event', views.log_click_event, name='log_click_event'),
+    path('spending_trends_card_recond.html', views.spending_trends_card_recond, name='spending_trends_card_recond'),
+    path('temp', views.temp, name='temp'),
 ]
