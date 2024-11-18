@@ -15,21 +15,23 @@
         position: relative;
     }
     header, footer {
-        background-color: #ffffff;
-        padding: 0px;
+        /* background-color: #ffffff; */
         text-align: center;
         width: 100%;
     }
     header {
+        background-color: #ffffff;
         position: fixed; 
+        padding: 0px;
         top: 0; 
         z-index: 1; 
     }
     footer {
-        position: fixed; 
+        /* position: fixed;  */
+        background-color: #39334f;
+        padding: 10px;
         bottom: 0; 
-        left: 0; 
-        width: 100%;
+        left: 0;
     }
     .container {
         padding-top: 120px;
@@ -177,15 +179,15 @@
     </div>
    <!-- 네비게이션 링크 -->
    <div class="nav-links" style="flex-grow: 1; text-align: center;">
-       <a href="#report">금융분석 리포트</a>
-       <a href="#recommendation">예/적금 비교</a>
-       <a href="#spending">소비 MBTI</a>
+       <a href="#report" style=" font-weight: bold; color: #121212;">금융분석 리포트</a>
+       <a href="#recommendation" style=" font-weight: bold; color: #121212;">예/적금 비교</a>
+       <a href="#spending" style=" font-weight: bold; color: #121212;">소비 MBTI</a>
    </div>
 
    <!-- 회원 정보 및 마이페이지 -->
    <div class="user-info">
-       <span>회원이름님</span> | <a href="#mypage" style="margin-left: 15px; text-decoration: none; font-weight: bold; color: #121212;">마이페이지</a> | 
-       <button style="margin-left: 10px; padding: 5px 10px; font-size: 0.9rem; background-color: #007BFF; color: white; border: none; border-radius: 5px; cursor: pointer;">
+       <span style="font-size: 1.1rem;">회원이름님</span> <a href="#mypage" style="margin-left: 15px; text-decoration: none; font-size: 1.1rem; font-weight: bold; color: #121212;">마이페이지</a> 
+       <button style="margin-left: 10px; padding: 5px 10px; font-size: 0.9rem; font-weight: bold; background-color: #007BFF; color: white; border: none; border-radius: 5px; cursor: pointer;">
         로그아웃
     </button>
    </div>
@@ -240,8 +242,9 @@
 </div><!-- container 끝 -->
 
 <footer>
-<p>고객지원 :1234-5678 | 이메일:support@finance.com </p >
-<p >©2024 YourCompany.All rights reserved.</p >
+<p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0;">서울특별시 마포구 월드컵북로 434 상암IT타워 6층</p> 
+<p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0;">고객지원 : 02-3151-7000 | 이메일: worifisa@worifisa.com </p >
+<p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0;">COPYRIGHT©우리팀이름~</p >
 </footer >
 
 </body >
