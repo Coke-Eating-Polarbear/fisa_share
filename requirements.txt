@@ -4,3 +4,5 @@ mysql-connector-python==9.1.0
 python-dotenv==1.0.1
 sqlparse==0.5.1
 tzdata==2024.2
+elasticsearch-dsl
+mysqlclient

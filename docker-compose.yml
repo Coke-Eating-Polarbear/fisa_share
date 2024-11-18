@@ -1,13 +1,12 @@
-# docker-compose.yml
 version: '3'
 services:
   elasticsearch:
-    image: elasticsearch:8.14.2  # 버전은 필요에 따라 조정
+    image: elasticsearch:8.14.2
     container_name: elasticsearch
     environment:
       - discovery.type=single-node
       - ES_JAVA_OPTS=-Xms512m -Xmx512m
-      - xpack.security.enabled=false  # 보안 기능 비활성화 (테스트 목적)
+      - xpack.security.enabled=false  # 보안 비활성화 (테스트용)
     ports:
       - "9203:9200"
     volumes:
@@ -21,6 +20,40 @@ services:
     ports:
       - "5603:5601"
 
+  web:
+    build:
+      context: .  # 현재 디렉토리에서 Dockerfile 읽기
+    container_name: django_app
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/app  # 로컬 파일을 컨테이너에 마운트
+    ports:
+      - "8001:8000"
+    depends_on:
+      - db
+      - elasticsearch
+    environment:
+      - DEBUG=1
+      - DATABASE_HOST=db
+      - DATABASE_NAME=your_database
+      - DATABASE_USER=your_user
+      - DATABASE_PASSWORD=your_password
+      - ELASTICSEARCH_HOST=http://elasticsearch:9200
+
+  db:
+    image: postgres:14
+    container_name: postgres_db
+    environment:
+      - POSTGRES_USER=your_user
+      - POSTGRES_PASSWORD=your_password
+      - POSTGRES_DB=your_database
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+
 volumes:
   es_data:
+    driver: local
+  postgres_data:
     driver: local

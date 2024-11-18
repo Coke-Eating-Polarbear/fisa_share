@@ -21,18 +21,28 @@ import json
 import os
 from dotenv import load_dotenv
 
-
 load_dotenv()
+
+def login_required_session(view_func):
+    """
+    세션에 'user_id'가 없을 경우 로그인 페이지로 리디렉션하는 데코레이터.
+    """
+    def wrapper(request, *args, **kwargs):
+        # 세션에 'user_id'가 없으면 로그인 페이지로 리디렉션
+        if not request.session.get('user_id'):
+            return redirect('login')  # 'login' URL로 이동
+        # 'user_id'가 있으면 원래의 뷰 함수 실행
+        return view_func(request, *args, **kwargs)
+    return wrapper
 
 logger = logging.getLogger(__name__)
 
 def terms_content3(request):
     return render(request, 'mydata_form3.html')
 
-def terms_content2(request):
-    return render(request, 'mydata_form2.html')
 
-def spending_trends_card_recond(request):
+@login_required_session
+def mypage(request):
     customer_id = request.session.get('user_id')  
     user_name = "사용자"
     if customer_id:
@@ -46,7 +56,28 @@ def spending_trends_card_recond(request):
     context = {
         'user_name': user_name,
     }
-    return render(request, 'spending_trends_card_recond.html', context)
+    return render(request, 'mypage.html',context)
+
+def terms_content2(request):
+    return render(request, 'mydata_form2.html')
+
+
+@login_required_session
+def spending_mbti(request):
+    customer_id = request.session.get('user_id')  
+    user_name = "사용자"
+    if customer_id:
+        try:
+            # CustomerID로 UserProfile 조회
+            user = UserProfile.objects.get(CustomerID=customer_id)
+            user_name = user.username  # 사용자 이름 설정
+        except UserProfile.DoesNotExist:
+            pass  # 사용자가 없을 경우 기본값 유지
+
+    context = {
+        'user_name': user_name,
+    }
+    return render(request, 'spending_mbti.html', context)
 
 
 def main(request):
@@ -72,6 +103,8 @@ def main(request):
     
     return render(request, 'main.html', context)
 
+
+@login_required_session
 def report(request):
     customer_id = request.session.get('user_id')  
     user_name = "사용자"  # 기본값 설정
@@ -105,7 +138,7 @@ def login_view(request):  # 이름을 login_view로 변경
             if check_password(password, user.Pw):
                 # 세션에 사용자 정보 저장하기
                 request.session['user_id'] = user.CustomerID
-                return redirect('maintwo.html')  # main.html로 리디렉션
+                return redirect('main')  # main.html로 리디렉션
             else:
                 # 비밀번호가 틀린 경우
                 return render(request, 'login.html', {'error': 'Invalid ID or password.'})
@@ -124,7 +157,7 @@ def signup(request):
             user_profile.sex = 'M' if user_profile.SerialNum in ['1', '3'] else 'F'
             print(form.cleaned_data)  # 로그 출력
             user_profile.save()  # 데이터베이스에 저장
-            return redirect('login')
+            return redirect('login.html')
         else:
             print(form.errors)  # 폼 에러 출력
             return render(request, 'signup.html', {'form': form})
@@ -132,6 +165,8 @@ def signup(request):
         form = UserProfileForm()
     return render(request, 'signup.html', {'form': form})
 
+
+@login_required_session
 def summary_view(request):
     customer_id = request.session.get('user_id')  # 세션에서 CustomerID 가져오기
     today = timezone.now().date()
@@ -147,7 +182,7 @@ def summary_view(request):
 
     # CustomerID가 세션에 없으면 로그인 페이지로 리디렉션
     if not customer_id:
-        return redirect('login')  # 로그인 페이지 URL로 수정 필요
+        return redirect('login.html')  # 로그인 페이지 URL로 수정 필요
 
     # 추천 테이블에서 CustomerID에 해당하는 추천 상품 가져오기
     recommended_products = Recommend.objects.filter(customerid=customer_id).values('dsid')
@@ -186,6 +221,8 @@ def summary_view(request):
     
     return render(request, 'maintwo.html', context)
 
+
+@login_required_session
 def info1(request):
     # 세션에서 CustomerID 가져오기
     customer_id = request.session.get('user_id')  
@@ -213,12 +250,13 @@ def info1(request):
         request.session['info1_saving_method'] = saving_method
 
         # 'savings_info2' 페이지로 리디렉션
-        return redirect('savings_info2.html')
+        return redirect('info2')
     
     # GET 요청일 경우 템플릿 렌더링
     return render(request, 'savings_info1.html', context)
 
 
+@login_required_session
 def info2(request):
     customer_id = request.session.get('user_id')  
     user_name = "사용자"  # 기본값 설정
@@ -243,7 +281,7 @@ def info2(request):
         request.session['info2_amount'] = amount
 
         # 다음 페이지로 리디렉션
-        return redirect('savings_info3.html')  # 다음 페이지 URL 이름에 맞게 수정
+        return redirect('info3')  # 다음 페이지 URL 이름에 맞게 수정
 
     context = {
         'user_name': user_name,
@@ -251,6 +289,7 @@ def info2(request):
     return render(request, 'savings_info2.html', context)
 
 
+@login_required_session
 def info3(request):
     customer_id = request.session.get('user_id')
     user_name = "사용자"  # 기본값 설정
@@ -271,13 +310,15 @@ def info3(request):
         request.session['info3_bank_option'] = bank_option
 
         # 다음 페이지로 리디렉션
-        return redirect('savings_info4.html')  # 다음 페이지 URL 이름에 맞게 수정
+        return redirect('info4')  # 다음 페이지 URL 이름에 맞게 수정
 
     context = {
         'user_name': user_name,
     }
     return render(request, 'savings_info3.html', context)
 
+
+@login_required_session
 def info4(request):
     customer_id = request.session.get('user_id')
     user_name = "사용자"  # 기본값 설정
@@ -298,7 +339,7 @@ def info4(request):
         request.session['selected_preferences'] = selected_preferences
 
         # 다음 페이지로 리디렉션합니다.
-        return redirect('recommend_savings_top5.html')
+        return redirect('top5')
 
     context = {
         'user_name': user_name,
@@ -307,6 +348,7 @@ def info4(request):
     return render(request, 'savings_info4.html', context)
 
 
+@login_required_session
 def top5(request):
     customer_id = request.session.get('user_id')  
     user_name = "사용자"  # 기본값 설정
@@ -329,6 +371,7 @@ def top5(request):
 # 테스트
 
 
+@login_required_session
 def main_view(request):
     if request.user.is_authenticated:
         try:
