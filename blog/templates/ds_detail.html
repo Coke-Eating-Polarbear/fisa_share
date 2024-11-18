@@ -10,13 +10,13 @@
         margin: 0;
         padding: 0;
         box-sizing: border-box;
-        background-color: #f5f5f5;
+        background-color: #ffffff;
         min-height: 100vh;
         position: relative;
     }
     header, footer {
-        background-color: #dde8f5;
-        padding: 10px;
+        background-color: #ffffff;
+        padding: 0px;
         text-align: center;
         width: 100%;
     }
@@ -39,16 +39,27 @@
     }
     .navbar {
         display: flex;
-        justify-content: flex-end; /* 오른쪽 정렬 */
+        justify-content: space-between; /* 좌측 로고와 우측 버튼 배치 */
+        /* justify-content: flex-end; 오른쪽 정렬 */
         align-items: center;
+        padding: 10px 20px;
+        font-size: 1rem;
+        background-color: #ffffff;
     }
     .nav-links {
         margin-right: 20px; /* 회원 정보와의 구분 */
     }
     .navbar a {
+        /* margin: 0 20px; 링크 간격 */
+        font-size: 1.2rem; /* 글씨 크기 */
+        font-weight: bold; /* 글씨 진하게 */
         margin-left: 15px; /* 각 링크 사이의 간격 */
         text-decoration: none;
         color: #333;
+    }
+    .user-info span {
+    font-size: 1.1rem;
+    font-weight: bold;
     }
 
     /* 본문 스타일 */
@@ -159,8 +170,13 @@
 
 <header>
 <div class="navbar">
+    <!-- 로고 및 상품명 -->
+    <div class="logo">
+        <img src="https://via.placeholder.com/50" alt="로고" style="vertical-align: middle;">
+        <span style="font-size: 1.5rem; font-weight: bold; margin-left: 10px;">예/적금 추천 서비스</span>
+    </div>
    <!-- 네비게이션 링크 -->
-   <div class="nav-links">
+   <div class="nav-links" style="flex-grow: 1; text-align: center;">
        <a href="#report">금융분석 리포트</a>
        <a href="#recommendation">예/적금 비교</a>
        <a href="#spending">소비 MBTI</a>
@@ -168,7 +184,10 @@
 
    <!-- 회원 정보 및 마이페이지 -->
    <div class="user-info">
-       <span>회원이름님</span> | <a href="#mypage">마이페이지</a>
+       <span>회원이름님</span> | <a href="#mypage" style="margin-left: 15px; text-decoration: none; font-weight: bold; color: #121212;">마이페이지</a> | 
+       <button style="margin-left: 10px; padding: 5px 10px; font-size: 0.9rem; background-color: #007BFF; color: white; border: none; border-radius: 5px; cursor: pointer;">
+        로그아웃
+    </button>
    </div>
 </div>
 </header>
