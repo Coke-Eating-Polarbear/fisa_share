@@ -40,6 +40,11 @@ logger = logging.getLogger(__name__)
 def terms_content3(request):
     return render(request, 'mydata_form3.html')
 
+def terms_content4(request):
+    return render(request, 'log_data.html')
+
+def terms_content5(request):
+    return render(request, 'marketing.html')
 
 @login_required_session
 def mypage(request):
@@ -173,7 +178,7 @@ def summary_view(request):
     yesterday = today - timedelta(days=1)
     # 오늘 날짜의 이미지 데이터 가져오기
     try:
-        wc_entry = Wc.objects.get(date=yesterday)
+        wc_entry = Wc.objects.filter(date=yesterday).first()
         image_base64 = base64.b64encode(wc_entry.image).decode('utf-8')  # base64 인코딩
     except Wc.DoesNotExist:
         image_base64 = None  # 이미지가 없을 경우 처리
