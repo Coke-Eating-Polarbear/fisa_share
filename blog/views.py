@@ -20,7 +20,7 @@ from django.views.decorators.csrf import csrf_exempt
 import json
 import os
 from dotenv import load_dotenv
-
+from collections import defaultdict
 load_dotenv()
 
 def login_required_session(view_func):
@@ -85,11 +85,7 @@ def spending_mbti(request):
     return render(request, 'spending_mbti.html', context)
 
 
-
-
 def main(request):
-    from collections import defaultdict
-
     today = timezone.now().date()
     yesterday = today - timedelta(days=1)
 
@@ -109,13 +105,10 @@ def main(request):
     for news in news_entries_queryset:
         if news.title not in seen_titles:
             seen_titles.add(news.title)
-            news_entries.append({
-                'title': news.title,
-                'summary': news.summary,
-                'url': news.url  # URL 추가
-            })
+            news_entries.append({'title': news.title, 'summary': news.summary})
 
     # 디버깅용 출력
+
     context = {
         'image_base64': image_base64,
         'news_entries': news_entries,
@@ -142,50 +135,6 @@ def report_ex(request):
         'user_name': user_name,
     }
     return render(request, 'report_ex.html', context)
-
-def agree(request):
-    return render(request, 'join_agree.html')
-
-def login_view(request):  # 이름을 login_view로 변경
-    if request.method == 'POST':
-        customer_id = request.POST['CustomerID']
-        password = request.POST['Pw']
-
-        try:
-            # UserProfile에서 CustomerID를 이용하여 사용자 객체 가져오기
-            user = UserProfile.objects.get(CustomerID=customer_id)
-            
-            # 비밀번호 확인
-            if check_password(password, user.Pw):
-                # 세션에 사용자 정보 저장하기
-                request.session['user_id'] = user.CustomerID
-                return redirect('main')  # main.html로 리디렉션
-            else:
-                # 비밀번호가 틀린 경우
-                return render(request, 'login.html', {'error': 'Invalid ID or password.'})
-        
-        except UserProfile.DoesNotExist:
-            # 사용자 ID가 없는 경우
-            return render(request, 'login.html', {'error': 'Invalid ID or password.'})
-    
-    return render(request, 'login.html')
-
-def signup(request):
-    if request.method == 'POST':
-        form = UserProfileForm(request.POST)
-        if form.is_valid():
-            user_profile = form.save(commit=False)
-            user_profile.sex = 'M' if user_profile.SerialNum in ['1', '3'] else 'F'
-            print(form.cleaned_data)  # 로그 출력
-            user_profile.save()  # 데이터베이스에 저장
-            return redirect('login.html')
-        else:
-            print(form.errors)  # 폼 에러 출력
-            return render(request, 'signup.html', {'form': form})
-    else:
-        form = UserProfileForm()
-    return render(request, 'signup.html', {'form': form})
-
 
 @login_required_session
 def summary_view(request):

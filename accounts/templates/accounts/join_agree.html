@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -66,11 +67,12 @@
             z-index: 1; 
         }
         footer {
-            position: fixed;
+            /* position: fixed; */
             background-color: #291e4ee5;
             padding: 10px;
             bottom: 0; 
             left: 0;
+            margin-top: 50px;
         }
             /* .nav-box {
                 border: 1px solid #ccc;
@@ -160,9 +162,10 @@
     <header>
     <div class="navbar">
         <div class="logo">
-            <a href="./">
-                <img src="./static/img/fisa_logo_after.png" style="vertical-align: middle;" alt="우리 FISA 로고">
+            <a href="{% url 'main' %}">
+                <img src="{% static 'img/fisa_logo_after.png' %}" style="vertical-align: middle;" alt="우리 FISA 로고">
                 <span style="font-size: 1.5rem; font-weight: bold; margin-left: 10px;">예/적금 추천 서비스</span>
+            </a>
         </div>
         <div class="nav-links" style="flex-grow: 1; text-align: center;">
                 <a href="./report.html" style=" font-weight: bold; color: #121212;">금융분석 리포트</a> 
@@ -209,8 +212,8 @@
                 <div class="terms-details" id="terms5" style="display: none;"></div>
             </div>
             <div class="button-container">
-                <button type="button" class="expand-btn" onclick="window.location.href='{% url 'login' %}'">뒤로가기</button>
-                <button type="button" class="expand-btn" onclick="window.location.href='{% url 'signup' %}'">가입하기</button>
+                <button type="button" class="expand-btn" onclick="window.location.href='{% url 'accounts:login' %}'">뒤로가기</button>
+                <button type="button" class="expand-btn" onclick="window.location.href='{% url 'accounts:signup' %}'">가입하기</button>
             </div>
         </form>
     </div>
