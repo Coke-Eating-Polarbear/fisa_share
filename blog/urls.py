@@ -3,8 +3,9 @@ from django.urls import path, include
 
 urlpatterns = [
     path('', views.main,name='main'), # 없는 경로를 호출하고 있음
+    path('report_ex', views.report_ex,name='report_ex'),
     path('main/', views.main, name='main'),
-    path('report', views.report,name='report'),
+    # path('report', views.report,name='report'),
     path('loginmain', views.summary_view,name='loginmain'),
     path('info1/', views.info1,name='info1'),
     path('info2/', views.info2,name='info2'),
