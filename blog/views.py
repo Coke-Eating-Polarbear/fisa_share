@@ -37,14 +37,7 @@ def login_required_session(view_func):
 
 logger = logging.getLogger(__name__)
 
-def terms_content3(request):
-    return render(request, 'mydata_form3.html')
 
-def terms_content4(request):
-    return render(request, 'log_data.html')
-
-def terms_content5(request):
-    return render(request, 'marketing.html')
 
 @login_required_session
 def mypage(request):
@@ -62,9 +55,6 @@ def mypage(request):
         'user_name': user_name,
     }
     return render(request, 'mypage.html',context)
-
-def terms_content2(request):
-    return render(request, 'mydata_form2.html')
 
 
 @login_required_session
@@ -119,7 +109,7 @@ def main(request):
 
 
 @login_required_session
-def report_ex(request):
+def report(request):
     customer_id = request.session.get('user_id')  
     user_name = "사용자"  # 기본값 설정
 
@@ -134,7 +124,7 @@ def report_ex(request):
     context = {
         'user_name': user_name,
     }
-    return render(request, 'report_ex.html', context)
+    return render(request, 'report.html', context)
 
 @login_required_session
 def summary_view(request):
@@ -142,27 +132,13 @@ def summary_view(request):
     today = timezone.now().date()
     yesterday = today - timedelta(days=1)
     # 오늘 날짜의 이미지 데이터 가져오기
-    # 어제 날짜의 이미지 데이터 가져오기
-    wc_entry = Wc.objects.filter(date=yesterday).first()
-    image_base64 = base64.b64encode(wc_entry.image).decode('utf-8') if wc_entry else None
+    try:
+        wc_entry = Wc.objects.filter(date=yesterday).first()
+        image_base64 = base64.b64encode(wc_entry.image).decode('utf-8')  # base64 인코딩
+    except Wc.DoesNotExist:
+        image_base64 = None  # 이미지가 없을 경우 처리
 
-    # 어제 날짜의 뉴스 데이터 가져오기
-    news_entries_queryset = News.objects.filter(
-        ndate=yesterday, 
-        summary__isnull=False
-    )
-
-    # 중복 제거 로직
-    seen_titles = set()  # 이미 본 제목을 저장
-    news_entries = []
-    for news in news_entries_queryset:
-        if news.title not in seen_titles:
-            seen_titles.add(news.title)
-            news_entries.append({
-                'title': news.title,
-                'summary': news.summary,
-                'url': news.url  # URL 추가
-            })
+    news_entries = News.objects.filter(ndate=yesterday, summary__isnull=False).values('title', 'summary')
 
     # CustomerID가 세션에 없으면 로그인 페이지로 리디렉션
     if not customer_id:
