@@ -12,30 +12,140 @@
         box-sizing: border-box;
         background-color: #ffffff;
         min-height: 100vh;
-        position: relative;
+        display: flex;
+        flex-direction: column;
     }
-    header, footer {
+
+    .login_section {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-top: 50px;
+      margin-bottom: 0px; /* 헤더와 바디 간격 조정 */
+      padding: 20px;
+      box-sizing: border-box;
+  }
+
+    .accounts_container {
+        display: flex;
+        max-width: 1000px;
+        width: 80%;
+        border-radius: 8px;
+        overflow: hidden;
         background-color: #ffffff;
-        padding: 0px;
+    }
+
+    .accounts_image {
+        flex: 1.5; /* 이미지 비율을 더 크게 설정 */
+        overflow: hidden;
+    }
+
+    .accounts_image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+
+    .accounts_forms {
+        flex: 1;
+        padding: 60px;
+        background-color: #ffffff;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .accounts_forms h1 {
         text-align: center;
+        margin-bottom: 40px;
+        font-size: 28px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+        display: flex;
+        flex-direction: column;
         width: 100%;
     }
+
+    .form-group label {
+        font-size: 16px;
+        font-weight: bold;
+        margin-bottom: 8px;
+    }
+
+    .form-group input {
+        width: 100%;
+        padding: 14px;
+        font-size: 16px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        box-sizing: border-box;
+    }
+
+    .form-group .login-button {
+        width: 100%;
+        padding: 14px;
+        font-size: 18px;
+        color: white;
+        background-color: #007bff;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        margin-top: 20px;
+    }
+
+    .form-group .login-button:hover {
+        background-color: #0056b3;
+    }
+
+    .helper-links {
+        text-align: center;
+        margin-top: 30px;
+        font-size: 14px;
+        color: #555;
+    }
+
+    .helper-links a {
+        color: #007bff;
+        text-decoration: none;
+        margin: 0 8px;
+    }
+
+    .helper-links a:hover {
+        text-decoration: underline;
+    }
+
+    header, footer {
+    /* background-color: #ffffff; */
+    text-align: center;
+    width: 100%;
+    }
     header {
+        background-color: #ffffff;
         position: fixed; 
+        padding: 0px;
         top: 0; 
         z-index: 1; 
     }
     footer {
-        position: fixed; 
+        /* position: fixed;  */
+        background-color: #291e4ee5;
+        padding: 10px;
         bottom: 0; 
-        left: 0; 
-        width: 100%;
+        left: 0;
     }
-    .container {
-        padding-top: 120px;
-        padding-bottom: 150px;
-        max-width: 1200px;
-        margin: 0 auto;
+        /* .nav-box {
+            border: 1px solid #ccc;
+            padding: 10px;
+        } */
+
+        /* 드롭다운 메뉴 스타일 */
+    .dropdown {
+        position: relative;
+        display: inline-block;
     }
     .navbar {
         display: flex;
@@ -47,7 +157,12 @@
         background-color: #ffffff;
     }
     .nav-links {
-        margin-right: 20px; /* 회원 정보와의 구분 */
+        margin-right: 10px; /* 회원 정보와의 구분 */
+        display: flex; 
+        justify-content: flex-end; 
+        align-items: center; 
+        flex-grow: 1; 
+        text-align: center;
     }
     .navbar a {
         /* margin: 0 20px; 링크 간격 */
@@ -57,111 +172,116 @@
         text-decoration: none;
         color: #333;
     }
-    .user-info span {
-    font-size: 1.1rem;
-    font-weight: bold;
+
+    .dropdown-content {
+        display: none;
+        position: absolute; /*부모요소 바로 아래에 위치*/
+        top: 100%;
+        left: 0;
+        background-color: #fff;
+        /* box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); */
+        padding: 0% ;
+        width: 150px; /*드롭다운이 전체 넓이를 차지*/
+        z-index: 1000;
+        border-top: 1px solid #ddd;
+        border-bottom: 1px solid #ddd;
+        /* border: 1px solid #ddd; */
+    }
+
+    .dropdown-content a {
+        padding: 10px 20px;
+        display: block;
+        text-align: left;
+        color: #333;
+        text-decoration: none;
+        /* white-space: nowrap; */
+    }
+
+    .dropdown-content a:hover {
+        background-color: #f1f1f1;
+    }
+
+    /* 마우스를 올렸을 때 드롭다운 표시 */
+    .dropdown:hover .dropdown-content {
+        display: block;
+    }
+
+    /* 링크 스타일 */
+    .nav-box nav a {
+        color: #333;
+        margin: 0 10px;
+        text-decoration: none;
+    }
+
+    .nav-box nav a:hover {
+        font-weight: bold;
     }
 </style>
-<head>
-  <meta charset="UTF-8">
-  <meta name="keywords" content="SignUp, Login, Register">
-  <meta name="keywords" content="Sign up, Sign in">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login</title>
-  <!--Bootstrap Css-->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css">
-  <!--Font-aweome-->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
- <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
-  <!--Custom Css-->
-  <link type="text/css" rel="stylesheet" href="./static/css/login.css" />
-
 </head>
-
 <body>
-    <div class="header" style="display: flex; align-items: center; justify-content: space-between; padding: 10px 20px; background-color: #f0f0f0;">
-        <div style="flex: 0 0 auto;">
+</head>
+<body>
+    {% csrf_token %}
+    <header>
+    <div class="navbar">
+        <div class="logo">
             <a href="./">
-                <img src="./static/img/fisa_logo_after.png" style="max-width: 150px; height: auto;" alt="우리 FISA 로고">
-            </a>
+                <img src="./static/img/fisa_logo_after.png" style="vertical-align: middle;" alt="우리 FISA 로고">
+                <span style="font-size: 1.5rem; font-weight: bold; margin-left: 10px;">예/적금 추천 서비스</span>
         </div>
-        <div style="margin-left: auto; display: flex; align-items: center;">
-            <div class="nav-box" style="border: 1px solid #ccc; padding: 10px;">
-                <nav>
-                    <a href="./report.html">금융분석 리포트</a> |
-                    <a href="#">예/적금 추천</a> |
-                    <a href="#">금융MBTI</a>
-                </nav>
-            </div>
+        <div class="nav-links" style="flex-grow: 1; text-align: center;">
+                <a href="./report.html" style=" font-weight: bold; color: #121212;">금융분석 리포트</a> 
+                <div class="dropdown">
+                    <a href="#" style=" font-weight: bold; color: #121212;">예/적금 추천</a>
+                    <div class="dropdown-content">
+                        <a href="savings_info1.html" style="font-size: 0.9rem;">신규적금추천</a>
+                        <a href="compare_products.html" style="font-size: 0.9rem;">기존상품비교</a>
+                    </div>
+                </div> 
+                <a href="#" style=" font-weight: bold; color: #121212;">소비MBTI</a>
         </div>
     </div>
-  <section class="login_section">
-    
-    <div class="container outer_container accounts_container">
-      <div class="row h-100">
-        <div class="col col-sm-12 col-md-12 col-lg-8 m-0 p-0 w-100 h-100 accounts_col">
-          <div class="accounts_image w-100 h-100">
-            <img src="https://img.freepik.com/free-photo/social-media-instagram-digital-marketing-concept-3d-rendering_106244-1717.jpg?t=st=1647414398~exp=1647414998~hmac=2c478ef6affd973ccd71ea4d394d9283db4a0c6c4c686ba0b9f6091c8a56e5a1&w=1480" alt="accounts_image" class="img-fluid w-100 h-100" />
+    </header>
+
+    <section class="login_section">
+      <div class="accounts_container">
+          <div class="accounts_image">
+              <img src="https://img.freepik.com/free-photo/social-media-instagram-digital-marketing-concept-3d-rendering_106244-1717.jpg?t=st=1647414398~exp=1647414998~hmac=2c478ef6affd973ccd71ea4d394d9283db4a0c6c4c686ba0b9f6091c8a56e5a1&w=1480" alt="계정 이미지">
           </div>
-          <!--accounts_image-->
-        </div>
-        <!--account_col-->
-        <div class="col col-sm-12 col-md-12 col-lg-4 m-0 p-0 accounts_col">
-          <!--accounts_forms-->
-          <div class="accounts_forms  w-100 h-100" id="login">
-            <div class="title  mt-4 p-4 w-100">
-              <h1>Sign In</h1>
-            </div>
-            <!--title-->
-            <form method="post" name="form" class="form  w-100 p-4" id="form">
-              {% csrf_token %}
-              <div class="form-group">
-                <label for="CustomerID">ID</label>
-                <input type="text" name="CustomerID" class="form-control" id="CustomerID" onfocus="labelUp(this)" onblur="labelDown(this)" required />
-              </div>
-              <div class="form-group">
-                <label for="Pw">Password</label>
-                <i class="fa fa-eye-slash" id="eye_icon_login"></i>
-                <input type="password" name="Pw" class="form-control" id="Pw" onfocus="labelUp(this)" onblur="labelDown(this)" required />
-              </div>
-              <div class="form-group mb-0">
-                <button type="submit" class="btn btn-primary register_btn w-100">로그인</button>
-              </div>
-              {% if error %}
-                <p style="color: red;">{{ error }}</p>
-              {% endif %}
-            </form>
-            <div class="form-group text-center mt-3">
-              <a href="{% url 'agree' %}" style="color: #000; font-size: 1.2rem;">회원가입</a>
-            </div>
+          <div class="accounts_forms">
             
+              <h1>로그인</h1>
+              <form method="post">
+                {% csrf_token %}
+                  <div class="form-group">
+                      <label for="CustomerID">아이디</label>
+                      <input type="text" id="CustomerID" placeholder="아이디 입력">
+                  </div>
+                  <div class="form-group">
+                      <label for="Pw">비밀번호</label>
+                      <input type="password" id="Pw" placeholder="비밀번호 입력">
+                  </div>
+                  <div class="form-group">
+                      <button type="submit" class="login-button">로그인</button>
+                    </div>
+                    {% if error %}
+                      <p style="color: red;">{{ error }}</p>
+                    {% endif %}
+                  </form>
+              <div class="helper-links">
+                  <a href="#">아이디찾기</a> | 
+                  <a href="#">비밀번호변경</a> | 
+                  <a href="{% url 'agree' %}">회원가입</a>
+              </div>
           </div>
-          <!--accounts_forms-->
-        </div>
-        <!--account_col-->
       </div>
-      <!--row-->
-    </div>
-    <!--accounts_container-->
   </section>
-  <!--login_section-->
 
-  <!-- jQuery library -->
-  <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.slim.min.js"></script>
-  <!-- Popper JS -->
-  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
-  <!-- Latest compiled JavaScript -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js"></script>
-  <!--Custom Js-->
-  <script type="text/javascript" src="./static/js/login.js"></script>
+    <footer>
+      <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0;">서울특별시 마포구 월드컵북로 434 상암IT타워 6층</p> 
+      <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0;">고객지원 : 02-3151-7000 | 이메일: worifisa@worifisa.com </p >
+      <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0;">COPYRIGHT©우리팀이름~</p >
+  </footer >
 
-
-  <footer>
-    <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0;">서울특별시 마포구 월드컵북로 434 상암IT타워 6층</p> 
-    <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0;">고객지원 : 02-3151-7000 | 이메일: worifisa@worifisa.com </p >
-    <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0;">COPYRIGHT©우리팀이름~</p >
-    </footer >
-    
-    </body >
-    </html >
+</body>
+</html>
