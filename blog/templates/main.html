@@ -184,7 +184,7 @@
         gap: 10px;
         /* width: 30% ; */
         height: stretch;  /* 높이 설정 */
-
+        text-decoration: none;
     }
 
     .summary-box:hover {
@@ -256,10 +256,10 @@
         <div class="news-summary">
             {% if news_entries %}
                 {% for news in news_entries %}
-                    <div class="summary-box">
-                        <div class="title">{{ news.title }}</div>
-                        <div class="summary">{{ news.summary }}</div>
-                    </div>
+                <a href="{{ news.url }}" target="_blank" class="summary-box">
+                    <div class="title">{{ news.title }}</div>
+                    <div class="summary">{{ news.summary }}</div>
+                </a>
                 {% endfor %}
             {% else %}
                 <p>뉴스가 없습니다.</p>

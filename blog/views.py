@@ -85,6 +85,8 @@ def spending_mbti(request):
     return render(request, 'spending_mbti.html', context)
 
 
+
+
 def main(request):
     from collections import defaultdict
 
@@ -107,10 +109,13 @@ def main(request):
     for news in news_entries_queryset:
         if news.title not in seen_titles:
             seen_titles.add(news.title)
-            news_entries.append({'title': news.title, 'summary': news.summary})
+            news_entries.append({
+                'title': news.title,
+                'summary': news.summary,
+                'url': news.url  # URL 추가
+            })
 
     # 디버깅용 출력
-
     context = {
         'image_base64': image_base64,
         'news_entries': news_entries,
