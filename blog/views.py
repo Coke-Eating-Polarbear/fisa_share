@@ -85,28 +85,63 @@ def spending_mbti(request):
     return render(request, 'spending_mbti.html', context)
 
 
+# def main(request):
+#     today = timezone.now().date()
+#     yesterday = today - timedelta(days=1)
+
+#     # 어제 날짜의 이미지 데이터 가져오기
+#     try:
+#         wc_entry = Wc.objects.filter(date=yesterday).first()
+#         image_base64 = base64.b64encode(wc_entry.image).decode('utf-8')
+#     except Wc.DoesNotExist:
+#         image_base64 = None
+
+#     # 어제 날짜의 뉴스 데이터에서 title과 summary만 가져오기
+#     news_entries = News.objects.filter(ndate=yesterday, summary__isnull=False).values('title', 'summary').distinct()
+    
+#     # 디버그 출력
+
+#     context = {
+#         'image_base64': image_base64,
+#         'news_entries': news_entries,
+#     }
+    
+#     return render(request, 'main.html', context)
+
 def main(request):
+    from collections import defaultdict
+
     today = timezone.now().date()
     yesterday = today - timedelta(days=1)
 
     # 어제 날짜의 이미지 데이터 가져오기
-    try:
-        wc_entry = Wc.objects.filter(date=yesterday).first()
-        image_base64 = base64.b64encode(wc_entry.image).decode('utf-8')
-    except Wc.DoesNotExist:
-        image_base64 = None
+    wc_entry = Wc.objects.filter(date=yesterday).first()
+    image_base64 = base64.b64encode(wc_entry.image).decode('utf-8') if wc_entry else None
 
-    # 어제 날짜의 뉴스 데이터에서 title과 summary만 가져오기
-    news_entries = News.objects.filter(ndate=yesterday, summary__isnull=False).values('title', 'summary')
-    
-    # 디버그 출력
+    # 어제 날짜의 뉴스 데이터 가져오기
+    news_entries_queryset = News.objects.filter(
+        ndate=yesterday, 
+        summary__isnull=False
+    )
+
+    # 중복 제거 로직
+    seen_titles = set()  # 이미 본 제목을 저장
+    news_entries = []
+    for news in news_entries_queryset:
+        if news.title not in seen_titles:
+            seen_titles.add(news.title)
+            news_entries.append({'title': news.title, 'summary': news.summary})
+
+    # 디버깅용 출력
+    print("뉴스 데이터 (중복 제거 후):", news_entries)
 
     context = {
         'image_base64': image_base64,
         'news_entries': news_entries,
     }
-    
+
     return render(request, 'main.html', context)
+
 
 
 @login_required_session
