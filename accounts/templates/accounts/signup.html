@@ -1,56 +1,57 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="ko">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>회원가입</title>
-        <link rel="stylesheet" href="./static/css/signup.css">
+        <link rel="stylesheet" href="{% static 'css/signup.css' %}">
     
-    <script>
-        function checkPasswords() {
-            const password = document.getElementById('password').value;
-            const confirmPassword = document.getElementById('confirm-password').value;
-            const message = document.getElementById('password-message');
+        <script>
+            function checkPasswords() {
+                const password = document.getElementById('password').value;
+                const confirmPassword = document.getElementById('confirm-password').value;
+                const message = document.getElementById('password-message');
 
-            if (password && confirmPassword) {
-                if (password === confirmPassword) {
-                    message.textContent = '서로 일치합니다.';
-                    message.style.color = 'green';
+                if (password && confirmPassword) {
+                    if (password === confirmPassword) {
+                        message.textContent = '서로 일치합니다.';
+                        message.style.color = 'green';
+                    } else {
+                        message.textContent = '서로 일치하지 않습니다.';
+                        message.style.color = 'red';
+                    }
                 } else {
-                    message.textContent = '서로 일치하지 않습니다.';
-                    message.style.color = 'red';
+                    message.textContent = '';
                 }
-            } else {
-                message.textContent = '';
             }
-        }
 
-        function autoMoveToNextField(current, next) {
-            if (current.value.length === current.maxLength) {
-                document.getElementById(next).focus();
-            }
-        }
-
-        function maskSSN() {
-            const serialField = document.getElementById('serial');
-            const maskedField = document.getElementById('masked-serial');
-
-            serialField.addEventListener('input', function() {
-                if (serialField.value.length > 1) {
-                    serialField.value = serialField.value.slice(0, 1);
+            function autoMoveToNextField(current, next) {
+                if (current.value.length === current.maxLength) {
+                    document.getElementById(next).focus();
                 }
-                maskedField.textContent = '●●●●●●';
-            });
-        }
+            }
 
-        document.addEventListener('DOMContentLoaded', maskSSN);
-    </script>
-</head>
+            function maskSSN() {
+                const serialField = document.getElementById('serial');
+                const maskedField = document.getElementById('masked-serial');
+
+                serialField.addEventListener('input', function() {
+                    if (serialField.value.length > 1) {
+                        serialField.value = serialField.value.slice(0, 1);
+                    }
+                    maskedField.textContent = '●●●●●●';
+                });
+            }
+
+            document.addEventListener('DOMContentLoaded', maskSSN);
+        </script>
+    </head>
 <body>
     <div class="header">
         <div style="flex: 0 0 auto;">
-            <a href="./">
-                <img src="./static/img/fisa_logo_after.png" style="max-width: 150px; height: auto;" alt="우리 FISA 로고">
+            <a href="{% url 'main' %}">
+                <img src="{% static 'img/fisa_logo_after.png' %}" style="max-width: 150px; height: auto;" alt="우리 FISA 로고">
             </a>
         </div>
         <div style="margin-left: auto; display: flex; align-items: center;">

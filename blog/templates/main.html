@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>메인 페이지</title>
-    <link rel="stylesheet" href="./static/css/main.css">
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
     <style>
     /* 최상위 요소들의 여백 제거 */
 *   {
@@ -223,7 +224,7 @@
     <div class="navbar">
         <div class="logo">
             <a href="./">
-                <img src="./static/img/fisa_logo_after.png" style="vertical-align: middle;" alt="우리 FISA 로고">
+                <img src="{% static 'img/fisa_logo_after.png' %}" style="vertical-align: middle;" alt="우리 FISA 로고">
                 <span style="font-size: 1.5rem; font-weight: bold; margin-left: 10px;">예/적금 추천 서비스</span>
         </div>
         <div class="nav-links" style="flex-grow: 1; text-align: center;">
@@ -247,7 +248,7 @@
                 천냥이, 만덕이와 <br> 함께 하는 <br> 똑똑한 금융생활-!
             </div>
             <div class="button-container" style="position: absolute; bottom: 13%; left: 15%; transform: translateX(-50%); background-color: rgba(44, 5, 142, 0.8); padding: 10px 20px; border-radius: 10px;">
-                <a href="{% url 'login' %}" style="color: #fff;"> 시작하기</a>
+                <a href="{% url 'accounts:login' %}" style="color: #fff;"> 시작하기</a>
             </div>
         </div>        
     </div>

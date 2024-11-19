@@ -1,80 +1,13 @@
-body{
-    width:100%;
-    background-color:var(--background-theme);
-}
-h1{
-    font-size: 3.2rem;
-}
-p{
-  font-size: 1.2rem;  
-}
-
-
-.accounts_container{
-    height: 550px;
-    min-height: 550px;
-    max-height: 100%;
-    border-radius:10px;
-    box-shadow: 8px 8px 8px rgba(0,0,0,0.1);
-    background-color: #fcfcfc;
-    overflow: hidden; 
-}
-
-
-.accounts_image img{
-    object-fit: cover;
-    object-position: center;
-    border-top-left-radius: 10px;
-    border-bottom-left-radius: 10px;
-}
-.accounts_col form .form-group{
-    position: relative !important;
-}
-.accounts_col form .form-control{
-    font-size:1.6rem;
-    padding:20px 10px;
-    margin-bottom:20px;
-    background:transparent !important;
-}
-.accounts_col form label,
-.accounts_col form .form-group i{
-    position:absolute;
-    z-index: 1;
-    pointer-events: none;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size:1.2rem;
-    left:10px;
-
-}
-.accounts_col form label{
-    transition: .2s linear;
-}
-.change_label{
-    background-color:#fcfcfc;
-    transition: .2s linear;
-    transform: scale(0.8);
-    top:0 !important;
-}
-.accounts_col form .form-group i{
-    left:90% !important;
-    cursor: pointer;
-    pointer-events:visible;
-}
-.register_btn{
-    padding:10px 0!important;
-    font-size: 1.6rem !important;
-    font-weight: 600 !important;
-
-}
-
-.login_form,
-.signup_form{
-    display:none;
-}
-
-
-body {
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>로그인 페이지</title>
+    <link rel="stylesheet" href="{% static 'css/login.css' %}">
+    <style>
+        body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
@@ -285,3 +218,70 @@ footer {
 .nav-box nav a:hover {
     font-weight: bold;
 }
+    </style>
+</head>
+<body>
+    {% csrf_token %}
+    <header>
+    <div class="navbar">
+        <div class="logo">
+            <a href="{% url 'main' %}">
+                <img src="{% static 'img/fisa_logo_after.png' %}" style="vertical-align: middle;" alt="우리 FISA 로고">
+
+                <span style="font-size: 1.5rem; font-weight: bold; margin-left: 10px;">예/적금 추천 서비스</span>
+        </div>
+        <div class="nav-links" style="flex-grow: 1; text-align: center;">
+                <a href="./report.html" style=" font-weight: bold; color: #121212;">금융분석 리포트</a> 
+                <div class="dropdown">
+                    <a href="#" style=" font-weight: bold; color: #121212;">예/적금 추천</a>
+                    <div class="dropdown-content">
+                        <a href="savings_info1.html" style="font-size: 0.9rem;">신규적금추천</a>
+                        <a href="compare_products.html" style="font-size: 0.9rem;">기존상품비교</a>
+                    </div>
+                </div> 
+                <a href="#" style=" font-weight: bold; color: #121212;">소비MBTI</a>
+        </div>
+    </div>
+    </header>
+
+    <section class="login_section">
+        <div class="accounts_container">
+            <div class="accounts_image">
+                <img src="https://img.freepik.com/free-photo/social-media-instagram-digital-marketing-concept-3d-rendering_106244-1717.jpg?t=st=1647414398~exp=1647414998~hmac=2c478ef6affd973ccd71ea4d394d9283db4a0c6c4c686ba0b9f6091c8a56e5a1&w=1480" alt="계정 이미지">
+            </div>
+            <div class="accounts_forms">
+                <h1>로그인</h1>
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="CustomerID">아이디</label>
+                        <input type="text" id="CustomerID" name="CustomerID" placeholder="아이디 입력">
+                    </div>
+                    <div class="form-group">
+                        <label for="Pw">비밀번호</label>
+                        <input type="password" id="Pw" name="Pw" placeholder="비밀번호 입력">
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="login-button">로그인</button>
+                    </div>
+                    {% if error %}
+                    <p style="color: red;">{{ error }}</p>
+                    {% endif %}
+                </form>
+                <div class="helper-links">
+                    <a href="#">아이디찾기</a> | 
+                    <a href="#">비밀번호변경</a> | 
+                    <a href="{% url 'accounts:agree' %}">회원가입</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+      <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0;">서울특별시 마포구 월드컵북로 434 상암IT타워 6층</p> 
+      <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0;">고객지원 : 02-3151-7000 | 이메일: worifisa@worifisa.com </p >
+      <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0;">COPYRIGHT©우리팀이름~</p >
+  </footer >
+
+</body>
+</html>
