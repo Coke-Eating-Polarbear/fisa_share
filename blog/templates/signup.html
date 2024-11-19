@@ -4,14 +4,13 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>회원가입</title>
-        <link rel="stylesheet" href="./static/css/signup.css">
+        {% comment %} <link rel="stylesheet" href="./static/css/signup.css"> {% endcomment %}
     
     <script>
         function checkPasswords() {
             const password = document.getElementById('password').value;
             const confirmPassword = document.getElementById('confirm-password').value;
             const message = document.getElementById('password-message');
-
             if (password && confirmPassword) {
                 if (password === confirmPassword) {
                     message.textContent = '서로 일치합니다.';
@@ -24,17 +23,14 @@
                 message.textContent = '';
             }
         }
-
         function autoMoveToNextField(current, next) {
             if (current.value.length === current.maxLength) {
                 document.getElementById(next).focus();
             }
         }
-
         function maskSSN() {
             const serialField = document.getElementById('serial');
             const maskedField = document.getElementById('masked-serial');
-
             serialField.addEventListener('input', function() {
                 if (serialField.value.length > 1) {
                     serialField.value = serialField.value.slice(0, 1);
@@ -42,73 +38,331 @@
                 maskedField.textContent = '●●●●●●';
             });
         }
-
         document.addEventListener('DOMContentLoaded', maskSSN);
     </script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            position: relative;
+            background-color: #ffffff;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            margin: 120px auto;
+            width: 80%;
+            max-width: 800px;
+            padding: 20px;
+            background-color: #fdfdfd;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .signup-form h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group.inline {
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px; /* 입력 필드와 버튼 간의 간격 */
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .form-group input,
+        .form-group button {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+        }
+
+        .form-group button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        .form-group button:hover {
+            background-color: #0056b3;
+        }
+
+        header, footer {
+            /* background-color: #ffffff; */
+            text-align: center;
+            width: 100%;
+            }
+            header {
+                background-color: #ffffff;
+                position: fixed; 
+                padding: 0px;
+                top: 0; 
+                z-index: 1; 
+            }
+            footer {
+                /* position: fixed;  */
+                background-color: #291e4ee5;
+                padding: 10px;
+                bottom: 0; 
+                left: 0;
+            }
+                /* .nav-box {
+                    border: 1px solid #ccc;
+                    padding: 10px;
+                } */
+        
+                /* 드롭다운 메뉴 스타일 */
+            .dropdown {
+                position: relative;
+                display: inline-block;
+            }
+            .navbar {
+                display: flex;
+                justify-content: space-between; /* 좌측 로고와 우측 버튼 배치 */
+                /* justify-content: flex-end; 오른쪽 정렬 */
+                align-items: center;
+                padding: 10px 20px;
+                font-size: 1rem;
+                background-color: #ffffff;
+            }
+            .nav-links {
+                margin-right: 10px; /* 회원 정보와의 구분 */
+                display: flex; 
+                justify-content: flex-end; 
+                align-items: center; 
+                flex-grow: 1; 
+                text-align: center;
+            }
+            .navbar a {
+                /* margin: 0 20px; 링크 간격 */
+                font-size: 1.2rem; /* 글씨 크기 */
+                font-weight: bold; /* 글씨 진하게 */
+                margin-left: 15px; /* 각 링크 사이의 간격 */
+                text-decoration: none;
+                color: #333;
+            }
+        
+            .dropdown-content {
+                display: none;
+                position: absolute; /*부모요소 바로 아래에 위치*/
+                top: 100%;
+                left: 0;
+                background-color: #fff;
+                /* box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); */
+                padding: 0% ;
+                width: 150px; /*드롭다운이 전체 넓이를 차지*/
+                z-index: 1000;
+                border-top: 1px solid #ddd;
+                border-bottom: 1px solid #ddd;
+                /* border: 1px solid #ddd; */
+            }
+        
+            .dropdown-content a {
+                padding: 10px 20px;
+                display: block;
+                text-align: left;
+                color: #333;
+                text-decoration: none;
+                /* white-space: nowrap; */
+            }
+        
+            .dropdown-content a:hover {
+                background-color: #f1f1f1;
+            }
+        
+            /* 마우스를 올렸을 때 드롭다운 표시 */
+            .dropdown:hover .dropdown-content {
+                display: block;
+            }
+        
+            /* 링크 스타일 */
+            .nav-box nav a {
+                color: #333;
+                margin: 0 10px;
+                text-decoration: none;
+            }
+        
+            .nav-box nav a:hover {
+                font-weight: bold;
+            }
+            /* 입력 필드 스타일 */
+            #CustomerID {
+                width: 100%;
+            }
+            
+            .CustomerID-group button {
+                flex: 1 !important;
+                padding: 8px !important;
+            }
+            
+            .password-check-message {
+                margin-top: 5px;
+                font-size: 0.9em;
+            }
+            
+            ssn-group {
+                display: flex;
+                align-items: center;
+                gap: 5px;
+            }
+            
+            .ssn-group input {
+                width: 140px;
+            }
+            
+            .ssn-group span {
+                font-size: 1.2em;
+            }
+            .ssn-group input:first-child { 
+                width: 50%; 
+                flex: none; 
+            }
+            
+            #serial {
+                width: 40px; /* serial 필드의 너비 */
+                height: 35px; /* serial 필드의 높이 */
+                font-size: 1em; /* 글자 크기 */
+            }
+            
+            .masked-ssn {
+                font-size: 1.5em;
+                letter-spacing: 0.4em;
+            }
+            .duplicate-check-button {
+                flex: 1;
+                padding: 8px;
+                background-color: #00b3ff;
+                color: white;
+                border: none;
+                cursor: pointer;
+                border-radius: 5px;
+                text-align: center;
+            }
+            
+            .hyphen {
+                margin: 0 10px !important; /* 하이픈 앞뒤 공간을 주기 위해 padding 사용 */
+                font-size: 1.5em !important;/* 하이픈 크기 */
+                display: inline-block;
+            }
+            
+            .error {
+                color: red;
+                font-size: 0.9em;
+                margin-top: 5px;
+            } 
+    </style>
 </head>
 <body>
-    <div class="header">
-        <div style="flex: 0 0 auto;">
+    {% csrf_token %}
+    <header>
+    <div class="navbar">
+        <div class="logo">
             <a href="./">
-                <img src="./static/img/fisa_logo_after.png" style="max-width: 150px; height: auto;" alt="우리 FISA 로고">
-            </a>
+                <img src="./static/img/fisa_logo_after.png" style="vertical-align: middle;" alt="우리 FISA 로고">
+                <span style="font-size: 1.5rem; font-weight: bold; margin-left: 10px;">예/적금 추천 서비스</span>
         </div>
-        <div style="margin-left: auto; display: flex; align-items: center;">
-            <div class="nav-box">
-                <nav>
-                    <a href="./report.html">금융분석 리포트</a> |
-                    <a href="#">예/적금 추천</a> |
-                    <a href="#">소비MBTI</a>
-                </nav>
-            </div>
+        <div class="nav-links" style="flex-grow: 1; text-align: center;">
+                <a href="./report.html" style=" font-weight: bold; color: #121212;">금융분석 리포트</a> 
+                <div class="dropdown">
+                    <a href="#" style=" font-weight: bold; color: #121212;">예/적금 추천</a>
+                    <div class="dropdown-content">
+                        <a href="savings_info1.html" style="font-size: 0.9rem;">신규적금추천</a>
+                        <a href="compare_products.html" style="font-size: 0.9rem;">기존상품비교</a>
+                    </div>
+                </div> 
+                <a href="#" style=" font-weight: bold; color: #121212;">소비MBTI</a>
         </div>
     </div>
-    
+    </header>
+
 
     <div class="container">
-    <form method="post" class="signup-form">
-        {% csrf_token %}
-        <h2>회원가입</h2>
-        <div class="form-group CustomerID-group">
-            <label for="CustomerID">아이디</label>
-            {{ form.CustomerID }}
-            <button type="button" class="duplicate-check-button">중복확인</button>
-        </div>
-        <div class="form-group">
-            <label for="Pw">비밀번호</label>
-            {{ form.Pw }}
-        </div>
-        <div class="form-group">
-            <label for="confirm-password">비밀번호 확인</label>
-            <input type="password" id="confirm-password" oninput="checkPasswords()">
-            <div id="password-message" class="password-check-message"></div>
-        </div>
-        <div class="form-group">
-            <label for="Email">이메일주소</label>
-            {{ form.Email }}
-        </div>
-        <div class="form-group">
-            <label for="username">이름</label>
-            {{ form.username }}
-        </div>
-        <div class="form-group ssn-group">
-            <label>주민번호</label>
-            {{ form.Birth }}
-            {% if form.Birth.errors %}
-            <div class="error">{{ form.Birth.errors.0 }}</div>
-            {% endif %}
-            <span class="hyphen"> &nbsp;-&nbsp; </span>
-            <input type="text" id="serial" name="SerialNum" maxlength="1" oninput="maskSSN()">
-            <span id="masked-serial" class="masked-ssn">●●●●●●</span>
-        </div>
-        <div class="form-group">
-            <label for="Phone">휴대전화번호</label>
-            {{ form.Phone }}
-        </div>
-        <div class="form-group">
-            <button type="submit">회원가입</button>
-        </div>
-    </form>
+        <form method="post" class="signup-form">
+            {% csrf_token %}
+            <h2>회원가입</h2>
+            <div class="form-group inline">
+                <label for="CustomerID">아이디</label>
+                <input type="text" id="CustomerID" name="CustomerID" placeholder="아이디를 입력하세요">
+                <button type="button">중복확인</button>
+            </div>
+            <div class="form-group">
+                <label for="Pw">비밀번호</label>
+                <input type="password" id="Pw" name="Pw" placeholder="비밀번호를 입력하세요">
+            </div>
+            <div class="form-group">
+                <label for="confirm-password">비밀번호 확인</label>
+                <input type="password" id="confirm-password" oninput="checkPasswords()" placeholder="비밀번호를 다시 입력하세요">
+                <div id="password-message" class="password-check-message"></div>
+            </div>
+            <div class="form-group">
+                <label for="Email">이메일주소</label>
+                <input type="email" id="Email" name="Email" placeholder="이메일을 입력하세요">
+            </div>
+            <div class="form-group">
+                <label for="username">이름</label>
+                <input type="text" id="username" name="username" placeholder="이름을 입력하세요">
+            </div>
+            <div class="form-group ssn-group">
+                <label for="Birth">주민번호</label>
+                <div class="ssn-inline">
+                    <input type="text" id="Birth" name="Birth" maxlength="6" placeholder="앞 6자리">
+                    <span class="hyphen">-</span>
+                    <input type="text" id="serial" name="SerialNum" maxlength="1" placeholder="">
+                    <span class="masked-ssn">●●●●●●</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="Phone">휴대전화번호</label>
+                <input type="text" id="Phone" name="Phone" placeholder="전화번호를 입력하세요">
+            </div>
+            <div class="form-group">
+                <button type="submit">회원가입</button>
+            </div>
+        </form>
     </div>
+    <footer>
+        <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0;">서울특별시 마포구 월드컵북로 434 상암IT타워 6층</p> 
+        <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0;">고객지원 : 02-3151-7000 | 이메일: worifisa@worifisa.com </p >
+        <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0;">COPYRIGHT©우리팀이름~</p >
+    </footer>
+    <script>
+        function checkPasswords() {
+            const password = document.getElementById('Pw').value;
+            const confirmPassword = document.getElementById('confirm-password').value;
+            const message = document.getElementById('password-message');
+            if (password && confirmPassword) {
+                message.textContent = password === confirmPassword ? '비밀번호가 일치합니다.' : '비밀번호가 일치하지 않습니다.';
+                message.style.color = password === confirmPassword ? 'green' : 'red';
+            } else {
+                message.textContent = '';
+            }
+        }
+    </script>
 </body>
 </html>
