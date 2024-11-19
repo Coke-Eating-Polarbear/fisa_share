@@ -16,6 +16,7 @@
     background-color: #ffffff;
     min-height: 100vh;
     position: relative;
+    overflow-x: hidden; /* 좌우 스크롤 제거 */
     }
     header, footer {
     /* background-color: #ffffff; */
@@ -31,7 +32,7 @@
     }
     footer {
         /* position: fixed;  */
-        background-color: #39334f;
+        background-color: #291e4ee5;
         padding: 10px;
         bottom: 0; 
         left: 0;
@@ -137,6 +138,13 @@
         padding: 20px;
         border: 1px solid black;
     }
+
+    .word-cloud img {
+        max-width: 100%; /* 박스의 가로 크기 안에 맞춤*/
+        max-height: 100%;  /* 박스의 세로 크기 안에 맞춤 */
+        display: block;  /* 이미지의 블록화로 여백 제거 */
+        margin: 0 auto; /* 이미지를 중앙 정렬 */
+    }
     
     .summary-box {
         flex: 1;
@@ -190,7 +198,7 @@
         <!-- <div class="image-container" style="position: relative;"> -->
             <!--<img src="./static/img/images.jpeg" alt="메인 이미지" style="width: 100%; height: 500px;">-->
             <div class="text-overlay" style="position: absolute; top: 35%; left: 15%; transform: translateX(-50%); color: #fff; font-size: 32px; font-weight: bold;">
-                천냥이, 만냥이와 <br> 함께 하는 <br> 똑똑한 금융생활-!
+                천냥이, 만덕이와 <br> 함께 하는 <br> 똑똑한 금융생활-!
             </div>
             <div class="button-container" style="position: absolute; bottom: 13%; left: 15%; transform: translateX(-50%); background-color: rgba(44, 5, 142, 0.8); padding: 10px 20px; border-radius: 10px;">
                 <a href="{% url 'login' %}" style="color: #fff;"> 시작하기</a>
@@ -213,7 +221,7 @@
         </div>
 
         <div class="word-cloud">
-            <h2>뉴스 워드클라우드</h2>
+            <h2 style="font-weight: bold;">오늘의 뉴스 키워드</h2>
             {% if image_base64 %}
                 <img src="data:image/png;base64,{{ image_base64 }}" alt="Word Cloud Image">
             {% else %}
@@ -221,5 +229,12 @@
             {% endif %}
         </div>
     </div>
+
+    <footer>
+        <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0;">서울특별시 마포구 월드컵북로 434 상암IT타워 6층</p> 
+        <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0;">고객지원 : 02-3151-7000 | 이메일: worifisa@worifisa.com </p >
+        <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0;">COPYRIGHT©우리팀이름~</p >
+    </footer >
+
 </body>
 </html>

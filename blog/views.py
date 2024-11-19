@@ -86,7 +86,7 @@ def main(request):
 
     # 어제 날짜의 이미지 데이터 가져오기
     try:
-        wc_entry = Wc.objects.get(date=yesterday)
+        wc_entry = Wc.objects.filter(date=yesterday).first()
         image_base64 = base64.b64encode(wc_entry.image).decode('utf-8')
     except Wc.DoesNotExist:
         image_base64 = None
