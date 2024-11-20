@@ -15,5 +15,7 @@ urlpatterns = [
     path('recommend_savings_top5', views.top5,name='top5'),
     path('log_click_event', views.log_click_event, name='log_click_event'),
     path('spending_mbti', views.spending_mbti, name='spending_mbti'),
-    path('temp', views.temp, name='temp'),
+    path('favorite', views.favorite, name='favorite'),
+    path('add_favorite/', views.add_favorite, name='add_favorite'),
+    path('remove_favorite/', views.remove_favorite, name='remove_favorite'),
 ]

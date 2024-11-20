@@ -5,16 +5,14 @@ from datetime import timedelta
 import base64
 from django.contrib import messages
 from .forms import UserProfileForm  # UserProfileForm을 가져옵니다
-from .models import UserProfile  # UserProfile 모델도 가져옵니다
+from .models import UserProfile,Recommend, DsProduct, Wc, News, Favorite  # UserProfile 모델도 가져옵니다
 from django.contrib.auth.hashers import check_password
 from django.views.decorators.http import require_POST
-from django.http import HttpResponse
-from .models import Recommend, DsProduct, Wc, News
+from django.http import HttpResponse,JsonResponse
 from django.db.models import F
 import random
 import logging
 from .logging import *
-from django.http import JsonResponse
 from elasticsearch import Elasticsearch
 from django.views.decorators.csrf import csrf_exempt
 import json
@@ -132,19 +130,40 @@ def summary_view(request):
     today = timezone.now().date()
     yesterday = today - timedelta(days=1)
     # 오늘 날짜의 이미지 데이터 가져오기
-    try:
-        wc_entry = Wc.objects.filter(date=yesterday).first()
-        if wc_entry is not None and wc_entry.image:
-            image_base64 = base64.b64encode(wc_entry.image).decode('utf-8')  # base64 인코딩
-        else:
-            image_base64 = None  # 이미지가 없거나 wc_entry가 None일 경우 처리
-    except Exception as e:
-    # 예상치 못한 오류를 잡아내기 위한 처리
-        image_base64 = None
-        print(f"An error occurred: {e}")
+        # 어제 날짜의 이미지 데이터 가져오기
+    wc_entry = Wc.objects.filter(date=yesterday).first()
+    image_base64 = base64.b64encode(wc_entry.image).decode('utf-8') if wc_entry else None
+
+    # 어제 날짜의 뉴스 데이터 가져오기
+    news_entries_queryset = News.objects.filter(
+        ndate=yesterday, 
+        summary__isnull=False
+    )
+
+    # 중복 제거 로직
+    seen_titles = set()  # 이미 본 제목을 저장
+    news_entries = []
+    for news in news_entries_queryset:
+        if news.title not in seen_titles:
+            seen_titles.add(news.title)
+            news_entries.append({
+                'title': news.title,
+                'summary': news.summary,
+                'url': news.url  # URL 추가
+            })
+    # try:
+    #     wc_entry = Wc.objects.filter(date=yesterday).first()
+    #     if wc_entry is not None and wc_entry.image:
+    #         image_base64 = base64.b64encode(wc_entry.image).decode('utf-8')  # base64 인코딩
+    #     else:
+    #         image_base64 = None  # 이미지가 없거나 wc_entry가 None일 경우 처리
+    # except Exception as e:
+    # # 예상치 못한 오류를 잡아내기 위한 처리
+    #     image_base64 = None
+    #     print(f"An error occurred: {e}")
 
 
-    news_entries = News.objects.filter(ndate=yesterday, summary__isnull=False).values('title', 'summary', 'url')
+    # news_entries = News.objects.filter(ndate=yesterday, summary__isnull=False).values('title', 'summary', 'url')
 
     # CustomerID가 세션에 없으면 로그인 페이지로 리디렉션
     if not customer_id:
@@ -318,23 +337,29 @@ def info4(request):
 def top5(request):
     customer_id = request.session.get('user_id')  
     user_name = "사용자"  # 기본값 설정
+    top5_products = []  # 추천 상품 리스트 초기화
 
     if customer_id:
         try:
             # CustomerID로 UserProfile 조회
             user = UserProfile.objects.get(CustomerID=customer_id)
             user_name = user.username  # 사용자 이름 설정
+
+            # Favorite 테이블에서 사용자와 관련된 DSID 가져오기
+            favorites = Favorite.objects.filter(CustomerID=user).select_related('DSID')
+
+            # Favorite에 등록된 상품 중 상위 5개 가져오기
+            top5_products = favorites[:5]  # 필요한 로직에 따라 상위 5개만 선택
         except UserProfile.DoesNotExist:
             pass  # 사용자가 없을 경우 기본값 유지
 
     context = {
         'user_name': user_name,
+        'top5_products': top5_products,
     }
 
     return render(request, 'recommend_savings_top5.html', context)
 
-
-# 테스트
 
 
 @login_required_session
@@ -373,57 +398,68 @@ def log_click_event(request):
 
 
 #----------------------------------------------------------------------
-def temp(request):
-    # 예시 데이터 (실제 데이터는 데이터베이스나 API에서 가져올 수 있음)
-    stats = {
-        "max_rate": "5.05%",
-        "total_products": 127,
-        "total_banks": 23
-    }
-    conditions = [
-        '비대면가입', '앱사용', '급여연동', '연금',
-        '공과금출금', '카드사용', '첫거래', '입출금통장',
-        '재예치', '청약보유', '추천쿠폰', '자동이체'
-    ]
-    products = [
-        {
-            "bank": "우리은행",
-            "title": "첫거래 우대 정기예금",
-            "base_rate": "3.95%",
-            "preferential_rate": "4.95%",
-            "recommend": True,
-            "conditions": ["첫거래", "앱사용"]
-        },
-                {
-            "bank": "국민은행",
-            "title": "첫거래 우대 정기예금",
-            "base_rate": "3.95%",
-            "preferential_rate": "4.95%",
-            "recommend": True,
-            "conditions": ["첫거래", "급여연동"]
-        },
-                {
-            "bank": "IM은행",
-            "title": "첫거래 우대 정기예금",
-            "base_rate": "3.95%",
-            "preferential_rate": "4.95%",
-            "recommend": True,
-            "conditions": ["첫거래", "급여연동", "앱사용"]
-        },
-                {
-            "bank": "새마을은행",
-            "title": "첫거래 우대 정기예금",
-            "base_rate": "3.95%",
-            "preferential_rate": "4.95%",
-            "recommend": True,
-            "conditions": ["첫거래", "급여연동", "앱사용"]
-        },
-        # 더 많은 상품 데이터를 추가 가능
-    ]
+def favorite(request):
+    customer_id = request.session.get('user_id')
+    user_name = "사용자"
+    top5_products = []
 
-    # 템플릿에 데이터 전달
-    return render(request, 'temp.html', {
-        'stats': stats,
-        'conditions': conditions,
-        'products': products
-    })
+    if customer_id:
+        try:
+            # CustomerID로 UserProfile 조회
+            user = UserProfile.objects.get(CustomerID=customer_id)
+            user_name = user.username
+
+            # Favorite 테이블에서 사용자와 관련된 DSID 가져오기
+            top5_products = Favorite.objects.filter(CustomerID=user).select_related('DSID')[:5]
+        except UserProfile.DoesNotExist:
+            pass
+
+    context = {
+        'user_name': user_name,
+        'top5_products': top5_products,
+    }
+
+    return render(request, 'favorites.html', context)
+
+@csrf_exempt
+def add_favorite(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            product_id = data.get("product_id")  # DSID
+            customer_id = request.session.get('user_id')  # 세션에서 사용자 ID 가져오기
+
+            if customer_id and product_id:
+                user = UserProfile.objects.get(CustomerID=customer_id)
+                ds_product = DsProduct.objects.get(dsid=product_id)
+
+                # Favorite에 추가
+                Favorite.objects.get_or_create(CustomerID=user, DSID=ds_product)
+                return JsonResponse({"status": "success"})
+
+        except Exception as e:
+            return JsonResponse({"status": "error", "message": str(e)}, status=400)
+
+    return JsonResponse({"status": "error"}, status=400)
+
+
+@csrf_exempt
+def remove_favorite(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            product_id = data.get("product_id")  # DSID
+            customer_id = request.session.get('user_id')  # 세션에서 사용자 ID 가져오기
+
+            if customer_id and product_id:
+                user = UserProfile.objects.get(CustomerID=customer_id)
+                ds_product = DsProduct.objects.get(dsid=product_id)
+
+                # Favorite에서 삭제
+                Favorite.objects.filter(CustomerID=user, DSID=ds_product).delete()
+                return JsonResponse({"status": "success"})
+
+        except Exception as e:
+            return JsonResponse({"status": "error", "message": str(e)}, status=400)
+
+    return JsonResponse({"status": "error"}, status=400)
