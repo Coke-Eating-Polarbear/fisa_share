@@ -179,7 +179,7 @@ def summary_view(request):
     if recommended_count > 0:
         recommended_dsid_list = [rec['DSID'] for rec in recommended_products]
         recommended_product_details = list(
-            DsProduct.objects.filter(DSID=recommended_dsid_list)
+            DsProduct.objects.filter(dsid__in=recommended_dsid_list)
             .values('dsname', 'bank', 'baser', 'maxir')
         )
 
