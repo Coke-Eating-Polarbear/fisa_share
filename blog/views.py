@@ -132,19 +132,40 @@ def summary_view(request):
     today = timezone.now().date()
     yesterday = today - timedelta(days=1)
     # 오늘 날짜의 이미지 데이터 가져오기
-    try:
-        wc_entry = Wc.objects.filter(date=yesterday).first()
-        if wc_entry is not None and wc_entry.image:
-            image_base64 = base64.b64encode(wc_entry.image).decode('utf-8')  # base64 인코딩
-        else:
-            image_base64 = None  # 이미지가 없거나 wc_entry가 None일 경우 처리
-    except Exception as e:
-    # 예상치 못한 오류를 잡아내기 위한 처리
-        image_base64 = None
-        print(f"An error occurred: {e}")
+        # 어제 날짜의 이미지 데이터 가져오기
+    wc_entry = Wc.objects.filter(date=yesterday).first()
+    image_base64 = base64.b64encode(wc_entry.image).decode('utf-8') if wc_entry else None
+
+    # 어제 날짜의 뉴스 데이터 가져오기
+    news_entries_queryset = News.objects.filter(
+        ndate=yesterday, 
+        summary__isnull=False
+    )
+
+    # 중복 제거 로직
+    seen_titles = set()  # 이미 본 제목을 저장
+    news_entries = []
+    for news in news_entries_queryset:
+        if news.title not in seen_titles:
+            seen_titles.add(news.title)
+            news_entries.append({
+                'title': news.title,
+                'summary': news.summary,
+                'url': news.url  # URL 추가
+            })
+    # try:
+    #     wc_entry = Wc.objects.filter(date=yesterday).first()
+    #     if wc_entry is not None and wc_entry.image:
+    #         image_base64 = base64.b64encode(wc_entry.image).decode('utf-8')  # base64 인코딩
+    #     else:
+    #         image_base64 = None  # 이미지가 없거나 wc_entry가 None일 경우 처리
+    # except Exception as e:
+    # # 예상치 못한 오류를 잡아내기 위한 처리
+    #     image_base64 = None
+    #     print(f"An error occurred: {e}")
 
 
-    news_entries = News.objects.filter(ndate=yesterday, summary__isnull=False).values('title', 'summary', 'url')
+    # news_entries = News.objects.filter(ndate=yesterday, summary__isnull=False).values('title', 'summary', 'url')
 
     # CustomerID가 세션에 없으면 로그인 페이지로 리디렉션
     if not customer_id:
