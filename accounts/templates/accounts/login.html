@@ -219,7 +219,30 @@ footer {
 .nav-box nav a:hover {
     font-weight: bold;
 }
+
+.btn-link {
+        background: none;
+        border: none;
+        padding: 0;
+        color: inherit;
+        font: inherit;
+        cursor: pointer;
+        text-decoration: none;
+    }
+    .btn-link:hover {
+        text-decoration: none;
+        color: #007bff; /* 원하는 색상으로 변경 */
+    }
     </style>
+    <script>
+        function openPopup(url) {
+            const width = 500;
+            const height = 600;
+            const left = (window.screen.width / 2) - (width / 2);
+            const top = (window.screen.height / 2) - (height / 2);
+            window.open(url, 'termsPopup', `width=${width},height=${height},top=${top},left=${left},resizable=yes,scrollbars=yes`);
+        }
+    </script>
 </head>
 <body>
     {% csrf_token %}
@@ -270,8 +293,8 @@ footer {
                     {% endif %}
                 </form>
                 <div class="helper-links">
-                    <a href="{% url 'accounts:findid' %}">아이디찾기</a> | 
-                    <a href="#">비밀번호찾기</a> | 
+                    <button type="button" class="btn-link" onclick="openPopup('/accounts/findid/')">아이디찾기</button> |
+                    <button type="button" class="btn-link" onclick="openPopup('/accounts/findid/')">비밀번호찾기</button> | 
                     <a href="{% url 'accounts:agree' %}">회원가입</a>
                 </div>
             </div>

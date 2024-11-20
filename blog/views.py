@@ -5,7 +5,7 @@ from datetime import timedelta
 import base64
 from django.contrib import messages
 from .forms import UserProfileForm  # UserProfileForm을 가져옵니다
-from .models import UserProfile,Recommend, DsProduct, Wc, News, Favorite  # UserProfile 모델도 가져옵니다
+from blog.models import UserProfile,Recommend, DsProduct, Wc, News, Favorite  # UserProfile 모델도 가져옵니다
 from django.contrib.auth.hashers import check_password
 from django.views.decorators.http import require_POST
 from django.http import HttpResponse,JsonResponse
@@ -167,19 +167,19 @@ def summary_view(request):
 
     # CustomerID가 세션에 없으면 로그인 페이지로 리디렉션
     if not customer_id:
-        return redirect('login.html')  # 로그인 페이지 URL로 수정 필요
+        return redirect('login')  # 로그인 페이지 URL로 수정 필요
 
     # 추천 테이블에서 CustomerID에 해당하는 추천 상품 가져오기
-    recommended_products = Recommend.objects.filter(customerid=customer_id).values('dsid')
+    recommended_products = Recommend.objects.filter(CustomerID=customer_id).values('DSID')
     recommended_count = recommended_products.count()
     recommended_dsid_list = []
 
     # 추천된 상품이 있을 경우 해당 dsid로 ds_product에서 정보 가져오기
     recommended_product_details = []
     if recommended_count > 0:
-        recommended_dsid_list = [rec['dsid'] for rec in recommended_products]
+        recommended_dsid_list = [rec['DSID'] for rec in recommended_products]
         recommended_product_details = list(
-            DsProduct.objects.filter(dsid__in=recommended_dsid_list)
+            DsProduct.objects.filter(DSID=recommended_dsid_list)
             .values('dsname', 'bank', 'baser', 'maxir')
         )
 
@@ -204,7 +204,7 @@ def summary_view(request):
         'news_entries': news_entries,
     }
     
-    return render(request, 'maintwo.html', context)
+    return render(request, 'loginmain.html', context)
 
 
 @login_required_session
