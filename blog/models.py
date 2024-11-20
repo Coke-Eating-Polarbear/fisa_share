@@ -96,3 +96,57 @@ class Favorite(models.Model):
 
     def __str__(self):
         return f"{self.CustomerID.CustomerID} - {self.DSID.dsid}"
+    
+
+class MyData(models.Model):
+    CustomerID = models.CharField(max_length=256, primary_key=True)  # 고객 ID
+    pDate = models.DateField()  # 결제 날짜
+    bizcode = models.CharField(max_length=256)  # 산업 분류 코드
+    store = models.CharField(max_length=256)  # 결제 상호명
+    price = models.IntegerField()  # 결제 금액
+    Income = models.IntegerField()  # 수입
+    Total = models.IntegerField()  # 계좌 잔액
+    estate = models.BigIntegerField()  # 부동산 (bigint)
+    credit = models.IntegerField()  # 입금 내역
+    spend = models.IntegerField()  # 지출
+
+    class Meta:
+        db_table = 'mydata'  # 테이블 이름 지정
+
+
+class Average(models.Model):
+    stage_class = models.CharField(max_length=10)  # StageClass 컬럼
+    inlevel = models.IntegerField()  # Inlevel 컬럼
+    spend = models.IntegerField()  # 소비
+    income = models.IntegerField()  # 수입
+    asset = models.IntegerField()  # 자산
+    finance = models.IntegerField()  # 금융
+    eat = models.IntegerField()  # 식사
+    transfer = models.IntegerField()  # 교통
+    utility = models.IntegerField()  # 공과금
+    phone = models.IntegerField()  # 통신
+    home = models.IntegerField()  # 주거
+    hobby = models.IntegerField()  # 취미
+    fashion = models.IntegerField()  # 패션
+    party = models.IntegerField()  # 파티
+    allowance = models.IntegerField()  # 용돈
+    study = models.IntegerField()  # 학업
+    medical = models.IntegerField()  # 의료
+
+    class Meta:
+        db_table = 'average'  # 테이블 이름
+        constraints = [
+            models.UniqueConstraint(fields=['stage_class', 'inlevel'], name='unique_stage_inlevel')
+        ]  # 복합 Primary Key 대체로 UniqueConstraint 사용
+
+    def __str__(self):
+        return f"{self.stage_class} - {self.inlevel}"
+
+class spend(models.Model):
+    CustomerID = models.CharField(max_length=256, primary_key=True)
+    SDate = models.DateField()
+    Category = models.CharField(max_length=256)
+    Frequency = models.IntegerField()
+    Amount = models.BigIntegerField()
+    store = models.CharField(max_length=256)
+    bizCode = models.CharField(max_length=256)

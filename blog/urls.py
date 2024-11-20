@@ -18,4 +18,6 @@ urlpatterns = [
     path('favorite', views.favorite, name='favorite'),
     path('add_favorite/', views.add_favorite, name='add_favorite'),
     path('remove_favorite/', views.remove_favorite, name='remove_favorite'),
+    # path('originreport/', views.originreport, name='originreport'),
+    path('originreport/', views.originreport_page, name='originreport'),
 ]

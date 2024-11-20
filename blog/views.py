@@ -2,10 +2,13 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
 from django.utils import timezone
 from datetime import timedelta
+import matplotlib.pyplot as plt
 import base64
+import io
+from matplotlib import font_manager, rc
 from django.contrib import messages
 from .forms import UserProfileForm  # UserProfileForm을 가져옵니다
-from blog.models import UserProfile,Recommend, DsProduct, Wc, News, Favorite  # UserProfile 모델도 가져옵니다
+from blog.models import UserProfile,Recommend, DsProduct, Wc, News, Favorite,MyData  # UserProfile 모델도 가져옵니다
 from django.contrib.auth.hashers import check_password
 from django.views.decorators.http import require_POST
 from django.http import HttpResponse,JsonResponse
@@ -19,8 +22,10 @@ import json
 import os
 from dotenv import load_dotenv
 from collections import defaultdict
+es = Elasticsearch([os.getenv('ES')])  # Elasticsearch 설정
 load_dotenv()
-
+rc('font', family='Malgun Gothic')
+logger = logging.getLogger(__name__)
 def login_required_session(view_func):
     """
     세션에 'user_id'가 없을 경우 로그인 페이지로 리디렉션하는 데코레이터.
@@ -32,10 +37,6 @@ def login_required_session(view_func):
         # 'user_id'가 있으면 원래의 뷰 함수 실행
         return view_func(request, *args, **kwargs)
     return wrapper
-
-logger = logging.getLogger(__name__)
-
-
 
 @login_required_session
 def mypage(request):
@@ -54,7 +55,6 @@ def mypage(request):
     }
     return render(request, 'mypage.html',context)
 
-
 @login_required_session
 def spending_mbti(request):
     customer_id = request.session.get('user_id')  
@@ -71,7 +71,6 @@ def spending_mbti(request):
         'user_name': user_name,
     }
     return render(request, 'spending_mbti.html', context)
-
 
 def main(request):
     today = timezone.now().date()
@@ -103,8 +102,6 @@ def main(request):
     }
 
     return render(request, 'main.html', context)
-
-
 
 @login_required_session
 def report_ex(request):
@@ -206,7 +203,6 @@ def summary_view(request):
     
     return render(request, 'loginmain.html', context)
 
-
 @login_required_session
 def info1(request):
     # 세션에서 CustomerID 가져오기
@@ -240,7 +236,6 @@ def info1(request):
     # GET 요청일 경우 템플릿 렌더링
     return render(request, 'savings_info1.html', context)
 
-
 @login_required_session
 def info2(request):
     customer_id = request.session.get('user_id')  
@@ -273,7 +268,6 @@ def info2(request):
     }
     return render(request, 'savings_info2.html', context)
 
-
 @login_required_session
 def info3(request):
     customer_id = request.session.get('user_id')
@@ -301,7 +295,6 @@ def info3(request):
         'user_name': user_name,
     }
     return render(request, 'savings_info3.html', context)
-
 
 @login_required_session
 def info4(request):
@@ -332,7 +325,6 @@ def info4(request):
     # GET 요청 시 페이지 렌더링
     return render(request, 'savings_info4.html', context)
 
-
 @login_required_session
 def top5(request):
     customer_id = request.session.get('user_id')  
@@ -360,8 +352,6 @@ def top5(request):
 
     return render(request, 'recommend_savings_top5.html', context)
 
-
-
 @login_required_session
 def main_view(request):
     if request.user.is_authenticated:
@@ -381,8 +371,6 @@ def main_view(request):
 
     return render(request, 'main.html')
 
-es = Elasticsearch([os.getenv('ES')])  # Elasticsearch 설정
-
 @csrf_exempt
 def log_click_event(request):
     if request.method == 'POST':
@@ -396,8 +384,6 @@ def log_click_event(request):
         return JsonResponse({"status": "success"})
     return JsonResponse({"status": "failed"}, status=400)
 
-
-#----------------------------------------------------------------------
 def favorite(request):
     customer_id = request.session.get('user_id')
     user_name = "사용자"
@@ -442,7 +428,6 @@ def add_favorite(request):
 
     return JsonResponse({"status": "error"}, status=400)
 
-
 @csrf_exempt
 def remove_favorite(request):
     if request.method == "POST":
@@ -463,3 +448,86 @@ def remove_favorite(request):
             return JsonResponse({"status": "error", "message": str(e)}, status=400)
 
     return JsonResponse({"status": "error"}, status=400)
+
+# @login_required_session
+# def originreport(request):
+#     customer_id = request.session.get('user_id')  
+#     user_name = "사용자"  # 기본값 설정
+
+#     if customer_id:
+#         try:
+#             # CustomerID로 UserProfile 조회
+#             user = UserProfile.objects.get(CustomerID=customer_id)
+#             user_name = user.username  # 사용자 이름 설정
+            
+#             # MyData에서 고객 데이터 조회
+#             user_data = MyData.objects.filter(CustomerID=customer_id).first()
+#             if not user_data:
+#                 raise ValueError("사용자 데이터가 없습니다.")
+
+#             # 데이터 준비
+#             bar_labels = ['총자산', '현금자산', '수입', '지출']
+#             bar_values = [user_data.Total, user_data.credit, user_data.Income, user_data.spend]
+
+#             pie_labels = ['식비', '경조사/선물', '카페', '마트/생필품', '교통/차량', '문화생활', '미용', '의류', '기타']
+#             pie_values = [34.2, 12.2, 9.9, 8.8, 8.0, 7.2, 5.7, 5.0, 8.0]  # 예제 데이터
+
+#             # 데이터 반환
+#             return JsonResponse({
+#                 'user_name': user_name,
+#                 'bar_chart': {
+#                     'labels': bar_labels,
+#                     'values': bar_values,
+#                 },
+#                 'pie_chart': {
+#                     'labels': pie_labels,
+#                     'values': pie_values,
+#                 }
+#             })
+
+#         except Exception as e:
+#             return JsonResponse({'error': str(e)}, status=500)
+
+#     return JsonResponse({'error': '로그인이 필요합니다.'})
+
+@login_required_session
+def originreport_page(request):
+    customer_id = request.session.get('user_id')  
+    user_name = "사용자"  # 기본값 설정
+
+    try:
+        if not customer_id:
+            raise ValueError("로그인이 필요합니다.")
+
+        # CustomerID로 UserProfile 조회
+        user = UserProfile.objects.get(CustomerID=customer_id)
+        user_name = user.username
+
+        # MyData에서 고객 데이터 조회
+        user_data = MyData.objects.filter(CustomerID=customer_id).first()
+        if not user_data:
+            raise ValueError("사용자 데이터가 없습니다.")
+
+        # 데이터 준비 (단위 변환 포함)
+        bar_data = {
+            '총자산': user_data.Total * 10000,
+            '현금자산': user_data.credit * 10000,
+            '수입': user_data.Income * 10000,
+            '지출': user_data.spend * 10000
+        }
+
+        pie_data = {
+
+        }
+
+        # 데이터를 템플릿으로 전달
+        context = {
+            'user_name': user_name,
+            'bar_data': bar_data,
+            'pie_data' :pie_data
+        }
+        return render(request, 'report_origin.html', context)
+
+    except Exception as e:
+        # 예외 발생 시 에러 메시지와 함께 HTML 렌더링
+        return render(request, 'report_origin.html', {'error': str(e)})
