@@ -17,7 +17,7 @@
             background-color: #ffffff;
             font-family: Arial, sans-serif;
             width: 100vw;
-            padding-top: 100px;
+            padding-top: 150px;
             /* margin: 0;
             padding: 0; */
             box-sizing: border-box;
@@ -39,7 +39,7 @@
             z-index: 1; 
         }
         footer {
-            position: fixed; 
+            /* position: fixed;  */
             background-color: #291e4ee5;
             padding: 10px;
             bottom: 0; 
@@ -110,7 +110,7 @@
         }
 
         .container {
-            max-width: 800px;
+            max-width: 100%;
             margin: 20px auto;
             background-color: #ffffff;
             padding: 20px;
@@ -124,8 +124,12 @@
             margin-bottom: 10px;
         }
         .cat-image {
-            width: 50px;
-            margin-right: 15px;
+            position: absolute;
+            top: 50%; 
+            left: 50%;
+            transform: translate(-50%, -50%); /* 가운데 정렬 */
+            cursor: pointer;
+            transition: opacity 0.3s ease-in-out;
         }
         .title {
             font-size: 24px;
@@ -206,6 +210,101 @@
             border-radius: 5px;
             cursor: pointer;
         }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        .plus-box {
+            display: none;
+            margin-top: 20px;
+            text-align: left;
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        
+        .option {
+            width: 48%;
+            padding: 15px;
+            background-color: #e9ecef;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .option h3 {
+            font-size: 16px;
+            color: #fff;
+            background-color: #007bff;
+            padding: 8px;
+            border-radius: 5px;
+            display: inline-block;
+            margin-top: 0;
+        }
+        .option p {
+            font-size: 12px;
+            color: #555;
+            margin: 10px 0;
+            line-height: 1.5;
+        }
+        .option .note {
+            color: red;
+            font-size: 10px;
+            margin-top: 5px;
+        }
+        .toggle-button {
+            margin: 10px 0;
+            padding: 8px 12px;
+            font-size: 0.9rem;
+            color: #fff;
+            background-color: #007bff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .toggle-content {
+            display: none;
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #f1f1f1;
+            border-radius: 5px;
+            text-align: left;
+            font-size: 0.9rem;
+            color: #555;
+        }
+        .preference-box {
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        .preference-box h3 {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        .preference-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+        .preference-options label {
+            padding: 8px 15px;
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+
     </style>
     <script>
         let selectedGoal = '';
@@ -235,6 +334,37 @@
                 document.getElementById('goalInput').value = customGoal;
             }
         }
+
+        function toggleDescription(element) {
+            // 컨테이너 찾기
+            const container = element.parentNode;
+
+            // 설명 컨테이너와 이미지 참조
+            const imgElement = container.querySelector('.cat-image');
+            const descriptionBox = container.querySelector('.plus-box');
+
+            // 클릭한 요소가 이미지라면: 이미지 숨기고 설명 보이기
+            if (element.classList.contains('cat-image')) {
+                imgElement.style.display = 'none';
+                descriptionBox.style.display = 'block';
+            }
+            // 클릭한 요소가 설명 컨테이너라면: 설명 숨기고 이미지 보이기
+            else if (element.classList.contains('plus-box')) {
+                descriptionBox.style.display = 'none';
+                imgElement.style.display = 'block';
+            }
+        }
+        function selectOption(optionValue, button) {
+            // 모든 버튼에서 'selected' 클래스를 제거하여 비활성화 스타일을 제거합니다
+            document.querySelectorAll('.buttons button').forEach(btn => btn.classList.remove('selected'));
+            
+            // 클릭한 버튼에 'selected' 클래스를 추가하여 활성화 스타일을 적용합니다
+            button.classList.add('selected');
+
+            // 선택된 옵션을 hidden input에 저장하여 폼과 함께 전송할 수 있도록 합니다
+            document.getElementById("bankOptionInput").value = optionValue;
+        }
+        
     </script>
 </head>
 <body>
@@ -270,39 +400,45 @@
     
 
     <!-- 메인 콘텐츠 -->
-    <div class="container">
         <!-- 제목과 이미지 -->
         <div class="title-container">
-            <img src="https://via.placeholder.com/50" class="cat-image" alt="천냥이 이미지">
+            <img src="https://via.placeholder.com/50" class="cat-image_main" alt="천냥이 이미지">
             <div class="title">천냥이와 함께 {{ user_name }}님의 맞춤 저축 방법을 찾으러 떠나볼까요?</div>
         </div>
+        <div class="container" style="display: grid; grid-template-columns: 8fr 2fr; grid-template-rows: repeat(7, auto); gap: 20px ; width: 90%;">
+            <div class="container" style="min-width: 100%;">
+                <div class="goal-prompt">어떤 목적으로 저축을 하실건가요?
 
-        <!-- 이미지 및 진행바 -->
-        <div class="progress-bar-container">
-            <div class="progress">
-                <div class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
-            </div>
-        </div>
+                <form id="infoForm" action="{% url 'info1' %}" method="POST" onsubmit="submitForm()">
+                {% csrf_token %}
+                <input type="hidden" name="goal" id="goalInput">
+                <input type="hidden" name="saving_method" id="savingMethodInput">
 
-        <!-- 목적 입력 안내 텍스트 -->
-        <div class="goal-prompt">어떤 목적으로 저축을 하실건가요?</div>
-
-        <form id="infoForm" action="{% url 'info1' %}" method="POST" onsubmit="submitForm()">
-            {% csrf_token %}
-            <input type="hidden" name="goal" id="goalInput">
-            <input type="hidden" name="saving_method" id="savingMethodInput">
-
-            <!-- 목적 옵션 버튼 -->
-            <div class="goal-options">
-                <button type="button" onclick="selectGoal(this, '내집 마련')">내집 마련</button>
-                <button type="button" onclick="selectGoal(this, '비상금')">비상금</button>
-                <button type="button" onclick="selectGoal(this, '노후대비')">노후대비</button>
-                <button type="button" onclick="selectGoal(this, '직접입력')">직접입력</button>
-            </div>
-            
+                <!-- 목적 옵션 버튼 -->
+                <div class="goal-options">
+                    <button type="button" onclick="selectGoal(this, '내집 마련')">내집 마련</button>
+                    <button type="button" onclick="selectGoal(this, '비상금')">비상금</button>
+                    <button type="button" onclick="selectGoal(this, '노후대비')">노후대비</button>
+                    <button type="button" onclick="selectGoal(this, '직접입력')">직접입력</button>
+                </div>
+                </div>
             <!-- 사용자 정의 입력 필드 -->
-            <div id="customInput" class="custom-input">
-                <input type="text" id="customGoalInput" class="form-control" placeholder="어떤 목적으로 저축을 하실건가요?">
+                <div id="customInput" class="custom-input" style="display: none; width: 100%; text-align: center;" >
+                    <input type="text" id="customGoalInput" class="form-control" placeholder="어떤 목적으로 저축을 하실건가요?"style="width: 50%;margin: 0 auto;padding: 8px;border: 1px solid #ccc;border-radius: 5px;">
+                </form>
+                </div>
+            </div>
+            <div style="min-width: 100%; text-align: center; position: relative;">
+                <img 
+                    src="https://via.placeholder.com/50" 
+                    class="cat-image" 
+                    alt="천냥이 이미지" 
+                    style="cursor: pointer;"
+                    onclick="toggleDescription(this)" 
+                />
+                <div class="plus-box" style="display: none; cursor: pointer;" onclick="toggleDescription(this)">
+                    자세한 설명 내용입니다. 여기에 원하는 정보를 추가하세요.
+                </div>
             </div>
             
             <!-- 저축 방식 선택 섹션 -->
@@ -324,13 +460,177 @@
                     </div>
                 </div>
             </div>
+            <div style="min-width: 100%; text-align: center; position: relative;">
+                <img 
+                    src="https://via.placeholder.com/50" 
+                    class="cat-image" 
+                    alt="천냥이 이미지" 
+                    style="cursor: pointer;"
+                    onclick="toggleDescription(this)" 
+                />
+                <div class="plus-box" style="display: none; cursor: pointer;" onclick="toggleDescription(this)">
+                    자세한 설명 내용입니다. 여기에 원하는 정보를 추가하세요.
+                </div>
+            </div>
+            <div class="container" style="min-width: 100%; text-align: center;">
+            <div class="goal-box">
+                <label>저축의 목적이 무엇인가요?</label>
+                <div class="goal-description">
+                    단기적 목적: 필요한 상품구매 등 구체적이고 비교적 가까운 미래의 지출<br>
+                    장기적 목적: 주택구매 등 특정한 미래의 목표 지출에 대비하는 경우
+                </div>
+                <div class="goal-options">
+                    <label><input type="radio" name="goal" value="short-term"> 단기적 목적</label>
+                    <label><input type="radio" name="goal" value="long-term"> 장기적 목적</label>
+                </div>
+            </div>
+            </div>
+            <div style="min-width: 100%; text-align: center; position: relative;">
+                <img 
+                    src="https://via.placeholder.com/50" 
+                    class="cat-image" 
+                    alt="천냥이 이미지" 
+                    style="cursor: pointer;"
+                    onclick="toggleDescription(this)" 
+                />
+                <div class="plus-box" style="display: none; cursor: pointer;" onclick="toggleDescription(this)">
+                    자세한 설명 내용입니다. 여기에 원하는 정보를 추가하세요.
+                </div>
+            </div>
+            <div class="container" style="min-width: 100%; text-align: center;">
+            <div class="period-box">
+                <label>원하시는 가입기간을 선택해주세요.</label>
+                <div class="period-description">
+                    가입 기간에 따라 적합한 금융상품을 추천해드립니다.
+                </div>
+                <div class="period-options">
+                    <label><input type="radio" name="period" value="12"> 12개월</label>
+                    <label><input type="radio" name="period" value="24"> 24개월</label>
+                    <label><input type="radio" name="period" value="36"> 36개월</label>
+                    <label><input type="radio" name="period" value="recommend"> 추천</label>
+                </div>
+            </div>
+            </div>
+            <div style="min-width: 100%; text-align: center; position: relative;">
+                <img 
+                    src="https://via.placeholder.com/50" 
+                    class="cat-image" 
+                    alt="천냥이 이미지" 
+                    style="cursor: pointer;"
+                    onclick="toggleDescription(this)" 
+                />
+                <div class="plus-box" style="display: none; cursor: pointer;" onclick="toggleDescription(this)">
+                    자세한 설명 내용입니다. 여기에 원하는 정보를 추가하세요.
+                </div>
+            </div>
+            <div class="container" style="min-width: 100%; text-align: center;">
+            <div class="amount-box">
+                <label>목표 금액을 입력해주세요.</label>
+                <div class="input-box">
+                    <input type="text" name="amount" placeholder="목표 금액을 입력해주세요.">
+                </div>
+            </div>
+            </div>
+            <div style="min-width: 100%; text-align: center; position: relative;">
+                <img 
+                    src="https://via.placeholder.com/50" 
+                    class="cat-image" 
+                    alt="천냥이 이미지" 
+                    style="cursor: pointer;"
+                    onclick="toggleDescription(this)" 
+                />
+                <div class="plus-box" style="display: none; cursor: pointer;" onclick="toggleDescription(this)">
+                    자세한 설명 내용입니다. 여기에 원하는 정보를 추가하세요.
+                </div>
+            </div>
+            <div class="container" style="min-width: 100%; text-align: center;">
+                <!-- 금융권 선택 섹션 -->
+                <div class="title">원하시는 금융권의 범위를 선택해주세요</div>
+                <div class="options-container" style="display: flex; flex-direction: row; align-items: center;">
+                    <div class="option">
+                        <h3>일반은행</h3>
+                        <p>비교적 높은 안정성<br>비교적 낮은 수익성<br>예시) 신한은행, 제주은행, 카카오뱅크</p>
+                        <p class="note">일반 은행의 이율을 참고할 수 있고<br>지역별로 다양한 은행을 확인할 수 있어요!</p>
+                    </div>
+                    <div class="option">
+                        <h3>저축은행</h3>
+                        <p>비교적 낮은 안정성<br>비교적 높은 수익성<br>예시) OK저축은행, 웰컴저축은행</p>
+                        <p class="note">금융회사별 SOLAR의 인증으로 안정성이<br>우수한 저축은행을 선택해 보세요!</p>
+                    </div>
+                </div>
 
+                <!-- 옵션 선택 버튼 -->
+                <form id="infoForm" action="{% url 'info3' %}" method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="bank_option" id="bankOptionInput"> <!-- 선택된 금융권 옵션 저장 -->
+                    
+                    <div class="buttons">
+                        <button type="button" onclick="selectOption('일반은행', this)">일반은행</button>
+                        <button type="button" onclick="selectOption('일반은행 + 저축은행', this)">일반은행 + 저축은행</button>
+                    </div>
+            </div>
+            <div style="min-width: 100%; text-align: center; position: relative;">
+                <img 
+                    src="https://via.placeholder.com/50" 
+                    class="cat-image" 
+                    alt="천냥이 이미지" 
+                    style="cursor: pointer;"
+                    onclick="toggleDescription(this)" 
+                />
+                <div class="plus-box" style="display: none; cursor: pointer;" onclick="toggleDescription(this)">
+                    자세한 설명 내용입니다. 여기에 원하는 정보를 추가하세요.
+                </div>
+            </div>
+            <!-- Main Content -->
+            <div class="container">
+                <div class="content">
+                    <!-- Toggle Button for 우대사항 설명 -->
+                    <button class="toggle-button" onclick="toggleDescription()">우대사항 설명 보기</button>
+                    
+                    <!-- Hidden Description Content -->
+                    <div class="toggle-content" id="description">
+                        우대사항은 고객이 특정 조건을 만족할 때 추가 금리를 제공하거나 특별 혜택을 제공하는 제도입니다. 예를 들어 비대면 가입, 첫 거래, 자동이체 등의 조건이 해당됩니다.
+                    </div>
+                    <form action="{% url 'info4' %}" method="POST">
+                        {% csrf_token %}
+                        <div class="preference-box">
+                            <h3>적용 가능한 우대사항을 선택해주세요 (중복 가능)</h3>
+                            <div class="preference-options">
+                                <label><input type="checkbox" name="preferences" value="비대면가입"> 비대면가입</label>
+                                <label><input type="checkbox" name="preferences" value="앱사용"> 앱사용</label>
+                                <label><input type="checkbox" name="preferences" value="급여연동"> 급여연동</label>
+                                <label><input type="checkbox" name="preferences" value="연금"> 연금</label>
+                                <label><input type="checkbox" name="preferences" value="공과금출금"> 공과금출금</label>
+                                <label><input type="checkbox" name="preferences" value="카드사용"> 카드사용</label>
+                                <label><input type="checkbox" name="preferences" value="첫거래"> 첫거래</label>
+                                <label><input type="checkbox" name="preferences" value="입출금통장"> 입출금통장</label>
+                                <label><input type="checkbox" name="preferences" value="재예치"> 재예치</label>
+                                <label><input type="checkbox" name="preferences" value="청약보유"> 청약보유</label>
+                                <label><input type="checkbox" name="preferences" value="추천쿠폰"> 추천쿠폰</label>
+                                <label><input type="checkbox" name="preferences" value="자동이체"> 자동이체</label>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div style="min-width: 100%; text-align: center; position: relative;">
+                <img 
+                    src="https://via.placeholder.com/50" 
+                    class="cat-image" 
+                    alt="천냥이 이미지" 
+                    style="cursor: pointer;"
+                    onclick="toggleDescription(this)" 
+                />
+                <div class="plus-box" style="display: none; cursor: pointer;" onclick="toggleDescription(this)">
+                    자세한 설명 내용입니다. 여기에 원하는 정보를 추가하세요.
+                </div>
+            </div>
+        </div>
             <!-- 다음 버튼 -->
             <div class="next-button-container">
                 <button type="submit" class="next-button">다음</button>
             </div>
-        </form>
-    </div>
+
 
     <footer>
         <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0;">서울특별시 마포구 월드컵북로 434 상암IT타워 6층</p> 
