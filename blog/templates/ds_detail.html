@@ -14,147 +14,202 @@
         min-height: 100vh;
         position: relative;
     }
+
     header, footer {
-        /* background-color: #ffffff; */
         text-align: center;
         width: 100%;
     }
+
     header {
         background-color: #ffffff;
-        position: fixed; 
+        position: fixed;
         padding: 0px;
-        top: 0; 
-        z-index: 1; 
+        top: 0;
+        z-index: 1;
     }
+
     footer {
-        /* position: fixed;  */
-        background-color: #39334f;
+        position: relative;
+        background-color: #291e4ee5;
         padding: 10px;
-        bottom: 0; 
+        bottom: 0;
         left: 0;
     }
-    .container {
-        padding-top: 120px;
-        padding-bottom: 150px;
-        max-width: 1200px;
-        margin: 0 auto;
+
+    .dropdown {
+        position: relative;
+        display: inline-block;
     }
+
     .navbar {
         display: flex;
-        justify-content: space-between; /* 좌측 로고와 우측 버튼 배치 */
-        /* justify-content: flex-end; 오른쪽 정렬 */
+        justify-content: space-between;
         align-items: center;
         padding: 10px 20px;
         font-size: 1rem;
         background-color: #ffffff;
     }
+
     .nav-links {
-        margin-right: 20px; /* 회원 정보와의 구분 */
+        margin-right: 10px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-grow: 1;
+        text-align: center;
     }
+
     .navbar a {
-        /* margin: 0 20px; 링크 간격 */
-        font-size: 1.2rem; /* 글씨 크기 */
-        font-weight: bold; /* 글씨 진하게 */
-        margin-left: 15px; /* 각 링크 사이의 간격 */
+        font-size: 1.2rem;
+        font-weight: bold;
+        margin-left: 15px;
         text-decoration: none;
         color: #333;
     }
+
+    .dropdown-content {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        background-color: #fff;
+        padding: 0%;
+        width: 150px;
+        z-index: 1000;
+        border-top: 1px solid #ddd;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .dropdown-content a {
+        padding: 10px 20px;
+        display: block;
+        text-align: left;
+        color: #333;
+        text-decoration: none;
+    }
+
+    .dropdown-content a:hover {
+        background-color: #f1f1f1;
+    }
+
+    .dropdown:hover .dropdown-content {
+        display: block;
+    }
+
+    .nav-box nav a {
+        color: #333;
+        margin: 0 10px;
+        text-decoration: none;
+    }
+
+    .nav-box nav a:hover {
+        font-weight: bold;
+    }
+
     .user-info span {
-    font-size: 1.1rem;
-    font-weight: bold;
+        font-size: 1.1rem;
+        font-weight: bold;
     }
 
-    /* 본문 스타일 */
-    .content {
-        display: flex;
-        justify-content: space-between;
+    .container {
+        padding-top: 150px; /* 상단 여백 추가 */
+        padding-bottom: 150px; /* 하단 여백 */
+        max-width: 900px; /* 전체 넓이 제한 */
+        margin: 0 auto; /* 중앙 정렬 */
     }
 
-    /* 상품 체크리스트 스타일 */
     .checklist {
         background-color: white;
         border-radius: 10px;
         border: 1px solid #ddd;
         padding: 20px;
-        margin-bottom: 20px;
+        margin-bottom: 30px; /* 박스 간 동일한 간격 */
+        width: 100%; /* 넓이 조정 */
+        box-sizing: border-box;
     }
 
-    .checklist h2 {
-       font-size: 20px;
-       margin-bottom: 10px;
-       display:flex ;
-       align-items:center ;
-     }
+    .checklist h2, .checklist h3 {
+        font-size: 20px;
+        margin-bottom: 10px;
+        text-align: left; /* 제목 중앙 정렬 */
+    }
 
-     .checklist h2 img{
-         width :24 px ;
-         height :24 px ;
-         margin-left :10 px ;
-     }
+    .checklist ul {
+        list-style-type: decimal;
+        padding-left: 20px;
+    }
 
-     .checklist ul {
-         list-style-type :decimal ;
-         padding-left :20 px ;
-     }
+    .checklist ul li {
+        margin-bottom: 10px;
+    }
 
-     .checklist ul li{
-         margin-bottom :10 px ;
-     }
+    .details-content {
+        display: none;
+        background-color: #e9e9e9;
+        padding: 10px;
+        border-radius: 5px;
+        margin-top: 10px;
+    }
 
-     /* 숨겨진 상품 정보 스타일 */
-     .details-content {
-         display:none; /* 기본적으로 숨김 */
-         background-color:#e9e9e9; 
-         padding :10px; 
-         border-radius :5px; 
-         margin-top :10px; 
-     }
+    .summary-box {
+        background-color: white;
+        border-radius: 15px;
+        border: 1px solid #ddd;
+        padding: 15px;
+        width: 100%;
+        text-align: center;
+        margin-bottom: 30px;
+    }
 
-     /* 만덕이가 알기 쉽게 정리했덕-!!! 요약 설명 */
-     .summary-box{
-         background-color:white ;
-         border-radius :15 px ;
-         border :1 px solid #ddd ;
-         padding :15 px ;
-         width: 30% ;
-         text-align:center ; 
-         margin-bottom: 20px;
-     }
+    .summary-box h3 {
+        font-size: 18px;
+        margin-bottom: 10px;
+        padding: 15px;
+        text-align: center;
+    }
 
-     .summary-box h3{
-          font-size :18 px ;
-          margin-bottom :10 px ;
-          padding :15 px ;
-          width: 30% ;
-          display:flex ;
-          align-items:center ; 
-      }
+    .product-list {
+        display: flex;
+        justify-content: space-between;
+    }
 
-      /* 상품 리스트 스타일 */
-      .product-list{
-          display:flex ;
-          justify-content :space-between ;
-      }
+    .product-box {
+        background-color: #f5f5f5;
+        border-radius: 10px;
+        border: 1px solid #ddd;
+        padding: 15px;
+        width: 100%; /* 박스 넓이 조정 */
+        text-align: center;
+        margin-bottom: 30px; /* 박스 간 동일한 간격 */
+    }
 
-      .product-box{
-          background-color:#f5f5f5 ;
-          border-radius :10 px ; 
-          border :1 px solid #ddd ; 
-          padding :15 px ; 
-          width :30% ; 
-          text-align:center ; 
-      }
+    .details-btn {
+        display: inline-block;
+        padding: 8px 15px;
+        background-color: #291e4ee5;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+        margin-top: 10px;
+        text-align: center;
+    }
 
-      .details-btn{
-          display:inline-block ; 
-          padding :8px ; 
-          background-color:#4CAF50 ; 
-          color:white ; 
-          text-decoration:none ; 
-          border-radius :5px ; 
-          text-align:center ; 
-          margin-top :10px ; 
-      }
+    /* 빈 박스 가로 정렬 */
+    .empty-box-row {
+        display: flex;
+        justify-content: space-between; /* 박스 간 동일 간격 */
+        margin-bottom: 30px; /* 아래 콘텐츠와 간격 */
+    }
+    
+    .empty-box {
+        background-color: #ffffff;
+        border-radius: 10px;
+        border: 1px solid #ddd;
+        width: 30%; /* 세 박스를 동일 비율로 */
+        height: 100px; /* 박스 높이 설정 */
+        box-sizing: border-box;
+    }
+
 </style>
 <script>
    // "자세히보기" 버튼 클릭 시 상세 설명 표시/숨기기
@@ -169,19 +224,24 @@
 </script>
 </head>
 <body>
-
-<header>
-<div class="navbar">
-    <!-- 로고 및 상품명 -->
-    <div class="logo">
-        <img src="https://via.placeholder.com/50" alt="로고" style="vertical-align: middle;">
-        <span style="font-size: 1.5rem; font-weight: bold; margin-left: 10px;">예/적금 추천 서비스</span>
-    </div>
-   <!-- 네비게이션 링크 -->
-   <div class="nav-links" style="flex-grow: 1; text-align: center;">
-       <a href="#report" style=" font-weight: bold; color: #121212;">금융분석 리포트</a>
-       <a href="#recommendation" style=" font-weight: bold; color: #121212;">예/적금 비교</a>
-       <a href="#spending" style=" font-weight: bold; color: #121212;">소비 MBTI</a>
+    {% csrf_token %}
+    <header>
+    <div class="navbar">
+        <div class="logo">
+            <a href="./">
+                <img src="./static/img/fisa_logo_after.png" style="vertical-align: middle;" alt="우리 FISA 로고">
+                <span style="font-size: 1.5rem; font-weight: bold; margin-left: 10px;">예/적금 추천 서비스</span>
+        </div>
+        <div class="nav-links" style="flex-grow: 1; text-align: center;">
+                <a href="./report.html" style=" font-weight: bold; color: #121212;">금융분석 리포트</a> 
+                <div class="dropdown">
+                    <a href="#" style=" font-weight: bold; color: #121212;">예/적금 추천</a>
+                    <div class="dropdown-content">
+                        <a href="savings_info1.html" style="font-size: 0.9rem;">신규적금추천</a>
+                        <a href="compare_products.htmlr" style="font-size: 0.9rem;">기존상품비교</a>
+                    </div>
+                </div> 
+                <a href="#" style=" font-weight: bold; color: #121212;">소비MBTI</a>
    </div>
 
    <!-- 회원 정보 및 마이페이지 -->
@@ -196,7 +256,15 @@
 
 <div class="container">
 
-<!-- 예적금 가입 전 체크리스트 -->
+    <!-- 빈 박스 영역 -->
+    <div class="empty-box-row">
+        <!-- 빈 박스 1 -->
+        <div class="empty-box"></div>
+        <!-- 빈 박스 2 -->
+        <div class="empty-box"></div>
+        <!-- 빈 박스 3 -->
+        <div class="empty-box"></div>
+    </div>
 <div class="checklist">
    <h2>예적금 가입 전 체크했덕? 🦆</h2>
    <ul>
