@@ -122,7 +122,7 @@ def report_ex(request):
     context = {
         'user_name': user_name,
     }
-    return render(request, 'report.html', context)
+    return render(request, 'report_ex.html', context)
 
 @login_required_session
 def summary_view(request):
