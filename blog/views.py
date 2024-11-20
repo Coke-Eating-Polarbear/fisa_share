@@ -109,7 +109,7 @@ def main(request):
 
 
 @login_required_session
-def report(request):
+def report_ex(request):
     customer_id = request.session.get('user_id')  
     user_name = "사용자"  # 기본값 설정
 
@@ -124,7 +124,7 @@ def report(request):
     context = {
         'user_name': user_name,
     }
-    return render(request, 'report.html', context)
+    return render(request, 'report_ex.html', context)
 
 @login_required_session
 def summary_view(request):
