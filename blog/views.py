@@ -95,7 +95,7 @@ def main(request):
     for news in news_entries_queryset:
         if news.title not in seen_titles:
             seen_titles.add(news.title)
-            news_entries.append({'title': news.title, 'summary': news.summary})
+            news_entries.append({'title': news.title, 'summary': news.summary, 'url': news.url })
 
     # 디버깅용 출력
 
@@ -109,7 +109,7 @@ def main(request):
 
 
 @login_required_session
-def report(request):
+def report_ex(request):
     customer_id = request.session.get('user_id')  
     user_name = "사용자"  # 기본값 설정
 
@@ -134,11 +134,17 @@ def summary_view(request):
     # 오늘 날짜의 이미지 데이터 가져오기
     try:
         wc_entry = Wc.objects.filter(date=yesterday).first()
-        image_base64 = base64.b64encode(wc_entry.image).decode('utf-8')  # base64 인코딩
-    except Wc.DoesNotExist:
-        image_base64 = None  # 이미지가 없을 경우 처리
+        if wc_entry is not None and wc_entry.image:
+            image_base64 = base64.b64encode(wc_entry.image).decode('utf-8')  # base64 인코딩
+        else:
+            image_base64 = None  # 이미지가 없거나 wc_entry가 None일 경우 처리
+    except Exception as e:
+    # 예상치 못한 오류를 잡아내기 위한 처리
+        image_base64 = None
+        print(f"An error occurred: {e}")
 
-    news_entries = News.objects.filter(ndate=yesterday, summary__isnull=False).values('title', 'summary')
+
+    news_entries = News.objects.filter(ndate=yesterday, summary__isnull=False).values('title', 'summary', 'url')
 
     # CustomerID가 세션에 없으면 로그인 페이지로 리디렉션
     if not customer_id:
