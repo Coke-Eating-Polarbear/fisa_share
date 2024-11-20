@@ -154,76 +154,71 @@
         }
     </style>
     <script>
-        let currentIndex = 0;
-
-        function updateCarousel() {
-            const carousel = document.querySelector('.recommendations');
-            const cardWidth = document.querySelector('.card').offsetWidth + 10; // 카드 폭 + 마진
-            carousel.style.transform = `translateX(-${currentIndex * cardWidth}px)`;
-        }
-
-        function prevSlide() {
-            if (currentIndex > 0) {
-                currentIndex--;
-                updateCarousel();
-            }
-        }
-
-        function nextSlide() {
-            const totalCards = document.querySelectorAll('.recommendations .card').length;
-            const visibleCards = Math.floor(document.querySelector('.carousel-wrapper').offsetWidth / (document.querySelector('.card').offsetWidth + 10));
-            if (currentIndex < totalCards - visibleCards) {
-                currentIndex++;
-                updateCarousel();
-            }
-        }
-
-        function toggleDetails(button) {
-            const detailsBox = button.closest('.card').querySelector('.details-box');
-            detailsBox.style.display = detailsBox.style.display === 'block' ? 'none' : 'block';
-        }
-
-        function closeDetails(button) {
-            const detailsBox = button.closest('.details-box');
-            detailsBox.style.display = 'none';
-        }
         document.addEventListener("DOMContentLoaded", function () {
-            const savedFavorites = JSON.parse(localStorage.getItem("favorites")) || [];
-
+            const csrfToken = "{{ csrf_token }}";
+    
+            // 모든 하트 아이콘을 선택
             document.querySelectorAll(".heart-icon").forEach((heart, index) => {
-                const productId = "product-" + (index + 1);
-                
-                // 찜한 항목이면 빨간 하트로 표시
-                if (savedFavorites.includes(productId)) {
-                    heart.classList.add("liked");
-                    heart.innerText = "♥"; // 하트 모양을 빨간색으로 채워진 하트로 변경
-                }
-
+                const productId = "product-" + (index + 1); // 각 상품의 고유 ID
+    
+                // 클릭 이벤트 추가
                 heart.addEventListener("click", function () {
-                    toggleFavorite(productId, this);
+                    // 하트 상태 토글
+                    if (heart.classList.contains("liked")) {
+                        heart.classList.remove("liked");
+                        heart.innerText = "♡"; // 빈 하트
+                        removeFromFavorites(productId); // 즐겨찾기에서 제거
+                    } else {
+                        heart.classList.add("liked");
+                        heart.innerText = "♥"; // 빨간 하트
+                        addToFavorites(productId); // 즐겨찾기에 추가
+                    }
                 });
             });
-        });
-
-        function toggleFavorite(productId, heart) {
-            let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
-            
-            if (favorites.includes(productId)) {
-                favorites = favorites.filter(id => id !== productId);
-                heart.classList.remove("liked");
-                heart.innerText = "♡"; // 하트를 빈 하트로 변경
-            } else {
-                favorites.push(productId);
-                heart.classList.add("liked");
-                heart.innerText = "♥"; // 하트를 빨간색으로 채워진 하트로 변경
+    
+            // 서버에 즐겨찾기 추가 요청
+            function addToFavorites(productId) {
+                fetch("/add_favorite/", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": csrfToken
+                    },
+                    body: JSON.stringify({ product_id: productId })
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Failed to add favorite");
+                    }
+                    console.log("Added to favorites:", productId);
+                })
+                .catch(error => {
+                    console.error(error);
+                });
             }
-
-            localStorage.setItem("favorites", JSON.stringify(favorites));
-        }
-
-        function viewFavorites() {
-            window.location.href = "favorites.html";
-        }
+    
+            // 서버에 즐겨찾기 제거 요청
+            function removeFromFavorites(productId) {
+                fetch("/remove_favorite/", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": csrfToken
+                    },
+                    body: JSON.stringify({ product_id: productId })
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Failed to remove favorite");
+                    }
+                    console.log("Removed from favorites:", productId);
+                })
+                .catch(error => {
+                    console.error(error);
+                });
+            }
+        });
+    </script>
     </script>
 </head>
 <body>
@@ -240,7 +235,7 @@
 
     <!-- 메인 콘텐츠 -->
     <div class="container">
-        <div class="recommendation-title">OO님의 위비프렌즈 추천 예/적금 TOP 5! 😊</div>
+        <div class="recommendation-title">{{ user_name }}님의 위비프렌즈 추천 예/적금 TOP 5! 😊</div>
         <div class="carousel-wrapper">
             <div class="recommendations">
                 <div class="card">

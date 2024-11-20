@@ -40,8 +40,22 @@
 <body>
 
     <div class="container">
-        <h2>찜한 상품 목록</h2>
-        <div id="favoritesContainer"></div>
+        <h2>{{ user_name }}님의 찜한 상품 목록</h2>
+        
+        {% if favorite_products %}
+            <ul class="list-group">
+                {% for product in favorite_products %}
+                    <li class="list-group-item">
+                        <strong>상품명:</strong> {{ product.DSID.dsname }}<br>
+                        <strong>은행:</strong> {{ product.DSID.bank }}<br>
+                        <strong>기준 금리:</strong> {{ product.DSID.baser }}<br>
+                        <strong>최대 금리:</strong> {{ product.DSID.maxir }}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>찜한 상품이 없습니다.</p>
+        {% endif %}
     </div>
 
 </body>
