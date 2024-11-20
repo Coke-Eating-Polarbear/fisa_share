@@ -11,4 +11,5 @@ urlpatterns = [
     path('terms3', views.terms_content3, name='terms3'),
     path('terms4', views.terms_content4, name='terms4'),
     path('terms5', views.terms_content5, name='terms5'),
+    path('findid/', views.findid, name='findid'),
 ]
