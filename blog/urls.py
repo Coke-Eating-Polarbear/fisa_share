@@ -1,5 +1,5 @@
 from . import views
-from django.urls import path, include
+from django.urls import path, include # type: ignore
 
 urlpatterns = [
     path('', views.main,name='main'), # 없는 경로를 호출하고 있음
