@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -31,13 +32,19 @@
             margin: 0 auto;
         }
         .navbar {
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-            margin-right: 20px;
+        display: flex;
+        justify-content: space-between; /* 좌측 로고와 우측 버튼 배치 */
+        /* justify-content: flex-end; 오른쪽 정렬 */
+        align-items: center;
+        padding: 10px 20px;
+        font-size: 1rem;
+        background-color: #ffffff;
         }
         .navbar a {
-            margin: 0 10px;
+            /* margin: 0 20px; 링크 간격 */
+            font-size: 1.2rem; /* 글씨 크기 */
+            font-weight: bold; /* 글씨 진하게 */
+            margin-left: 15px; /* 각 링크 사이의 간격 */
             text-decoration: none;
             color: #333;
         }
@@ -87,10 +94,15 @@
 <body>
     <header>
         <div class="navbar">
+            <div class="logo">
+                <a href="./main">
+                    <img src="{% static 'img/fisa_logo_after.png' %}" style="vertical-align: middle;" alt="우리 FISA 로고">
+                    <span style="font-size: 1.5rem; font-weight: bold; margin-left: 10px;">예/적금 추천 서비스</span>
+            </div>
             <div class="nav-links">
                 <a href="#report">금융분석 리포트</a>
                 <a href="#recommendation">예/적금 추천</a>
-                <a href="#spending">소비MBTI</a>
+                <a href="{% url 'spending_mbti' %}">소비MBTI</a>
             </div>
             <div class="user-info">
                 <span>{{ user_name }}님</span> | <a href="#mypage">마이페이지</a>
