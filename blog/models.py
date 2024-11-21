@@ -1,5 +1,5 @@
-from django.db import models
-from django.contrib.auth.hashers import make_password
+from django.db import models # type: ignore
+from django.contrib.auth.hashers import make_password # type: ignore
 
 
 # UserProfile 모델 (회원 정보)
@@ -12,6 +12,8 @@ class UserProfile(models.Model):
     SerialNum = models.CharField(max_length=1)  # 주민번호 뒷자리
     Phone = models.CharField(max_length=11)  # 전화번호
     sex = models.CharField(max_length=1, blank=True)  # 성별 (M, F)
+    stageclass = models.CharField(max_length=1)
+    inlevel = models.SmallIntegerField()
 
     def save(self, *args, **kwargs):
         # 비밀번호가 이미 해시되지 않은 경우에만 해시화
@@ -115,7 +117,7 @@ class MyData(models.Model):
 
 
 class Average(models.Model):
-    stage_class = models.CharField(max_length=10)  # StageClass 컬럼
+    stageclass = models.CharField(max_length=10, primary_key=True)  # StageClass 컬럼
     inlevel = models.IntegerField()  # Inlevel 컬럼
     spend = models.IntegerField()  # 소비
     income = models.IntegerField()  # 수입
@@ -135,12 +137,14 @@ class Average(models.Model):
 
     class Meta:
         db_table = 'average'  # 테이블 이름
+        managed = False  # Django가 테이블을 생성/수정하지 않도록 설정
+        unique_together = (('stageclass', 'inlevel'),)
         constraints = [
-            models.UniqueConstraint(fields=['stage_class', 'inlevel'], name='unique_stage_inlevel')
+            models.UniqueConstraint(fields=['stageclass', 'inlevel'], name='unique_stage_inlevel')
         ]  # 복합 Primary Key 대체로 UniqueConstraint 사용
 
     def __str__(self):
-        return f"{self.stage_class} - {self.inlevel}"
+        return f"{self.stageclass} - {self.inlevel}"
 
 class spend(models.Model):
     CustomerID = models.CharField(max_length=256, primary_key=True)

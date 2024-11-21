@@ -105,7 +105,7 @@ def findpw(request):
 
             if user:
                 # 이메일로 ID 전송
-                try:
+                try: # 추후 수정
                     send_mail(
                         "Your ID",
                         f"안녕하세요, {name}님! 회원님의 ID는 {user.CustomerID}입니다.",

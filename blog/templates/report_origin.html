@@ -3,117 +3,228 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>자산 보고서</title>
+    <title>Multiple Bar Charts with Averages</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        /* 전체 컨테이너 설정 */
-        .chart-container {
+        body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        background-color: #f3f3f3;
+        }
+        header, footer {
+            background-color: #f8f8f8;
+            padding: 10px;
+            text-align: center;
+            position: fixed;
+            width: 100%;
+            z-index: 1;
+        }
+        header { top: 0; }
+        footer { bottom: 0; }
+        .container {
+            padding-top: 80px;
+            padding-bottom: 80px;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .navbar {
             display: flex;
-            justify-content: space-around; /* 그래프 간 간격 균등 분배 */
-            flex-wrap: wrap; /* 화면이 작아지면 줄바꿈 */
-            gap: 20px; /* 그래프 간 간격 */
+            justify-content: flex-end;
+            align-items: center;
+            margin-right: 20px;
         }
-
-        /* 개별 그래프 */
-        .chart-box {
-            width: 22%; /* 화면의 22%씩 차지 */
-            min-width: 200px; /* 최소 너비 설정 */
+        .navbar a {
+            margin: 0 10px;
+            text-decoration: none;
+            color: #333;
         }
-
+        .content {
+            text-align: center;
+            margin-top: 40px;
+        }
+        .box {
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            margin: 20px auto;
+            padding: 20px;
+            width: 90%;
+            max-width: 1000px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .score-summary {
+            font-size: 18px;
+        }
+        .graphs {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+        }
+        .graph {
+            width: 22%;
+            margin: 10px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            background-color: #fafafa;
+        }
+        .report-summary {
+            font-size: 16px;
+        }
         canvas {
-            width: 100%; /* 캔버스 크기를 부모 요소에 맞춤 */
-            height: auto;
+            max-width: 400px;
+            margin: 20px auto;
+        }
+        .chart-container {
+            margin-bottom: 40px;
+            text-align: center;
         }
     </style>
 </head>
 <body>
-    <h1>{{ user_name }}의 자산 보고서</h1>
-
-    <div class="chart-container">
-        <!-- 총자산 -->
-        <div class="chart-box">
-            <h3>총자산</h3>
-            <canvas id="totalAssetChart"></canvas>
+    <header>
+        <div class="navbar">
+            <div class="nav-links">
+                <a href="#report">금융분석 리포트</a>
+                <a href="#recommendation">예/적금 추천</a>
+                <a href="#spending">소비MBTI</a>
+            </div>
+            <div class="user-info">
+                <span>{{ user_name }}님</span> | <a href="#mypage">마이페이지</a>
+            </div>
         </div>
-
-        <!-- 현금자산 -->
-        <div class="chart-box">
-            <h3>현금자산</h3>
-            <canvas id="cashAssetChart"></canvas>
+    </header>
+    <div class="container">
+        <div class="content">
+            <div class="box">
+                <h2>{{ user_name }}님의 금융분석 리포트입니다 😊</h2>
+            </div>
+            <div class="box score-summary">
+                <p>금융 자산 분석 점수: <span id="analysis-score">88점</span> 🔍 | 한 줄 요약: <span id="summary">키워드로? 아님 진짜 한줄 요약으로</span></p>
+            </div>
+                <div class="box graphs">
+                    <div class="chart-container">
+                        <h3>총자산</h3>
+                        <canvas id="chartTotal"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h3>현금자산</h3>
+                        <canvas id="chartCash"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h3>수입</h3>
+                        <canvas id="chartIncome"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h3>지출</h3>
+                        <canvas id="chartSpend"></canvas>
+                    </div>
+                </div>
+            </div>
         </div>
-
-        <!-- 수입 -->
-        <div class="chart-box">
-            <h3>수입</h3>
-            <canvas id="incomeChart"></canvas>
-        </div>
-
-        <!-- 지출 -->
-        <div class="chart-box">
-            <h3>지출</h3>
-            <canvas id="spendingChart"></canvas>
+        <div class="box report-summary">
+            <h3>금융 리포트 종합 요약</h3>
+            <p id="full-report">
+                생성형 AI로 분석한 전체 자산 요약 내용이 들어갑니다. 회원의 자산 상태를 설명하는 구체적인 분석 내용이 표시됩니다.
+            </p>
         </div>
     </div>
 
+
     <script>
-        // Django에서 전달된 데이터를 JavaScript로 변환
-        const barData = {{ bar_data|safe }};
+        // Django에서 전달된 데이터를 JavaScript로 로드
+        const barData = JSON.parse('{{ bar_data|safe }}');
+        const averageData = JSON.parse('{{ average_data|safe }}');
 
-        // 총자산 그래프
-        const totalAssetCtx = document.getElementById('totalAssetChart').getContext('2d');
-        new Chart(totalAssetCtx, {
-            type: 'bar',
-            data: {
-                labels: ['총자산'],
-                datasets: [{
-                    label: '총자산',
-                    data: [barData['총자산']],
-                    backgroundColor: '#98FB98',
-                }]
-            }
-        });
+        // 데이터 키와 값
+        const categories = Object.keys(barData); // ['총자산', '현금자산', '수입', '지출']
+        const userValues = Object.values(barData);
+        const averageValues = Object.values(averageData);
 
-        // 현금자산 그래프
-        const cashAssetCtx = document.getElementById('cashAssetChart').getContext('2d');
-        new Chart(cashAssetCtx, {
-            type: 'bar',
-            data: {
-                labels: ['현금자산'],
-                datasets: [{
-                    label: '현금자산',
-                    data: [barData['현금자산']],
-                    backgroundColor: '#90EE90',
-                }]
-            }
-        });
+        // 플러그인: 각 차트에 수평선(평균 데이터) 추가
+        const drawAverageLinePlugin = {
+            id: 'drawAverageLine',
+            afterDatasetsDraw(chart) {
+                const { ctx, scales } = chart;
+                const yAxis = scales.y;
+                const xAxis = scales.x;
 
-        // 수입 그래프
-        const incomeCtx = document.getElementById('incomeChart').getContext('2d');
-        new Chart(incomeCtx, {
-            type: 'bar',
-            data: {
-                labels: ['수입'],
-                datasets: [{
-                    label: '수입',
-                    data: [barData['수입']],
-                    backgroundColor: '#87CEEB',
-                }]
-            }
-        });
+                // 평균값 가져오기
+                const averageValue = chart.config.options.plugins.averageLine.value;
 
-        // 지출 그래프
-        const spendingCtx = document.getElementById('spendingChart').getContext('2d');
-        new Chart(spendingCtx, {
-            type: 'bar',
-            data: {
-                labels: ['지출'],
-                datasets: [{
-                    label: '지출',
-                    data: [barData['지출']],
-                    backgroundColor: '#FFC0CB',
-                }]
+                // 수평선 그리기
+                const yPos = yAxis.getPixelForValue(averageValue); // Y축 값 위치 계산
+                const xStart = xAxis.left; // 차트 왼쪽 끝
+                const xEnd = xAxis.right; // 차트 오른쪽 끝
+
+                ctx.save();
+                ctx.beginPath();
+                ctx.strokeStyle = 'red'; // 수평선 색상
+                ctx.lineWidth = 2;
+                ctx.moveTo(xStart, yPos);
+                ctx.lineTo(xEnd, yPos);
+                ctx.stroke();
+                ctx.restore();
             }
-        });
+        };
+
+        // 차트 생성 함수
+        function createBarChart(chartId, label, userValue, averageValue) {
+            const ctx = document.getElementById(chartId).getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: [label], // 단일 레이블
+                    datasets: [
+                        {
+                            label: '사용자 데이터',
+                            data: [userValue],
+                            backgroundColor: '#A3D5A3',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false // 범례 숨김
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const diff = context.raw - averageValue;
+                                    return `사용자 데이터: ${context.raw.toLocaleString()}원\n(평균보다 ${diff > 0 ? '+' : ''}${diff.toLocaleString()}원)`;
+                                }
+                            }
+                        },
+                        averageLine: {
+                            value: averageValue // 플러그인에 전달할 평균 값
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return value.toLocaleString() + '원'; // Y축 단위 표시
+                                }
+                            }
+                        }
+                    }
+                },
+                plugins: [drawAverageLinePlugin] // 플러그인 추가
+            });
+        }
+
+        // 4개의 그래프 생성
+        createBarChart('chartTotal', '총자산', userValues[0], averageValues[0]);
+        createBarChart('chartCash', '현금자산', userValues[1], averageValues[1]);
+        createBarChart('chartIncome', '수입', userValues[2], averageValues[2]);
+        createBarChart('chartSpend', '지출', userValues[3], averageValues[3]);
     </script>
 </body>
 </html>

@@ -1,26 +1,26 @@
-from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login
-from django.utils import timezone
+from django.shortcuts import render, redirect # type: ignore
+from django.contrib.auth import authenticate, login # type: ignore
+from django.utils import timezone # type: ignore
 from datetime import timedelta
-import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt # type: ignore
 import base64
 import io
-from matplotlib import font_manager, rc
-from django.contrib import messages
+from matplotlib import font_manager, rc # type: ignore
+from django.contrib import messages # type: ignore
 from .forms import UserProfileForm  # UserProfileForm을 가져옵니다
-from blog.models import UserProfile,Recommend, DsProduct, Wc, News, Favorite,MyData  # UserProfile 모델도 가져옵니다
-from django.contrib.auth.hashers import check_password
-from django.views.decorators.http import require_POST
-from django.http import HttpResponse,JsonResponse
-from django.db.models import F
+from blog.models import UserProfile,Recommend, DsProduct, Wc, News, Favorite,MyData, Average  # UserProfile 모델도 가져옵니다
+from django.contrib.auth.hashers import check_password# type: ignore
+from django.views.decorators.http import require_POST# type: ignore
+from django.http import HttpResponse,JsonResponse# type: ignore
+from django.db.models import F # type: ignore
 import random
 import logging
 from .logging import *
-from elasticsearch import Elasticsearch
-from django.views.decorators.csrf import csrf_exempt
+from elasticsearch import Elasticsearch # type: ignore
+from django.views.decorators.csrf import csrf_exempt # type: ignore
 import json
 import os
-from dotenv import load_dotenv
+from dotenv import load_dotenv # type: ignore
 from collections import defaultdict
 es = Elasticsearch([os.getenv('ES')])  # Elasticsearch 설정
 load_dotenv()
@@ -449,66 +449,46 @@ def remove_favorite(request):
 
     return JsonResponse({"status": "error"}, status=400)
 
-# @login_required_session
-# def originreport(request):
-#     customer_id = request.session.get('user_id')  
-#     user_name = "사용자"  # 기본값 설정
-
-#     if customer_id:
-#         try:
-#             # CustomerID로 UserProfile 조회
-#             user = UserProfile.objects.get(CustomerID=customer_id)
-#             user_name = user.username  # 사용자 이름 설정
-            
-#             # MyData에서 고객 데이터 조회
-#             user_data = MyData.objects.filter(CustomerID=customer_id).first()
-#             if not user_data:
-#                 raise ValueError("사용자 데이터가 없습니다.")
-
-#             # 데이터 준비
-#             bar_labels = ['총자산', '현금자산', '수입', '지출']
-#             bar_values = [user_data.Total, user_data.credit, user_data.Income, user_data.spend]
-
-#             pie_labels = ['식비', '경조사/선물', '카페', '마트/생필품', '교통/차량', '문화생활', '미용', '의류', '기타']
-#             pie_values = [34.2, 12.2, 9.9, 8.8, 8.0, 7.2, 5.7, 5.0, 8.0]  # 예제 데이터
-
-#             # 데이터 반환
-#             return JsonResponse({
-#                 'user_name': user_name,
-#                 'bar_chart': {
-#                     'labels': bar_labels,
-#                     'values': bar_values,
-#                 },
-#                 'pie_chart': {
-#                     'labels': pie_labels,
-#                     'values': pie_values,
-#                 }
-#             })
-
-#         except Exception as e:
-#             return JsonResponse({'error': str(e)}, status=500)
-
-#     return JsonResponse({'error': '로그인이 필요합니다.'})
-
 @login_required_session
 def originreport_page(request):
-    customer_id = request.session.get('user_id')  
+    # 세션에서 사용자 ID 가져오기
+    customer_id = request.session.get('user_id')
     user_name = "사용자"  # 기본값 설정
 
+    if customer_id:
+        try:
+            # CustomerID로 UserProfile 조회
+            user = UserProfile.objects.get(CustomerID=customer_id)
+            user_name = user.username  # 사용자 이름 설정
+        except UserProfile.DoesNotExist:
+            pass  # 사용자가 없을 경우 기본값 유지
     try:
+        # 세션 데이터가 없는 경우 예외 발생
         if not customer_id:
             raise ValueError("로그인이 필요합니다.")
 
         # CustomerID로 UserProfile 조회
         user = UserProfile.objects.get(CustomerID=customer_id)
-        user_name = user.username
+        print("Customer ID:", customer_id)  # 디버깅용 출력
+        print("User Data:", user)
+
+        # Average 테이블에서 고객 소득분위 기준 데이터 조회
+        average_data = Average.objects.filter(
+            stageclass=user.stageclass,
+            inlevel=user.inlevel
+        ).first()
+
+        if not average_data:
+            raise ValueError(f"소득 분위 데이터가 없습니다. (Stage Class: {user.stageclass}, Inlevel: {user.inlevel})")
+        print("Average Data:", average_data)  # 디버깅용 출력
 
         # MyData에서 고객 데이터 조회
         user_data = MyData.objects.filter(CustomerID=customer_id).first()
         if not user_data:
-            raise ValueError("사용자 데이터가 없습니다.")
+            raise ValueError(f"사용자 데이터를 찾을 수 없습니다. (Customer ID: {customer_id})")
+        print("User Financial Data:", user_data)  # 디버깅용 출력
 
-        # 데이터 준비 (단위 변환 포함)
+        # 데이터 준비
         bar_data = {
             '총자산': user_data.Total * 10000,
             '현금자산': user_data.credit * 10000,
@@ -516,18 +496,25 @@ def originreport_page(request):
             '지출': user_data.spend * 10000
         }
 
-        pie_data = {
-
+        average_values = {
+            '총자산': (average_data.asset + average_data.finance) * 10000,
+            '현금자산': average_data.asset * 10000,
+            '수입': average_data.income * 10000,
+            '지출': average_data.spend * 10000
         }
 
-        # 데이터를 템플릿으로 전달
+        # JSON 직렬화된 데이터를 템플릿에 전달
         context = {
+            'bar_data': json.dumps(bar_data),
+            'average_data': json.dumps(average_values),
             'user_name': user_name,
-            'bar_data': bar_data,
-            'pie_data' :pie_data
         }
+
         return render(request, 'report_origin.html', context)
 
+    except UserProfile.DoesNotExist:
+        print("UserProfile 데이터가 없습니다.")  # 디버깅용
+        return render(request, 'report_origin.html', {'error': '사용자 정보를 찾을 수 없습니다.'})
     except Exception as e:
-        # 예외 발생 시 에러 메시지와 함께 HTML 렌더링
+        print("에러 발생:", str(e))  # 디버깅용
         return render(request, 'report_origin.html', {'error': str(e)})
