@@ -1,4 +1,3 @@
-
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
@@ -7,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>약관동의</title>
     <style>
-
         body {
             margin: 0;
             padding: 0;
@@ -56,7 +54,7 @@
             cursor: pointer;
         }
         .form-box {
-            border: 2px solid #291e4ee5;
+            /*border: 2px solid #291e4ee5;*/
             border-radius: 10px;
             padding: 10px;
             width: 1200px;
@@ -76,7 +74,7 @@
             z-index: 1; 
         }
         footer {
-            position: fixed;
+            position: relative;
             background-color: #291e4ee5;
             padding: 10px;
             bottom: 0; 
@@ -161,6 +159,52 @@
         .nav-box nav a:hover {
             font-weight: bold;
         }
+        /* 팝업 스타일 */
+        .popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #fff;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            width: 300px;
+            display: none; /* 기본적으로 숨김 */
+            z-index: 1000;
+        }
+    
+        .popup-message {
+            font-size: 1rem;
+            color: #333;
+            margin-bottom: 20px;
+        }
+    
+        .popup button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+    
+        .popup button:hover {
+            background-color: #0056b3;
+        }
+    
+        /* 팝업 배경 */
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none; /* 기본적으로 숨김 */
+            z-index: 999;
+        }
     </style>
 </head>
 <body>
@@ -230,16 +274,48 @@
             </div>
             <div class="button-container">
                 <button type="button" class="expand-btn" onclick="window.location.href='{% url 'accounts:login' %}'">뒤로가기</button>
-                <button type="button" class="expand-btn" onclick="window.location.href='{% url 'accounts:signup' %}'" disabled>가입하기</button>
+                <button type="button" class="expand-btn" onclick="window.location.href='{% url 'accounts:signup' %}'">가입하기</button>
             </div>
         </form>
+             <!-- 팝업 배경 -->
+            <div class="popup-overlay" id="popup-overlay"></div>
+            <!-- 팝업 내용 -->
+            <div class="popup" id="popup">
+                <div class="popup-message">약관에 동의해 주세요.</div>
+                <button onclick="closePopup()">OK</button>
+            </div>
     </div>
     <script>
         // 페이지 로드 시 초기화
         document.addEventListener("DOMContentLoaded", function () {
             updateSignupButtonState();
         });
-    
+        // "가입하기" 버튼 클릭 시 처리
+        function handleSignupClick() {
+        const requiredCheckboxes = document.querySelectorAll('input[type="checkbox"][required]');
+        const allChecked = Array.from(requiredCheckboxes).every(checkbox => checkbox.checked);
+        if (!allChecked) {
+            showPopup(); // 팝업 표시
+            handleSignupClick();
+            return;
+        }
+        // 모든 체크박스가 체크된 경우
+        document.querySelector('#signupForm').submit();
+    }
+        // 팝업 표시
+        function showPopup() {
+            const popup = document.getElementById('popup');
+            const overlay = document.getElementById('popup-overlay');
+            popup.style.display = 'block';
+            overlay.style.display = 'block';
+        }
+        // 팝업 닫기
+        function closePopup() {
+            const popup = document.getElementById('popup');
+            const overlay = document.getElementById('popup-overlay');
+            popup.style.display = 'none';
+            overlay.style.display = 'none';
+    }
         // 필수 체크박스 상태에 따라 "가입하기" 버튼 활성화/비활성화
         function updateSignupButtonState() {
             const requiredCheckboxes = document.querySelectorAll('input[type="checkbox"][required]');
@@ -259,7 +335,7 @@
             });
             updateSignupButtonState();
         }
-    
+   
         // 개별 체크박스 상태에 따라 전체 선택 체크박스 상태 업데이트
         function updateSelectAllState() {
             const checkboxes = document.querySelectorAll('input[type="checkbox"]:not(#selectAll)');
@@ -282,8 +358,8 @@
         function openPdfPopup() {
             window.open('https://www.signgate.com/doc/mydata/%EB%B3%B8%EC%9D%B8%ED%99%95%EC%9D%B8%EC%84%9C%EB%B9%84%EC%8A%A4_%EC%9D%B4%EC%9A%A9%EC%95%BD%EA%B4%80.pdf', '_blank', 'width=800,height=600');
         }
-    </script>
 
+    </script>
     <footer>
         <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0;">서울특별시 마포구 월드컵북로 434 상암IT타워 6층</p> 
         <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0;">고객지원 : 02-3151-7000 | 이메일: worifisa@worifisa.com </p >
