@@ -1,26 +1,31 @@
-from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login
-from django.utils import timezone
+from django.shortcuts import render, redirect # type: ignore
+from django.contrib.auth import authenticate, login # type: ignore
+from django.utils import timezone # type: ignore
 from datetime import timedelta
+import matplotlib.pyplot as plt # type: ignore
 import base64
-from django.contrib import messages
+import io
+from matplotlib import font_manager, rc # type: ignore
+from django.contrib import messages # type: ignore
 from .forms import UserProfileForm  # UserProfileForm을 가져옵니다
-from blog.models import UserProfile,Recommend, DsProduct, Wc, News, Favorite  # UserProfile 모델도 가져옵니다
-from django.contrib.auth.hashers import check_password
-from django.views.decorators.http import require_POST
-from django.http import HttpResponse,JsonResponse
-from django.db.models import F
+from blog.models import UserProfile,Recommend, DsProduct, Wc, News, Favorite,MyData, Average,card  # UserProfile 모델도 가져옵니다
+from django.contrib.auth.hashers import check_password# type: ignore
+from django.views.decorators.http import require_POST# type: ignore
+from django.http import HttpResponse,JsonResponse# type: ignore
+from django.db.models import F # type: ignore
 import random
 import logging
 from .logging import *
-from elasticsearch import Elasticsearch
-from django.views.decorators.csrf import csrf_exempt
+from elasticsearch import Elasticsearch # type: ignore
+from django.views.decorators.csrf import csrf_exempt # type: ignore
 import json
 import os
-from dotenv import load_dotenv
+from dotenv import load_dotenv # type: ignore
 from collections import defaultdict
+es = Elasticsearch([os.getenv('ES')])  # Elasticsearch 설정
 load_dotenv()
-
+rc('font', family='Malgun Gothic')
+logger = logging.getLogger(__name__)
 def login_required_session(view_func):
     """
     세션에 'user_id'가 없을 경우 로그인 페이지로 리디렉션하는 데코레이터.
@@ -32,10 +37,6 @@ def login_required_session(view_func):
         # 'user_id'가 있으면 원래의 뷰 함수 실행
         return view_func(request, *args, **kwargs)
     return wrapper
-
-logger = logging.getLogger(__name__)
-
-
 
 @login_required_session
 def mypage(request):
@@ -54,7 +55,6 @@ def mypage(request):
     }
     return render(request, 'mypage.html',context)
 
-
 @login_required_session
 def spending_mbti(request):
     customer_id = request.session.get('user_id')  
@@ -71,7 +71,6 @@ def spending_mbti(request):
         'user_name': user_name,
     }
     return render(request, 'spending_mbti.html', context)
-
 
 def main(request):
     today = timezone.now().date()
@@ -103,8 +102,6 @@ def main(request):
     }
 
     return render(request, 'main.html', context)
-
-
 
 @login_required_session
 def report_ex(request):
@@ -179,7 +176,7 @@ def summary_view(request):
     if recommended_count > 0:
         recommended_dsid_list = [rec['DSID'] for rec in recommended_products]
         recommended_product_details = list(
-            DsProduct.objects.filter(DSID=recommended_dsid_list)
+            DsProduct.objects.filter(dsid__in=recommended_dsid_list)
             .values('dsname', 'bank', 'baser', 'maxir')
         )
 
@@ -206,9 +203,8 @@ def summary_view(request):
     
     return render(request, 'loginmain.html', context)
 
-
 @login_required_session
-def info1(request):
+def info(request):
     # 세션에서 CustomerID 가져오기
     customer_id = request.session.get('user_id')  
     user_name = "사용자"  # 기본값 설정
@@ -227,111 +223,26 @@ def info1(request):
     
     # POST 요청일 경우 info1의 goal과 saving_method를 세션에 저장 후 리디렉션
     if request.method == 'POST':
+        biggoal = request.POST.get('biggoal')
         goal = request.POST.get('goal')
         saving_method = request.POST.get('saving_method')
-        
-        # 세션에 선택한 데이터 저장
-        request.session['info1_goal'] = goal
-        request.session['info1_saving_method'] = saving_method
-
-        # 'savings_info2' 페이지로 리디렉션
-        return redirect('info2')
-    
-    # GET 요청일 경우 템플릿 렌더링
-    return render(request, 'savings_info1.html', context)
-
-
-@login_required_session
-def info2(request):
-    customer_id = request.session.get('user_id')  
-    user_name = "사용자"  # 기본값 설정
-
-    if customer_id:
-        try:
-            # CustomerID로 UserProfile 조회
-            user = UserProfile.objects.get(CustomerID=customer_id)
-            user_name = user.username  # 사용자 이름 설정
-        except UserProfile.DoesNotExist:
-            pass  # 사용자가 없을 경우 기본값 유지
-
-    if request.method == 'POST':
-        # POST 요청에서 info2의 폼 데이터 가져오기
-        goal = request.POST.get('goal')
         period = request.POST.get('period')
         amount = request.POST.get('amount')
-
-        # 세션에 데이터 저장
-        request.session['info2_goal'] = goal
-        request.session['info2_period'] = period
-        request.session['info2_amount'] = amount
-
-        # 다음 페이지로 리디렉션
-        return redirect('info3')  # 다음 페이지 URL 이름에 맞게 수정
-
-    context = {
-        'user_name': user_name,
-    }
-    return render(request, 'savings_info2.html', context)
-
-
-@login_required_session
-def info3(request):
-    customer_id = request.session.get('user_id')
-    user_name = "사용자"  # 기본값 설정
-
-    if customer_id:
-        try:
-            # CustomerID로 UserProfile 조회
-            user = UserProfile.objects.get(CustomerID=customer_id)
-            user_name = user.username  # 사용자 이름 설정
-        except UserProfile.DoesNotExist:
-            pass  # 사용자가 없을 경우 기본값 유지
-
-    if request.method == 'POST':
-        # POST 요청에서 금융권 옵션 가져오기
         bank_option = request.POST.get('bank_option')
-        
-        # 세션에 금융권 옵션 저장 (겹치지 않도록 명확한 키 이름 사용)
-        request.session['info3_bank_option'] = bank_option
-
-        # 다음 페이지로 리디렉션
-        return redirect('info4')  # 다음 페이지 URL 이름에 맞게 수정
-
-    context = {
-        'user_name': user_name,
-    }
-    return render(request, 'savings_info3.html', context)
-
-
-@login_required_session
-def info4(request):
-    customer_id = request.session.get('user_id')
-    user_name = "사용자"  # 기본값 설정
-
-    if customer_id:
-        try:
-            # CustomerID로 UserProfile 조회
-            user = UserProfile.objects.get(CustomerID=customer_id)
-            user_name = user.username  # 사용자 이름 설정
-        except UserProfile.DoesNotExist:
-            pass  # 사용자가 없을 경우 기본값 유지
-
-    if request.method == 'POST':
-        # POST 요청에서 선택한 우대사항을 리스트로 가져옵니다.
         selected_preferences = request.POST.getlist('preferences')
         
-        # 세션에 우대사항을 저장합니다.
+        request.session['biggoal'] = biggoal
         request.session['selected_preferences'] = selected_preferences
-
-        # 다음 페이지로 리디렉션합니다.
+        request.session['bank_option'] = bank_option
+        request.session['period'] = period
+        request.session['amount'] = amount
+        request.session['goal'] = goal
+        request.session['saving_method'] = saving_method
+        print(biggoal,selected_preferences,bank_option,period,amount,goal,saving_method)
         return redirect('top5')
-
-    context = {
-        'user_name': user_name,
-    }
-    # GET 요청 시 페이지 렌더링
-    return render(request, 'savings_info4.html', context)
-
+    
+    # GET 요청일 경우 템플릿 렌더링
+    return render(request, 'savings_info.html', context)
 
 @login_required_session
 def top5(request):
@@ -360,8 +271,6 @@ def top5(request):
 
     return render(request, 'recommend_savings_top5.html', context)
 
-
-
 @login_required_session
 def main_view(request):
     if request.user.is_authenticated:
@@ -381,8 +290,6 @@ def main_view(request):
 
     return render(request, 'main.html')
 
-es = Elasticsearch([os.getenv('ES')])  # Elasticsearch 설정
-
 @csrf_exempt
 def log_click_event(request):
     if request.method == 'POST':
@@ -396,8 +303,6 @@ def log_click_event(request):
         return JsonResponse({"status": "success"})
     return JsonResponse({"status": "failed"}, status=400)
 
-
-#----------------------------------------------------------------------
 def favorite(request):
     customer_id = request.session.get('user_id')
     user_name = "사용자"
@@ -442,7 +347,6 @@ def add_favorite(request):
 
     return JsonResponse({"status": "error"}, status=400)
 
-
 @csrf_exempt
 def remove_favorite(request):
     if request.method == "POST":
@@ -463,3 +367,73 @@ def remove_favorite(request):
             return JsonResponse({"status": "error", "message": str(e)}, status=400)
 
     return JsonResponse({"status": "error"}, status=400)
+
+@login_required_session
+def originreport_page(request):
+    # 세션에서 사용자 ID 가져오기
+    customer_id = request.session.get('user_id')
+    user_name = "사용자"  # 기본값 설정
+
+    if customer_id:
+        try:
+            # CustomerID로 UserProfile 조회
+            user = UserProfile.objects.get(CustomerID=customer_id)
+            user_name = user.username  # 사용자 이름 설정
+        except UserProfile.DoesNotExist:
+            pass  # 사용자가 없을 경우 기본값 유지
+    try:
+        # 세션 데이터가 없는 경우 예외 발생
+        if not customer_id:
+            raise ValueError("로그인이 필요합니다.")
+
+        # CustomerID로 UserProfile 조회
+        user = UserProfile.objects.get(CustomerID=customer_id)
+        print("Customer ID:", customer_id)  # 디버깅용 출력
+        print("User Data:", user)
+
+        # Average 테이블에서 고객 소득분위 기준 데이터 조회
+        average_data = Average.objects.filter(
+            stageclass=user.stageclass,
+            inlevel=user.inlevel
+        ).first()
+
+        if not average_data:
+            raise ValueError(f"소득 분위 데이터가 없습니다. (Stage Class: {user.stageclass}, Inlevel: {user.inlevel})")
+        print("Average Data:", average_data)  # 디버깅용 출력
+
+        # MyData에서 고객 데이터 조회
+        user_data = MyData.objects.filter(CustomerID=customer_id).first()
+        if not user_data:
+            raise ValueError(f"사용자 데이터를 찾을 수 없습니다. (Customer ID: {customer_id})")
+        print("User Financial Data:", user_data)  # 디버깅용 출력
+
+        # 데이터 준비
+        bar_data = {
+            '총자산': user_data.Total * 10000,
+            '현금자산': user_data.credit * 10000,
+            '수입': user_data.Income * 10000,
+            '지출': user_data.spend * 10000
+        }
+
+        average_values = {
+            '총자산': (average_data.asset + average_data.finance) * 10000,
+            '현금자산': average_data.asset * 10000,
+            '수입': average_data.income * 10000,
+            '지출': average_data.spend * 10000
+        }
+
+        # JSON 직렬화된 데이터를 템플릿에 전달
+        context = {
+            'bar_data': json.dumps(bar_data),
+            'average_data': json.dumps(average_values),
+            'user_name': user_name,
+        }
+
+        return render(request, 'report_origin.html', context)
+
+    except UserProfile.DoesNotExist:
+        print("UserProfile 데이터가 없습니다.")  # 디버깅용
+        return render(request, 'report_origin.html', {'error': '사용자 정보를 찾을 수 없습니다.'})
+    except Exception as e:
+        print("에러 발생:", str(e))  # 디버깅용
+        return render(request, 'report_origin.html', {'error': str(e)})

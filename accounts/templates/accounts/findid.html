@@ -65,6 +65,7 @@
             {% csrf_token %}
             <input type="text" id="name" name="name" placeholder="이름" required>
             <input type="email" id="email" name="email" placeholder="이메일" required>
+            <input type="text" id="Phone" name="Phone" placeholder="전화번호" required>
             <button type="submit">ID 찾기</button>
         </form>
         <p id="message" class="error" style="display: none;"></p>
@@ -75,6 +76,7 @@
             event.preventDefault(); // 기본 폼 제출 동작 방지
             const name = document.getElementById("name").value;
             const email = document.getElementById("email").value;
+            const Phone = document.getElementById("Phone").value;
             const message = document.getElementById("message");
 
             fetch("{% url 'accounts:findid' %}", {
@@ -83,7 +85,7 @@
                     "Content-Type": "application/json",
                     "X-CSRFToken": "{{ csrf_token }}"
                 },
-                body: JSON.stringify({ name: name, email: email })
+                body: JSON.stringify({ name: name, email: email, Phone:Phone })
             })
             .then(response => response.json())
             .then(data => {

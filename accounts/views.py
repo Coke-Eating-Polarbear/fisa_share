@@ -57,11 +57,12 @@ def findid(request):
             data = json.loads(request.body)
             name = data.get('name')
             email = data.get('email')
-
+            Phone = data.get('Phone')
             # 사용자 데이터 확인
             user = UserProfile.objects.filter(
                 username__iexact=name,
-                Email__iexact=email
+                Email__iexact=email,
+                Phone__iexact=Phone
             ).first()
 
             if user:
@@ -86,7 +87,43 @@ def findid(request):
             return JsonResponse({"success": False, "error": str(e)})
     return render(request, 'accounts/findid.html')
 
+def findpw(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            name = data.get('name')
+            email = data.get('email')
+            Phone = data.get('Phone')
+            userid = data.get('userid')
+            # 사용자 데이터 확인
+            user = UserProfile.objects.filter(
+                username__iexact=name,
+                Email__iexact=email,
+                Phone__iexact=Phone,
+                userid__iexact=userid
+            ).first()
 
+            if user:
+                # 이메일로 ID 전송
+                try: # 추후 수정
+                    send_mail(
+                        "Your ID",
+                        f"안녕하세요, {name}님! 회원님의 ID는 {user.CustomerID}입니다.",
+                        "noreply@gmail.com",
+                        [email],
+                        fail_silently=False,
+                    )
+                    print("Email sent successfully")
+                except Exception as e:
+                    print(f"Failed to send email: {e}")
+                return JsonResponse({"success": True})
+            else:
+                print("No matching user found")
+                return JsonResponse({"success": False, "error": "일치하는 사용자가 없습니다."})
+        except Exception as e:
+            print("Error:", e)
+            return JsonResponse({"success": False, "error": str(e)})
+    return render(request, 'accounts/findpw.html')
 
 
 

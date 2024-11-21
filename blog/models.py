@@ -1,5 +1,5 @@
-from django.db import models
-from django.contrib.auth.hashers import make_password
+from django.db import models # type: ignore
+from django.contrib.auth.hashers import make_password # type: ignore
 
 
 # UserProfile 모델 (회원 정보)
@@ -12,6 +12,8 @@ class UserProfile(models.Model):
     SerialNum = models.CharField(max_length=1)  # 주민번호 뒷자리
     Phone = models.CharField(max_length=11)  # 전화번호
     sex = models.CharField(max_length=1, blank=True)  # 성별 (M, F)
+    stageclass = models.CharField(max_length=1)
+    inlevel = models.SmallIntegerField()
 
     def save(self, *args, **kwargs):
         # 비밀번호가 이미 해시되지 않은 경우에만 해시화
@@ -96,3 +98,74 @@ class Favorite(models.Model):
 
     def __str__(self):
         return f"{self.CustomerID.CustomerID} - {self.DSID.dsid}"
+    
+
+class MyData(models.Model):
+    CustomerID = models.CharField(max_length=256, primary_key=True)  # 고객 ID
+    pDate = models.DateField()  # 결제 날짜
+    bizcode = models.CharField(max_length=256)  # 산업 분류 코드
+    store = models.CharField(max_length=256)  # 결제 상호명
+    price = models.IntegerField()  # 결제 금액
+    Income = models.IntegerField()  # 수입
+    Total = models.IntegerField()  # 계좌 잔액
+    estate = models.BigIntegerField()  # 부동산 (bigint)
+    credit = models.IntegerField()  # 입금 내역
+    spend = models.IntegerField()  # 지출
+
+    class Meta:
+        db_table = 'mydata'  # 테이블 이름 지정
+
+
+class Average(models.Model):
+    stageclass = models.CharField(max_length=10, primary_key=True)  # StageClass 컬럼
+    inlevel = models.IntegerField()  # Inlevel 컬럼
+    spend = models.IntegerField()  # 소비
+    income = models.IntegerField()  # 수입
+    asset = models.IntegerField()  # 자산
+    finance = models.IntegerField()  # 금융
+    eat = models.IntegerField()  # 식사
+    transfer = models.IntegerField()  # 교통
+    utility = models.IntegerField()  # 공과금
+    phone = models.IntegerField()  # 통신
+    home = models.IntegerField()  # 주거
+    hobby = models.IntegerField()  # 취미
+    fashion = models.IntegerField()  # 패션
+    party = models.IntegerField()  # 파티
+    allowance = models.IntegerField()  # 용돈
+    study = models.IntegerField()  # 학업
+    medical = models.IntegerField()  # 의료
+
+    class Meta:
+        db_table = 'average'  # 테이블 이름
+        managed = False  # Django가 테이블을 생성/수정하지 않도록 설정
+        unique_together = (('stageclass', 'inlevel'),)
+        constraints = [
+            models.UniqueConstraint(fields=['stageclass', 'inlevel'], name='unique_stage_inlevel')
+        ]  # 복합 Primary Key 대체로 UniqueConstraint 사용
+
+    def __str__(self):
+        return f"{self.stageclass} - {self.inlevel}"
+
+class spend(models.Model):
+    CustomerID = models.CharField(max_length=256, primary_key=True)
+    SDate = models.DateField()
+    Category = models.CharField(max_length=256)
+    Frequency = models.IntegerField()
+    Amount = models.BigIntegerField()
+    store = models.CharField(max_length=256)
+    bizCode = models.CharField(max_length=256)
+
+    class Meta:
+        db_table = 'spend'
+
+class card(models.Model):
+    cardID = models.CharField(max_length=256, primary_key=True)
+    cardName = models.CharField(max_length=256)
+    benefits = models.CharField(max_length=256)
+    image = models.CharField(max_length=256)
+    details = models.TextField()
+    url = models.CharField(max_length=256)
+    cardType = models.CharField(max_length=1)
+
+    class Meta:
+        db_table = 'card'

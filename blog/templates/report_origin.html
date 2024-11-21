@@ -1,112 +1,197 @@
+{% load static %}
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>금융 분석 리포트</title>
-<style>
-    body {
-        font-family: Arial, sans-serif;
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-        background-color: #f3f3f3;
-    }
-    header, footer {
-        background-color: #f8f8f8;
-        padding: 10px;
-        text-align: center;
-        position: fixed;
-        width: 100%;
-        z-index: 1;
-    }
-    header { top: 0; }
-    footer { bottom: 0; }
-    .container {
-        padding-top: 80px;
-        padding-bottom: 80px;
-        width: 100%;
-        max-width: 1200px;
-        margin: 0 auto;
-    }
-    .navbar {
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>금융분석리포트</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            background-color: #ffffff;
+        }
+        header, footer {
+            padding: 10px;
+            text-align: center;
+            width: 100vw;
+        }
+        header { 
+            top: 0; 
+            background-color: #ffffff;
+            position: fixed;
+            padding: 0px;
+            z-index: 1;
+        }
+        footer { 
+            bottom: 0; 
+            background-color: #291e4ee5;
+            padding: 10px;
+            left : 0;
+        }
+        .container {
+            padding-top: 80px;
+            padding-bottom: 80px;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .navbar {
         display: flex;
-        justify-content: flex-end;
+        justify-content: space-between; /* 좌측 로고와 우측 버튼 배치 */
+        /* justify-content: flex-end; 오른쪽 정렬 */
         align-items: center;
-        margin-right: 20px;
-    }
-    .navbar a {
-        margin: 0 10px;
-        text-decoration: none;
-        color: #333;
-    }
-    .content {
-        text-align: center;
-        margin-top: 40px;
-    }
-    .box {
-        background-color: white;
-        border: 1px solid #ddd;
-        border-radius: 10px;
-        margin: 20px auto;
-        padding: 20px;
-        width: 90%;
-        max-width: 1000px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
-    .score-summary {
-        font-size: 18px;
-    }
-    .graphs {
-        display: flex;
-        justify-content: space-around;
-        flex-wrap: wrap;
-    }
-    .graph {
-        width: 22%;
-        margin: 10px;
-        padding: 15px;
-        border: 1px solid #ddd;
-        border-radius: 10px;
-        background-color: #fafafa;
-    }
-    .report-summary {
-        font-size: 16px;
-    }
-</style>
+        padding: 10px 20px;
+        font-size: 1rem;
+        background-color: #ffffff;
+        }
+
+        .nav-links {
+        margin-right: 20px; /* 회원 정보와의 구분 */
+        }
+
+        .navbar a {
+            /* margin: 0 20px; 링크 간격 */
+            font-size: 1.2rem; /* 글씨 크기 */
+            font-weight: bold; /* 글씨 진하게 */
+            margin-left: 15px; /* 각 링크 사이의 간격 */
+            text-decoration: none;
+            color: #333;
+        }
+
+        .nav-box nav a {
+            color: #333;
+            margin: 0 10px;
+            text-decoration: none;
+        }
+        
+        .nav-box nav a:hover {
+            font-weight: bold;
+        }
+
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background-color: #fff;
+            /* box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); */
+            padding: 0%;
+            min-width: 150px;
+            z-index: 1;
+            border: 1px solid #ddd;
+        }
+        .dropdown-content a {
+            padding: 10px 20px;
+            display: block;
+            color: #333;
+            text-align: left;
+            text-decoration: none;
+            /* white-space: nowrap; */
+        }
+        .dropdown-content a:hover {
+        background-color: #f1f1f1;
+        }
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        .content {
+            text-align: center;
+            margin-top: 40px;
+        }
+        .box {
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            margin: 20px auto;
+            padding: 20px;
+            width: 90%;
+            max-width: 1000px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .score-summary {
+            font-size: 18px;
+        }
+        .graphs {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+        }
+        .graph {
+            width: 22%;
+            margin: 10px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            background-color: #fafafa;
+        }
+        .report-summary {
+            font-size: 16px;
+        }
+        canvas {
+            max-width: 400px;
+            margin: 20px auto;
+        }
+        .chart-container {
+            margin-bottom: 40px;
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
-
-<header>
-    <div class="navbar">
-        <div class="nav-links">
-            <a href="#report">금융분석 리포트</a>
-            <a href="#recommendation">예/적금 추천</a>
-            <a href="#spending">소비MBTI</a>
+    <header>
+        <div class="navbar">
+            <div class="logo">
+                <a href="./main">
+                    <img src="{% static 'img/fisa_logo_after.png' %}" style="vertical-align: middle;" alt="우리 FISA 로고">
+                    <span style="font-size: 1.5rem; font-weight: bold; margin-left: 10px;">예/적금 추천 서비스</span>
+            </div>
+            <div class="nav-links">
+                <a href="#report">금융분석 리포트</a>
+                <a href="#recommendation">예/적금 추천</a>
+                <a href="{% url 'spending_mbti' %}">소비MBTI</a>
+            </div>
+            <div class="user-info">
+                <span>{{ user_name }}님</span> | <a href="#mypage">마이페이지</a>
+            </div>
         </div>
-        <div class="user-info">
-            <span>회원이름님</span> | <a href="#mypage">마이페이지</a>
+    </header>
+    <div class="container">
+        <div class="content">
+            <div class="box">
+                <h2>{{ user_name }}님의 금융분석 리포트입니다 😊</h2>
+            </div>
+            <div class="box score-summary">
+                <p>금융 자산 분석 점수: <span id="analysis-score">88점</span> 🔍 | 한 줄 요약: <span id="summary">키워드로? 아님 진짜 한줄 요약으로</span></p>
+            </div>
+                <div class="box graphs">
+                    <div class="chart-container">
+                        <h3>총자산</h3>
+                        <canvas id="chartTotal"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h3>현금자산</h3>
+                        <canvas id="chartCash"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h3>수입</h3>
+                        <canvas id="chartIncome"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h3>지출</h3>
+                        <canvas id="chartSpend"></canvas>
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
-</header>
-
-<div class="container">
-    <div class="content">
-        <div class="box">
-            <h2>@@님의 금융분석 리포트입니다 😊</h2>
-        </div>
-
-        <div class="box score-summary">
-            <p>금융 자산 분석 점수: <span id="analysis-score">88점</span> 🔍 | 한 줄 요약: <span id="summary">키워드로? 아님 진짜 한줄 요약으로</span></p>
-        </div>
-
-        <div class="box graphs">
-            <div class="graph" id="assets-graph">총자산 그래프</div>
-            <div class="graph" id="liquid-assets-graph">현금자산 그래프</div>
-            <div class="graph" id="income-expense-graph">수입 지출 그래프</div>
-            <div class="graph" id="pie-chart">자산 분포 파이 차트</div>
-        </div>
-
         <div class="box report-summary">
             <h3>금융 리포트 종합 요약</h3>
             <p id="full-report">
@@ -114,11 +199,99 @@
             </p>
         </div>
     </div>
-</div>
 
-<footer>
-    <p>회사명 | 주소 | 연락처</p>
-</footer>
 
+    <script>
+        // Django에서 전달된 데이터를 JavaScript로 로드
+        const barData = JSON.parse('{{ bar_data|safe }}');
+        const averageData = JSON.parse('{{ average_data|safe }}');
+
+        // 데이터 키와 값
+        const categories = Object.keys(barData); // ['총자산', '현금자산', '수입', '지출']
+        const userValues = Object.values(barData);
+        const averageValues = Object.values(averageData);
+
+        // 플러그인: 각 차트에 수평선(평균 데이터) 추가
+        const drawAverageLinePlugin = {
+            id: 'drawAverageLine',
+            afterDatasetsDraw(chart) {
+                const { ctx, scales } = chart;
+                const yAxis = scales.y;
+                const xAxis = scales.x;
+
+                // 평균값 가져오기
+                const averageValue = chart.config.options.plugins.averageLine.value;
+
+                // 수평선 그리기
+                const yPos = yAxis.getPixelForValue(averageValue); // Y축 값 위치 계산
+                const xStart = xAxis.left; // 차트 왼쪽 끝
+                const xEnd = xAxis.right; // 차트 오른쪽 끝
+
+                ctx.save();
+                ctx.beginPath();
+                ctx.strokeStyle = 'red'; // 수평선 색상
+                ctx.lineWidth = 2;
+                ctx.moveTo(xStart, yPos);
+                ctx.lineTo(xEnd, yPos);
+                ctx.stroke();
+                ctx.restore();
+            }
+        };
+
+        // 차트 생성 함수
+        function createBarChart(chartId, label, userValue, averageValue) {
+            const ctx = document.getElementById(chartId).getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: [label], // 단일 레이블
+                    datasets: [
+                        {
+                            label: '사용자 데이터',
+                            data: [userValue],
+                            backgroundColor: '#A3D5A3',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false // 범례 숨김
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const diff = context.raw - averageValue;
+                                    return `사용자 데이터: ${context.raw.toLocaleString()}원\n(평균보다 ${diff > 0 ? '+' : ''}${diff.toLocaleString()}원)`;
+                                }
+                            }
+                        },
+                        averageLine: {
+                            value: averageValue // 플러그인에 전달할 평균 값
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return value.toLocaleString() + '원'; // Y축 단위 표시
+                                }
+                            }
+                        }
+                    }
+                },
+                plugins: [drawAverageLinePlugin] // 플러그인 추가
+            });
+        }
+
+        // 4개의 그래프 생성
+        createBarChart('chartTotal', '총자산', userValues[0], averageValues[0]);
+        createBarChart('chartCash', '현금자산', userValues[1], averageValues[1]);
+        createBarChart('chartIncome', '수입', userValues[2], averageValues[2]);
+        createBarChart('chartSpend', '지출', userValues[3], averageValues[3]);
+    </script>
 </body>
 </html>

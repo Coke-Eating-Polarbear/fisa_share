@@ -14,7 +14,7 @@
         box-sizing: border-box;
         }
         body {
-            background-color: #ffffff;
+            background-color: #f4f4f6;
             font-family: Arial, sans-serif;
             width: 100vw;
             padding-top: 150px;
@@ -110,7 +110,7 @@
         }
 
         .container {
-            max-width: 100%;
+            min-width: 80%;
             margin: 20px auto;
             background-color: #ffffff;
             padding: 20px;
@@ -119,9 +119,18 @@
         }
         .title-container {
             display: flex;
+            flex-direction: column;
+            position: fixed;
             align-items: center;
             justify-content: center;
+            top: 12%;
+            margin-top: 0px;
             margin-bottom: 10px;
+            background-color: #ffffff;
+            padding-top: 11px;
+            min-width: 100%;
+            z-index: 1;
+            gap: 20px;
         }
         .cat-image {
             position: absolute;
@@ -130,9 +139,11 @@
             transform: translate(-50%, -50%); /* 가운데 정렬 */
             cursor: pointer;
             transition: opacity 0.3s ease-in-out;
+            max-width: 20%;
+            height: auto;
         }
         .title {
-            font-size: 24px;
+            font-size: 20px;
             font-weight: bold;
             text-align: center;
             margin: 0;
@@ -143,21 +154,11 @@
             text-align: center;
             margin-bottom: 20px;
         }
-        .progress-bar-container {
-            display: flex;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        .progress {
-            width: 100%;
-            margin-right: 10px;
-            height: 20px;
-        }
         .goal-prompt {
             text-align: center;
-            font-size: 16px;
+            font-size: 20px;
             font-weight: bold;
-            margin-bottom: 10px;
+            margin-bottom: 20px;
         }
         .goal-options {
             display: flex;
@@ -173,7 +174,7 @@
             cursor: pointer;
         }
         .goal-options button.active, .saving-method-options button.active {
-            background-color: #44cfe8;
+            background-color: #181b7caf;
             color: white;
         }
         .custom-input {
@@ -190,6 +191,7 @@
             text-align: center;
             margin-bottom: 20px;
             font-weight: bold;
+            font-size: 20px;
         }
         .saving-method-options {
             display: flex;
@@ -199,12 +201,13 @@
         }
         .next-button-container {
             display: flex;
-            justify-content: flex-end;
+            justify-content: center;
             margin-top: 20px;
+            margin-bottom: 20px;
         }
         .next-button {
             padding: 10px 20px;
-            background-color: #44cfe8;
+            background-color: #181b7caf;
             color: #fff;
             border: none;
             border-radius: 5px;
@@ -232,17 +235,16 @@
         .option {
             width: 48%;
             padding: 15px;
-            background-color: #e9ecef;
             border-radius: 10px;
             text-align: center;
         }
         .option h3 {
-            font-size: 16px;
-            color: #fff;
-            background-color: #007bff;
+            font-size: 35px;
+            /* color: #fff; */
+            /* background-color: #181b7caf; */
             padding: 8px;
             border-radius: 5px;
-            display: inline-block;
+            /* display: inline-block; */
             margin-top: 0;
         }
         .option p {
@@ -261,7 +263,7 @@
             padding: 8px 12px;
             font-size: 0.9rem;
             color: #fff;
-            background-color: #007bff;
+            background-color: #181b7caf;
             border: none;
             border-radius: 5px;
             cursor: pointer;
@@ -277,7 +279,7 @@
             color: #555;
         }
         .preference-box {
-            border: 1px solid #ccc;
+            /* border: 1px solid #ccc; */
             border-radius: 10px;
             padding: 20px;
             margin-top: 20px;
@@ -288,14 +290,14 @@
             margin-bottom: 15px;
         }
         .preference-options {
-            display: flex;
-            flex-wrap: wrap;
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
             gap: 10px;
             justify-content: center;
         }
         .preference-options label {
             padding: 8px 15px;
-            background-color: #f8f9fa;
+            /* background-color: #f8f9fa; */
             border: 1px solid #ddd;
             border-radius: 5px;
             cursor: pointer;
@@ -304,24 +306,99 @@
             gap: 5px;
         }
 
+        .progress-bar-container {
+            position: relative;
+            width: 75%;
+        }
+
+        .progress {
+            width: 100%;
+            height: 20px;
+            background-color: #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background-color: #181b7caf;
+            transition: width 0.3s ease;
+            display: flex; /* 텍스트 중앙 정렬 */
+            justify-content: center; /* 텍스트 수평 중앙 정렬 */
+            align-items: center; /* 텍스트 수직 중앙 정렬 */
+            color: #fff; /* Progress 바 내부 텍스트 색상 */
+            font-weight: bold;
+            font-size: 14px;
+            position: relative; /* 텍스트를 바 안에 위치 */
+        }
+
+        .progress-text {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%); /* 텍스트 중앙 정렬 */
+            white-space: nowrap;
+}
+
+        .goal-options button {
+            padding: 10px 15px;
+            background-color: #e9ecef;
+            border: 1px solid transparent; /* 기본 상태에서 테두리는 투명 */
+            border-radius: 5px;
+            cursor: pointer;
+            transition: border-color 0.3s ease-in-out; /* 테두리 변화 애니메이션 */
+        }
+
+        .goal-options button.active {
+            border: 2px solid #7c5118af !important; /* 테두리 추가 */
+            border-radius: 5px; /* 둥근 모서리 */
+            color: inherit; /* 버튼 글씨 색상을 상속 */
+            background-color: inherit; /* 배경색 상속 */
+            font-size: inherit; /* 글씨 크기 유지 */
+            text-align: center; /* 텍스트 정렬 */
+        }
 
     </style>
     <script>
-        let selectedGoal = '';
+        let selectedGroups = {
+            biggoal: false,
+            savingMethod: false,
+            goal : false,
+            period : false,
+            amount :false,
+            bank_option : false,
+            preferences : false
+        };
 
-        function selectGoal(button, goal) {
-            document.querySelectorAll('.goal-options button').forEach(btn => btn.classList.remove('active'));
-            button.classList.add('active');
-            selectedGoal = goal;
-
-            if (goal === '직접입력') {
-                document.getElementById('customInput').style.display = 'block';
-            } else {
+        function selectGoal(button, goalValue) {
+            // 만약 클릭한 버튼이 이미 활성화된 상태라면 (active 클래스가 존재)
+            if (button.classList.contains('active')) {
+                // active 클래스를 제거하여 비활성화
+                button.classList.remove('active');
+                // 숨겨진 필드 값 초기화
+                document.getElementById("bigGoalInput").value = '';
+                // '직접 입력' 필드 숨기기
                 document.getElementById('customInput').style.display = 'none';
-                document.getElementById('goalInput').value = goal;
+                selectedGroups.biggoal = false;
+                return;
+            } else {
+                // 모든 버튼에서 'active' 클래스 제거
+                document.querySelectorAll('.goal-options button').forEach(btn => btn.classList.remove('active'));
+
+                // 클릭한 버튼에 'active' 클래스 추가
+                button.classList.add('active');
+                // 선택된 값을 숨겨진 필드에 저장
+                document.getElementById("bigGoalInput").value = goalValue;
+                selectedGroups.biggoal = true;
+                // '직접 입력'일 경우 추가 입력 필드 표시
+                if (goalValue === '직접입력') {
+                    document.getElementById('customInput').style.display = 'block';
+                } else {
+                    document.getElementById('customInput').style.display = 'none';
+                }
             }
         }
-
+        
         function selectSavingMethod(button, savingMethod) {
             document.querySelectorAll('.saving-method-options button').forEach(btn => btn.classList.remove('active'));
             button.classList.add('active');
@@ -364,6 +441,68 @@
             // 선택된 옵션을 hidden input에 저장하여 폼과 함께 전송할 수 있도록 합니다
             document.getElementById("bankOptionInput").value = optionValue;
         }
+
+        let answeredQuestions = 0; // 진행된 질문 수
+        const totalQuestions = 7; // 전체 질문 수
+
+        function updateProgressBar() {
+            const progressBar = document.querySelector('.progress-bar'); // Progress 바
+            const progressText = document.querySelector('.progress-text'); // Progress 텍스트
+
+            if (!progressBar || !progressText) {
+                console.error("Progress 바 요소를 찾을 수 없습니다. HTML 구조를 확인해주세요.");
+                return;
+            }
+
+            // 진행도를 업데이트
+            answeredQuestions = Math.min(answeredQuestions + 1, totalQuestions); // 최대 질문 수 초과 방지
+            const progress = (answeredQuestions / totalQuestions) * 100; // 백분율 계산
+
+            // Progress 바 업데이트
+            progressBar.style.width = `${progress}%`;
+            progressBar.setAttribute('aria-valuenow', progress);
+
+            // 텍스트 업데이트
+            progressText.textContent = `${Math.round(progress)}%`;
+        }
+
+        function attachEventListeners() {
+        // 목적 선택
+        document.querySelectorAll('.goal-options button').forEach(btn => {
+            btn.addEventListener('click', updateProgressBar);
+        });
+
+        // 저축 방식 선택
+        document.querySelectorAll('.saving-method-options button').forEach(btn => {
+            btn.addEventListener('click', updateProgressBar);
+        });
+
+        // 저축 목적 (단기/장기)
+        document.querySelectorAll('input[name="goal"]').forEach(radio => {
+            radio.addEventListener('change', updateProgressBar);
+        });
+
+        // 가입 기간 선택
+        document.querySelectorAll('input[name="period"]').forEach(radio => {
+            radio.addEventListener('change', updateProgressBar);
+        });
+
+        // 목표 금액 입력
+        document.querySelector('input[name="amount"]').addEventListener('change', updateProgressBar);
+
+        // 금융권 범위 선택
+        document.querySelectorAll('.buttons button').forEach(btn => {
+            btn.addEventListener('click', updateProgressBar);
+        });
+
+        // 우대사항 선택
+        document.querySelectorAll('input[name="preferences"]').forEach(checkbox => {
+            checkbox.addEventListener('change', updateProgressBar);
+        });
+        }
+
+        // DOM이 로드된 후 이벤트 리스너 추가
+        document.addEventListener('DOMContentLoaded', attachEventListeners);
         
     </script>
 </head>
@@ -382,7 +521,7 @@
                 <div class="dropdown">
                     <a href="#" style=" font-weight: bold; color: #121212;">예/적금 추천</a>
                     <div class="dropdown-content">
-                        <a href="savings_info1" style="font-size: 0.9rem;">신규적금추천</a>
+                        <a href="savings_info" style="font-size: 0.9rem;">신규적금추천</a>
                         <a href="compare_products" style="font-size: 0.9rem;">기존상품비교</a>
                     </div>
                 </div> 
@@ -391,7 +530,7 @@
                <!-- 회원 정보 및 마이페이지 -->
             <div class="user-info">
                 <span style="font-size: 1.1rem;">{{ user_name}}님</span> <a href="./mypage" style="margin-left: 15px; text-decoration: none; font-size: 1.1rem; font-weight: bold; color: #121212;">마이페이지</a> 
-                <button style="margin-left: 10px; margin-right: 5px; padding: 5px 10px; font-size: 0.9rem; font-weight: bold; background-color: #007BFF; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                <button style="margin-left: 10px; margin-right: 5px; padding: 5px 10px; font-size: 0.9rem; font-weight: bold; background-color: #181b7caf; color: white; border: none; border-radius: 5px; cursor: pointer;">
                 로그아웃
             </button>
             </div>
@@ -402,42 +541,66 @@
     <!-- 메인 콘텐츠 -->
         <!-- 제목과 이미지 -->
         <div class="title-container">
-            <img src="https://via.placeholder.com/50" class="cat-image_main" alt="천냥이 이미지">
-            <div class="title">천냥이와 함께 {{ user_name }}님의 맞춤 저축 방법을 찾으러 떠나볼까요?</div>
+            <!-- <img src="/static/img/chunnyang_face.png" style="width: 20px; height: 20px;" alt="천냥이 이미지"> -->
+            <div class="title">
+                <img src="/static/img/chunnyang_face.png" style="width: 40px; height: 40px;" alt="천냥이 이미지">
+                천냥이와 함께 {{ user_name }}님의 맞춤 저축 상품을 찾으러 떠나볼까요?
+                <img src="/static/img/chunnyang_face.png" style="width: 40px; height: 40px;" alt="천냥이 이미지"></div>
+                <div class="progress-bar-container">
+                    <div class="progress">
+                        <div class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                            <span class="progress-text">0%</span> <!-- Progress 텍스트를 바 내부로 이동 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="container" style="display: grid; grid-template-columns: 8fr 2fr; grid-template-rows: repeat(7, auto); gap: 20px ; width: 90%;">
+        <div class="container" style="display: grid; grid-template-columns: 8fr 2fr; grid-template-rows: repeat(7, auto); gap: 10px ; width: 80%; margin-top: 100px; row-gap: 30px;">
             <div class="container" style="min-width: 100%;">
-                <div class="goal-prompt">어떤 목적으로 저축을 하실건가요?
+                <div class="goal-prompt" style="margin-bottom: 20px; margin-top: 10px;">어떤 목적으로 저축을 하실건가요?
 
-                <form id="infoForm" action="{% url 'info1' %}" method="POST" onsubmit="submitForm()">
+                <form id="infoForm" method="POST" onsubmit="submitForm()">
                 {% csrf_token %}
                 <input type="hidden" name="goal" id="goalInput">
                 <input type="hidden" name="saving_method" id="savingMethodInput">
 
                 <!-- 목적 옵션 버튼 -->
-                <div class="goal-options">
-                    <button type="button" onclick="selectGoal(this, '내집 마련')">내집 마련</button>
-                    <button type="button" onclick="selectGoal(this, '비상금')">비상금</button>
-                    <button type="button" onclick="selectGoal(this, '노후대비')">노후대비</button>
-                    <button type="button" onclick="selectGoal(this, '직접입력')">직접입력</button>
+                <div class="goal-options" style="margin-top: 20px;">
+                    <button type="button" onclick="selectGoal(this, '내집 마련')" style="display: flex; flex-direction: column; align-items: center; border: none; background: none; cursor: pointer;">
+                        <span style="font-size: 2rem;">🏠</span> <!-- 집 아이콘 -->
+                        <span style="font-size: 1rem; margin-top: 5px;">내집 마련</span>
+                    </button>
+                    <button type="button" onclick="selectGoal(this, '비상금')" style="display: flex; flex-direction: column; align-items: center; border: none; background: none; cursor: pointer;">
+                        <span style="font-size: 2rem;">💸</span>
+                        <span style="font-size: 1rem; margin-top: 5px;">비상금</span>
+                    </button>
+                    <button type="button" onclick="selectGoal(this, '노후대비')" style="display: flex; flex-direction: column; align-items: center; border: none; background: none; cursor: pointer;">
+                        <span style="font-size: 2rem;">🧓</span>
+                        <span style="font-size: 1rem; margin-top: 5px;">노후 대비</span>
+                    </button>
+                    <button type="button" onclick="selectGoal(this, '직접입력')" style="display: flex; flex-direction: column; align-items: center; border: none; background: none; cursor: pointer;">
+                        <span style="font-size: 2rem;">➕</span>
+                        <span style="font-size: 1rem; margin-top: 5px;">직접 입력</span>
+                    </button>
                 </div>
+                <input type="hidden" name="biggoal" id="bigGoalInput">
                 </div>
             <!-- 사용자 정의 입력 필드 -->
                 <div id="customInput" class="custom-input" style="display: none; width: 100%; text-align: center;" >
                     <input type="text" id="customGoalInput" class="form-control" placeholder="어떤 목적으로 저축을 하실건가요?"style="width: 50%;margin: 0 auto;padding: 8px;border: 1px solid #ccc;border-radius: 5px;">
-                </form>
                 </div>
             </div>
             <div style="min-width: 100%; text-align: center; position: relative;">
                 <img 
-                    src="https://via.placeholder.com/50" 
+                    src="/static/img/chunnyang_face.png" 
                     class="cat-image" 
                     alt="천냥이 이미지" 
                     style="cursor: pointer;"
                     onclick="toggleDescription(this)" 
                 />
-                <div class="plus-box" style="display: none; cursor: pointer;" onclick="toggleDescription(this)">
-                    자세한 설명 내용입니다. 여기에 원하는 정보를 추가하세요.
+                <div class="plus-box" style="display: none; cursor: pointer; text-align: center;" onclick="toggleDescription(this)">
+                    <span style="font-weight: bold;"> {{ user_name }} 님의 목표를 입력해주세요-! </span><br>
+                    <span>확실한 목표가 있다면 저축이 더 즐거워질지도 몰라요-!<br>{{user_name}}님만의 저축 목표를 입력해주라냥-!</span>
                 </div>
             </div>
             
@@ -445,39 +608,41 @@
             <div class="saving-method-container">
                 <div class="saving-method">원하시는 저축방식을 선택해주세요</div>
                 
-                <div class="saving-method-options">
+                <div class="saving-method-options" style="margin-top: 30px; align-items: center; text-align: center; column-gap: 10px;">
                     <div>
-                        <div class="text-container">시작이 반이다!<br>지금부터 꾸준히<br>목돈을 모아봐요-!</div>
+                        <div class="text-container" style="margin-bottom: 20%; margin-top: 10px;">🪙<br>시작이 반이다!!</div>
                         <button type="button" onclick="selectSavingMethod(this, '목돈 모으기')">목돈 모으기</button>
                     </div>
                     <div>
-                        <div class="text-container">깨진 독에 물 붓기!<br>이미 가지고 있는 현금은<br>현명하게 활용해봐요.</div>
+                        <div class="text-container" style="margin-bottom: 10%;">💰<br>목돈을<br>더 크게-! 크게-!</div>
                         <button type="button" onclick="selectSavingMethod(this, '목돈 굴리기')">목돈 굴리기</button>
                     </div>
                     <div>
-                        <div class="text-container">더 큰 목표를 향해!<br>보유 현금을 굴리면서 새로운<br>목돈 마련을 시작해요-!</div>
-                        <button type="button" onclick="selectSavingMethod(this, '목돈 모으기 + 목돈 굴리기')">목돈 모으기 + 목돈 굴리기</button>
+                        <div class="text-container" style="margin-bottom: 10%;">🪙 ➕ 💰 <br> 둘 다 <br> 놓칠 수 없다-!</div>
+                        <button type="button" onclick="selectSavingMethod(this, '목돈 모으기 + 목돈 굴리기')">목돈 모으기 + 굴리기</button>
                     </div>
                 </div>
             </div>
             <div style="min-width: 100%; text-align: center; position: relative;">
                 <img 
-                    src="https://via.placeholder.com/50" 
+                    src="/static/img/chunnyang_face.png" 
                     class="cat-image" 
                     alt="천냥이 이미지" 
                     style="cursor: pointer;"
                     onclick="toggleDescription(this)" 
                 />
-                <div class="plus-box" style="display: none; cursor: pointer;" onclick="toggleDescription(this)">
-                    자세한 설명 내용입니다. 여기에 원하는 정보를 추가하세요.
+                <div class="plus-box" style="display: none; cursor: pointer; text-align: center;" onclick="toggleDescription(this)">
+                    목돈 모으기 : 더 큰 목표를 향해-! 적금으로 차근차근 목돈부터 만들기 시작-!<br><br>
+                    목돈 굴리기 : 지금 가진 목독을 더 크게크게-! 예금으로 목돈 굴리기-!<br><br>
+                    목돈 모으기 + 굴리기 : 아직 미정.... 
                 </div>
             </div>
             <div class="container" style="min-width: 100%; text-align: center;">
             <div class="goal-box">
-                <label>저축의 목적이 무엇인가요?</label>
-                <div class="goal-description">
-                    단기적 목적: 필요한 상품구매 등 구체적이고 비교적 가까운 미래의 지출<br>
-                    장기적 목적: 주택구매 등 특정한 미래의 목표 지출에 대비하는 경우
+                <label style="margin-bottom: 20px; margin-top: 10px; font-size: 20px; font-weight: bold;">저축의 목적이 무엇인가요?</label>
+                <div class="goal-description" style="margin-top: 30px;">
+                    <span>단기</span>
+                    <span>장기</span>
                 </div>
                 <div class="goal-options">
                     <label><input type="radio" name="goal" value="short-term"> 단기적 목적</label>
@@ -487,20 +652,21 @@
             </div>
             <div style="min-width: 100%; text-align: center; position: relative;">
                 <img 
-                    src="https://via.placeholder.com/50" 
+                    src="/static/img/chunnyang_face.png" 
                     class="cat-image" 
                     alt="천냥이 이미지" 
                     style="cursor: pointer;"
                     onclick="toggleDescription(this)" 
                 />
-                <div class="plus-box" style="display: none; cursor: pointer;" onclick="toggleDescription(this)">
-                    자세한 설명 내용입니다. 여기에 원하는 정보를 추가하세요.
+                <div class="plus-box" style="display: none; cursor: pointer; text-align: center;" onclick="toggleDescription(this)">
+                    단기적 목적: 필요한 상품구매 등 구체적이고 비교적 가까운 미래의 지출<br>
+                    장기적 목적: 주택구매 등 특정한 미래의 목표 지출에 대비하는 경우
                 </div>
             </div>
             <div class="container" style="min-width: 100%; text-align: center;">
             <div class="period-box">
-                <label>원하시는 가입기간을 선택해주세요.</label>
-                <div class="period-description">
+                <label style="margin-bottom: 20px; margin-top: 10px; font-size: 20px; font-weight: bold;">원하시는 가입기간을 선택해주세요.</label>
+                <div class="period-description" style="margin-top: 30px; margin-bottom: 30px;">
                     가입 기간에 따라 적합한 금융상품을 추천해드립니다.
                 </div>
                 <div class="period-options">
@@ -513,27 +679,27 @@
             </div>
             <div style="min-width: 100%; text-align: center; position: relative;">
                 <img 
-                    src="https://via.placeholder.com/50" 
+                    src="/static/img/chunnyang_face.png" 
                     class="cat-image" 
                     alt="천냥이 이미지" 
                     style="cursor: pointer;"
                     onclick="toggleDescription(this)" 
                 />
-                <div class="plus-box" style="display: none; cursor: pointer;" onclick="toggleDescription(this)">
-                    자세한 설명 내용입니다. 여기에 원하는 정보를 추가하세요.
+                <div class="plus-box" style="display: none; cursor: pointer; text-align: center;" onclick="toggleDescription(this)">
+                    추천 : 목표 금액과 우대사항을 고려해서 목표에 적합한 기간 추천-!
                 </div>
             </div>
             <div class="container" style="min-width: 100%; text-align: center;">
             <div class="amount-box">
-                <label>목표 금액을 입력해주세요.</label>
+                <label style="margin-bottom: 20px; margin-top: 10px; font-size: 20px; font-weight: bold;">목표 금액을 입력해주세요.</label>
                 <div class="input-box">
-                    <input type="text" name="amount" placeholder="목표 금액을 입력해주세요.">
+                    <input type="text" name="amount" placeholder="목표 금액을 입력해주세요." style="margin-top: 30px; padding: 5px;">
                 </div>
             </div>
             </div>
             <div style="min-width: 100%; text-align: center; position: relative;">
                 <img 
-                    src="https://via.placeholder.com/50" 
+                    src="/static/img/chunnyang_face.png" 
                     class="cat-image" 
                     alt="천냥이 이미지" 
                     style="cursor: pointer;"
@@ -548,52 +714,51 @@
                 <div class="title">원하시는 금융권의 범위를 선택해주세요</div>
                 <div class="options-container" style="display: flex; flex-direction: row; align-items: center;">
                     <div class="option">
-                        <h3>일반은행</h3>
-                        <p>비교적 높은 안정성<br>비교적 낮은 수익성<br>예시) 신한은행, 제주은행, 카카오뱅크</p>
-                        <p class="note">일반 은행의 이율을 참고할 수 있고<br>지역별로 다양한 은행을 확인할 수 있어요!</p>
+                        <h3>🏦</h3>
+                        <p style="font-size: 1.2rem; font-weight: bolder;">일반 은행</p>
+                        <p>비교적 높은 안정성<br>비교적 낮은 수익성</p>
                     </div>
                     <div class="option">
-                        <h3>저축은행</h3>
-                        <p>비교적 낮은 안정성<br>비교적 높은 수익성<br>예시) OK저축은행, 웰컴저축은행</p>
-                        <p class="note">금융회사별 SOLAR의 인증으로 안정성이<br>우수한 저축은행을 선택해 보세요!</p>
+                        <h3>💵</h3>
+                        <p style="font-size: 1.2rem; font-weight: bolder;">저축 은행</p>
+                        <p>비교적 낮은 안정성<br>비교적 높은 수익성</p>
                     </div>
                 </div>
 
                 <!-- 옵션 선택 버튼 -->
-                <form id="infoForm" action="{% url 'info3' %}" method="POST">
-                    {% csrf_token %}
                     <input type="hidden" name="bank_option" id="bankOptionInput"> <!-- 선택된 금융권 옵션 저장 -->
                     
                     <div class="buttons">
-                        <button type="button" onclick="selectOption('일반은행', this)">일반은행</button>
-                        <button type="button" onclick="selectOption('일반은행 + 저축은행', this)">일반은행 + 저축은행</button>
+                        <button type="button" onclick="selectOption('일반은행', this)" style="margin-right: 17%;">일반은행</button>
+                        <button type="button" onclick="selectOption('일반은행 + 저축은행', this)" style="margin-left: 17%;">일반은행 + 저축은행</button>
                     </div>
             </div>
             <div style="min-width: 100%; text-align: center; position: relative;">
                 <img 
-                    src="https://via.placeholder.com/50" 
+                    src="/static/img/chunnyang_face.png" 
                     class="cat-image" 
                     alt="천냥이 이미지" 
                     style="cursor: pointer;"
                     onclick="toggleDescription(this)" 
                 />
                 <div class="plus-box" style="display: none; cursor: pointer;" onclick="toggleDescription(this)">
-                    자세한 설명 내용입니다. 여기에 원하는 정보를 추가하세요.
+                    일반은행 : 예시) 신한은행, 제주은행, 카카오뱅크<br>
+                    일반 은행의 이율을 참고할 수 있고<br>지역별로 다양한 은행을 확인할 수 있어요!<br>
+                    저축은행 : 예시) OK저축은행, 웰컴저축은행<br>
+                    금융회사별 SOLAR의 인증으로 안정성이<br>우수한 저축은행을 선택해 보세요!
                 </div>
             </div>
             <!-- Main Content -->
-            <div class="container">
-                <div class="content">
+            <div class="container" style="min-width: 100%;">
+                <div class="content" style="align-items: center;">
                     <!-- Toggle Button for 우대사항 설명 -->
-                    <button class="toggle-button" onclick="toggleDescription()">우대사항 설명 보기</button>
+                    <!-- <button class="toggle-button" onclick="toggleDescription()">우대사항 설명 보기</button>
                     
-                    <!-- Hidden Description Content -->
+                    Hidden Description Content
                     <div class="toggle-content" id="description">
                         우대사항은 고객이 특정 조건을 만족할 때 추가 금리를 제공하거나 특별 혜택을 제공하는 제도입니다. 예를 들어 비대면 가입, 첫 거래, 자동이체 등의 조건이 해당됩니다.
-                    </div>
-                    <form action="{% url 'info4' %}" method="POST">
-                        {% csrf_token %}
-                        <div class="preference-box">
+                    </div> -->
+                        <div class="preference-box" style="align-items: center; text-align: center;">
                             <h3>적용 가능한 우대사항을 선택해주세요 (중복 가능)</h3>
                             <div class="preference-options">
                                 <label><input type="checkbox" name="preferences" value="비대면가입"> 비대면가입</label>
@@ -610,12 +775,11 @@
                                 <label><input type="checkbox" name="preferences" value="자동이체"> 자동이체</label>
                             </div>
                         </div>
-                    </form>
                 </div>
             </div>
             <div style="min-width: 100%; text-align: center; position: relative;">
                 <img 
-                    src="https://via.placeholder.com/50" 
+                    src="/static/img/chunnyang_face.png" 
                     class="cat-image" 
                     alt="천냥이 이미지" 
                     style="cursor: pointer;"
@@ -630,7 +794,7 @@
             <div class="next-button-container">
                 <button type="submit" class="next-button">다음</button>
             </div>
-
+        </form>
 
     <footer>
         <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0;">서울특별시 마포구 월드컵북로 434 상암IT타워 6층</p> 
