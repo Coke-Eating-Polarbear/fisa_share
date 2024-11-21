@@ -4,26 +4,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Multiple Bar Charts with Averages</title>
+    <title>금융분석리포트</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body {
-        font-family: Arial, sans-serif;
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-        background-color: #f3f3f3;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            background-color: #ffffff;
         }
         header, footer {
-            background-color: #f8f8f8;
             padding: 10px;
             text-align: center;
+            width: 100vw;
+        }
+        header { 
+            top: 0; 
+            background-color: #ffffff;
             position: fixed;
-            width: 100%;
+            padding: 0px;
             z-index: 1;
         }
-        header { top: 0; }
-        footer { bottom: 0; }
+        footer { 
+            bottom: 0; 
+            background-color: #291e4ee5;
+            padding: 10px;
+            left : 0;
+        }
         .container {
             padding-top: 80px;
             padding-bottom: 80px;
@@ -40,6 +48,11 @@
         font-size: 1rem;
         background-color: #ffffff;
         }
+
+        .nav-links {
+        margin-right: 20px; /* 회원 정보와의 구분 */
+        }
+
         .navbar a {
             /* margin: 0 20px; 링크 간격 */
             font-size: 1.2rem; /* 글씨 크기 */
@@ -48,6 +61,48 @@
             text-decoration: none;
             color: #333;
         }
+
+        .nav-box nav a {
+            color: #333;
+            margin: 0 10px;
+            text-decoration: none;
+        }
+        
+        .nav-box nav a:hover {
+            font-weight: bold;
+        }
+
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background-color: #fff;
+            /* box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); */
+            padding: 0%;
+            min-width: 150px;
+            z-index: 1;
+            border: 1px solid #ddd;
+        }
+        .dropdown-content a {
+            padding: 10px 20px;
+            display: block;
+            color: #333;
+            text-align: left;
+            text-decoration: none;
+            /* white-space: nowrap; */
+        }
+        .dropdown-content a:hover {
+        background-color: #f1f1f1;
+        }
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
         .content {
             text-align: center;
             margin-top: 40px;
