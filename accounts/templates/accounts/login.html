@@ -37,10 +37,11 @@
     margin: 50px auto 0; /* 위쪽 여백을 줄임 */
     background-color: #ffffff;
     box-shadow: none; /* 그림자 제거 */
+    height: 100%;
 }
 
 .accounts_image {
-    flex: 1.5; /* 이미지 비율을 더 크게 설정 */
+    flex: 1; /* 이미지 비율을 더 크게 설정 */
     overflow: hidden;
 }
 
@@ -52,7 +53,7 @@
 }
 
 .accounts_forms {
-    flex: 1;
+    flex: 1.5;
     padding: 60px;
     background-color: #ffffff;
     display: flex;
@@ -294,7 +295,7 @@ footer {
                 </form>
                 <div class="helper-links">
                     <button type="button" class="btn-link" onclick="openPopup('/accounts/findid/')">아이디찾기</button> |
-                    <button type="button" class="btn-link" onclick="openPopup('/accounts/findid/')">비밀번호찾기</button> | 
+                    <button type="button" class="btn-link" onclick="openPopup('/accounts/findpw/')">비밀번호찾기</button> | 
                     <a href="{% url 'accounts:agree' %}">회원가입</a>
                 </div>
             </div>
