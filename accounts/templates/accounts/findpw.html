@@ -64,10 +64,10 @@
         <form method="post" id="findIdForm">
             {% csrf_token %}
             <input type="text" id="name" name="name" placeholder="이름" required>
-            <input type="text" id="userid" name="userid" placeholder="아이디" required>
+            <input type="text" id="CustomerID" name="CustomerID     " placeholder="아이디" required>
             <input type="email" id="email" name="email" placeholder="이메일" required>
             <input type="text" id="Phone" name="Phone" placeholder="전화번호" required>           
-            <button type="submit">ID 찾기</button>
+            <button type="submit">임시 비밀번호 발급받기</button>
         </form>
         <p id="message" class="error" style="display: none;"></p>
     </div>
@@ -78,27 +78,27 @@
             const name = document.getElementById("name").value;
             const email = document.getElementById("email").value;
             const Phone = document.getElementById("Phone").value;
-            const userid = document.getElementById("userid").value;
+            const CustomerID = document.getElementById("CustomerID").value;
             const message = document.getElementById("message");
 
-            fetch("{% url 'accounts:findid' %}", {
+            fetch("{% url 'accounts:findpw' %}", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                     "X-CSRFToken": "{{ csrf_token }}"
                 },
-                body: JSON.stringify({ name: name, email: email, Phone:Phone, userid:userid })
+                body: JSON.stringify({ name: name, email: email, Phone:Phone, CustomerID:CustomerID })
             })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
                     message.style.display = "block";
                     message.className = "success";
-                    message.textContent = "ID가 입력된 이메일로 발송되었습니다.";
+                    message.textContent = "임시 비밀번호가 입력된 이메일로 발송되었습니다.";
                 } else {
                     message.style.display = "block";
                     message.className = "error";
-                    message.textContent = data.error || "ID 찾기에 실패했습니다.";
+                    message.textContent = data.error || "임시 비밀번호 발급에 실패했습니다.";
                 }
             })
             .catch(error => {

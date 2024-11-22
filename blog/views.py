@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect # type: ignore
-from django.contrib.auth import authenticate, login # type: ignore
+from django.contrib.auth import authenticate, login,logout # type: ignore
 from django.utils import timezone # type: ignore
 from datetime import timedelta
 import matplotlib.pyplot as plt # type: ignore
@@ -33,10 +33,17 @@ def login_required_session(view_func):
     def wrapper(request, *args, **kwargs):
         # 세션에 'user_id'가 없으면 로그인 페이지로 리디렉션
         if not request.session.get('user_id'):
-            return redirect('login')  # 'login' URL로 이동
+            return redirect('accounts:login')  # 'login' URL로 이동
         # 'user_id'가 있으면 원래의 뷰 함수 실행
         return view_func(request, *args, **kwargs)
     return wrapper
+
+def logout_view(request):
+    # 모든 세션 초기화
+    logout(request)
+    
+    # main.html로 리다이렉트
+    return redirect('main')  # 'main'은 urls.py에서 정의된 main.html의 URL name
 
 @login_required_session
 def mypage(request):
@@ -148,19 +155,15 @@ def summary_view(request):
                 'summary': news.summary,
                 'url': news.url  # URL 추가
             })
-    # try:
-    #     wc_entry = Wc.objects.filter(date=yesterday).first()
-    #     if wc_entry is not None and wc_entry.image:
-    #         image_base64 = base64.b64encode(wc_entry.image).decode('utf-8')  # base64 인코딩
-    #     else:
-    #         image_base64 = None  # 이미지가 없거나 wc_entry가 None일 경우 처리
-    # except Exception as e:
-    # # 예상치 못한 오류를 잡아내기 위한 처리
-    #     image_base64 = None
-    #     print(f"An error occurred: {e}")
+    user_name = "사용자"  # 기본값 설정
 
-
-    # news_entries = News.objects.filter(ndate=yesterday, summary__isnull=False).values('title', 'summary', 'url')
+    if customer_id:
+        try:
+            # CustomerID로 UserProfile 조회
+            user = UserProfile.objects.get(CustomerID=customer_id)
+            user_name = user.username  # 사용자 이름 설정
+        except UserProfile.DoesNotExist:
+            pass  # 사용자가 없을 경우 기본값 유지
 
     # CustomerID가 세션에 없으면 로그인 페이지로 리디렉션
     if not customer_id:
@@ -199,6 +202,7 @@ def summary_view(request):
         'product_details': product_details,
         'image_base64': image_base64,
         'news_entries': news_entries,
+        'user_name': user_name,
     }
     
     return render(request, 'loginmain.html', context)
@@ -303,6 +307,7 @@ def log_click_event(request):
         return JsonResponse({"status": "success"})
     return JsonResponse({"status": "failed"}, status=400)
 
+@login_required_session
 def favorite(request):
     customer_id = request.session.get('user_id')
     user_name = "사용자"

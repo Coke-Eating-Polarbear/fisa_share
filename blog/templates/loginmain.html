@@ -321,10 +321,14 @@
         </div>
            <!-- 회원 정보 및 마이페이지 -->
         <div class="user-info">
-            <span style="font-size: 1.1rem;">회원이름님</span> <a href="./mypage" style="margin-left: 15px; text-decoration: none; font-size: 1.1rem; font-weight: bold; color: #121212;">마이페이지</a> 
-            <button style="margin-left: 10px; margin-right: 5px; padding: 5px 10px; font-size: 0.9rem; font-weight: bold; background-color: #007BFF; color: white; border: none; border-radius: 5px; cursor: pointer;">
-            로그아웃
-        </button>
+            <span style="font-size: 1.1rem;">{{ user_name }}님</span> 
+            <a href="./mypage" style="margin-left: 15px; text-decoration: none; font-size: 1.1rem; font-weight: bold; color: #121212;">마이페이지</a> 
+            <form method="POST" action="{% url 'logout' %}" style="display: inline;">
+                {% csrf_token %}
+                <button name="logout" style="margin-left: 10px; margin-right: 5px; padding: 5px 10px; font-size: 0.9rem; font-weight: bold; background-color: #007BFF; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                    로그아웃
+                </button>
+            </form>
         </div>
     </div>
     </header>
@@ -339,7 +343,7 @@
     
         <!-- 맞춤 예측 상품 TOP 5 섹션 -->
         <div class="product-section">
-            <h2>[회원 이름] 맞춤 예/적금 상품 TOP 5!</h2>
+            <h2>{{ user_name }}님 맞춤 예/적금 상품 TOP 5!</h2>
     
             <div class="product-list">
                 {% for product in product_details %}

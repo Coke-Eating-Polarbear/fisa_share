@@ -1,12 +1,20 @@
 import json
+import random
+import string
 from django.shortcuts import render, redirect  # 페이지 렌더링 및 리디렉션
 from django.contrib.auth.hashers import check_password  # 비밀번호 확인
 from blog.models import UserProfile
 from blog.forms import UserProfileForm  # UserProfileForm 폼 클래스
 from django.http import JsonResponse
+from django.contrib.auth.hashers import make_password
 from django.core.mail import send_mail, BadHeaderError
 
 # Create your views here.
+
+def generate_temp_password(length=8):
+    """임시 비밀번호 생성 함수"""
+    characters = string.ascii_letters + string.digits
+    return ''.join(random.choice(characters) for _ in range(length))
 
 def signup(request):
     if request.method == 'POST':
@@ -94,35 +102,47 @@ def findpw(request):
             name = data.get('name')
             email = data.get('email')
             Phone = data.get('Phone')
-            userid = data.get('userid')
+            CustomerID = data.get('CustomerID')
+
             # 사용자 데이터 확인
             user = UserProfile.objects.filter(
                 username__iexact=name,
                 Email__iexact=email,
                 Phone__iexact=Phone,
-                userid__iexact=userid
+                CustomerID__iexact=CustomerID
             ).first()
 
             if user:
-                # 이메일로 ID 전송
-                try: # 추후 수정
+                # 임시 비밀번호 생성
+                temp_password = generate_temp_password()
+
+                # 데이터베이스에 암호화된 비밀번호 저장
+                user.Pw = make_password(temp_password)
+                user.save()
+
+                # 이메일로 임시 비밀번호 전송
+                try:
                     send_mail(
-                        "Your ID",
-                        f"안녕하세요, {name}님! 회원님의 ID는 {user.CustomerID}입니다.",
+                        "Your Temporary Password",
+                        f"안녕하세요, {name}님! 임시 비밀번호는 {temp_password}입니다. 로그인 후 반드시 비밀번호를 변경해주세요.",
                         "noreply@gmail.com",
                         [email],
                         fail_silently=False,
                     )
-                    print("Email sent successfully")
+                    print("Temporary password sent successfully")
                 except Exception as e:
                     print(f"Failed to send email: {e}")
-                return JsonResponse({"success": True})
+                    return JsonResponse({"success": False, "error": "임시 비밀번호 이메일 전송 실패"})
+
+                return JsonResponse({"success": True, "message": "임시 비밀번호가 이메일로 전송되었습니다."})
             else:
                 print("No matching user found")
                 return JsonResponse({"success": False, "error": "일치하는 사용자가 없습니다."})
+
         except Exception as e:
             print("Error:", e)
             return JsonResponse({"success": False, "error": str(e)})
+    
     return render(request, 'accounts/findpw.html')
 
 
