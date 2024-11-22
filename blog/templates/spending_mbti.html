@@ -8,71 +8,239 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            background-color: #ffffff;
             font-family: Arial, sans-serif;
-            background-color: #f8f9fa;
-            padding: 20px;
+            padding-top: 120px;
         }
-        .header {
+        header, footer {
+            /* background-color: #ffffff; */
+            text-align: center;
+            width: 100vw;
+            }
+        header {
+            background-color: #ffffff;
+            position: fixed;
+            padding: 0px;
+            top: 0;
+            z-index: 1;
+        }
+        footer {
+            position: relative;
+            background-color: #291e4ee5;
+            padding: 10px;
+            bottom: 0; 
+            left: 0;
+            margin-top: 20px;
+        }
+        /* .nav-box {
+            border: 1px solid #ccc;
+            padding: 10px;
+        } */
+        .navbar {
             display: flex;
-            justify-content: space-between;
+            justify-content: space-between; /* 좌측 로고와 우측 버튼 배치 */
+            /* justify-content: flex-end; 오른쪽 정렬 */
+            align-items: center;
             padding: 10px 20px;
-            background-color: #e9ecef;
-            border-bottom: 1px solid #dee2e6;
-            margin-bottom: 20px;
+            font-size: 1rem;
+            background-color: #ffffff;
         }
-        .header a {
-            margin: 0 10px;
+        .nav-links {
+            margin-right: 20px; /* 회원 정보와의 구분 */
+            /* display: flex; 
+            justify-content: flex-end; 
+            align-items: center; 
+            flex-grow: 1; 
+            text-align: center; */
+        }
+        .navbar a {
+            /* margin: 0 20px; 링크 간격 */
+            font-size: 1.2rem; /* 글씨 크기 */
+            font-weight: bold; /* 글씨 진하게 */
+            margin-left: 15px; /* 각 링크 사이의 간격 */
+            text-decoration: none;
             color: #333;
+        }
+
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background-color: #fff;
+            /* box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); */
+            padding: 0%;
+            min-width: 150px;
+            z-index: 1;
+            border: 1px solid #ddd;
+        }
+        .dropdown-content a {
+            padding: 10px 20px;
+            display: block;
+            color: #333;
+            text-align: left;
+            text-decoration: none;
+            /* white-space: nowrap; */
+        }
+        .dropdown-content a:hover {
+            background-color: #f1f1f1;
+        }
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+        .nav-box nav a {
+            color: #333;
+            margin: 0 10px;
             text-decoration: none;
         }
+        .nav-box nav a:hover {
+            font-weight: bold;
+        }
         .container {
-            max-width: 900px;
+            max-width: 1200px;
             margin: 0 auto;
             background-color: #ffffff;
             padding: 20px;
             border: 1px solid #ddd;
             border-radius: 10px;
         }
-        .title {
-            font-size: 24px;
-            font-weight: bold;
-            text-align: left;
-            margin-bottom: 20px;
-        }
         .content-row {
-            display: flex;
+            display: flex; /* 차트를 가로로 나열 */
+            justify-content: space-between; /* 차트 간 간격을 유지 */
+            align-items: flex-start; /* 상단 맞춤 */
             gap: 20px;
-            align-items: flex-start;
         }
         .chart-container {
-            width: 40%;
-            text-align: center;
+            flex: 1;
+            position: relative;
+            max-width: 48%; /* 각 차트 컨테이너의 최대 너비 */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 10px;
+            width: 100%;
+        }
+        .chart-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+        }
+        .filter-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+            margin-bottom: 10px;
+            width: 100%;
+        }
+        .sort-container select,
+        .date-container input {
+            padding: 5px 10px;
+            font-size: 14px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #fff;
+            color: #333;
+        }
+        .sort-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;  
+        }
+        .date-container {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .date-range-buttons button {
+            padding: 8px 15px;
+            font-size: 14px;
+            border: 1px solid #007bff;
+            background-color: #ffffff;
+            color: #007bff;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s, box-shadow 0.3s;
+            outline: none;
+        }
+    
+        .date-range-buttons button:hover {
+            background-color: #e7f3ff;
+        }
+    
+        .date-range-buttons .active {
+            background-color: #007bff;
+            color: #ffffff;
+            box-shadow: 0 2px 5px rgba(0, 123, 255, 0.3);
+        }
+        .legend-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+            margin-left: 20px; /* 범례 간격 */
         }
         .chart {
-            width: 100%;
-            max-width: 300px;
+            width: 100%; /* 차트가 컨테이너에 맞게 크기 조정 */
             height: auto;
-            margin-bottom: 10px;
+            max-height: 400px; /* 차트의 최대 높이 설정 */
         }
         .description {
-            width: 60%;
+            width: 100%; /* 섹션 전체 너비 */
             font-size: 16px;
             line-height: 1.6;
             color: #333;
+            text-align: left; /* 텍스트 중앙 정렬 */
+            margin: 0 auto; /* 섹션 자체 중앙 정렬 */
         }
         .highlight {
             font-weight: bold;
             color: #007bff;
         }
-        .prediction-section {
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid #ddd;
+        .prediction-section .content-row {
+            display: flex;
+            align-items: flex-start; /* 상단 맞춤 */
+            justify-content: space-between; /* 요소 간격 유지 */
+            gap: 20px; /* 요소 간 간격 */
+        }
+        
+        .prediction-section .chart-container {
+            flex: 2; /* 꺾은선 그래프가 더 넓게 차지 */
+            padding-right: 20px; /* 내부 여백 추가 */
+        }
+        
+        .prediction-section .description {
+            display: flex; /* 가로 정렬 */
+            justify-content: space-between; /* 꺾은선 그래프와 카드 추천 사이 간격 */
+            align-items: flex-start; /* 세로 방향 상단 정렬 */
+            gap: 20px; /* 그래프와 카드 추천 간 간격 */
+        }
+        .filter-section {
+            display: flex;
+            justify-content: center; /* 드롭다운 정렬 */
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;     /* 드롭다운 아래 간격 */
         }
         .card-container {
+            flex: 1; /* 카드 추천이 적절한 비율을 차지 */
             display: flex;
-            gap: 20px;
-            margin-bottom: 20px;
+            flex-direction: column; /* 카드들을 세로로 나열 */
+            gap: 20px; /* 카드 간 간격 */
         }
         .card-box {
             display: flex;
@@ -118,31 +286,100 @@
     </style>
 </head>
 <body>
-
-    <!-- 상단 네비게이션 -->
-    <div class="header">
-        <a href="#">로그인</a>
-        <a href="#">금융분석 리포트</a>
-        <a href="#">예/적금 비교</a>
-        <a href="#">소비MBTI</a>
-        <a href="#">{{ user_name }}님 | 마이페이지</a>
+    <header>
+    <!-- 상단 헤더 -->
+    <div class="navbar">
+        <div class="logo">
+            <a href="./main">
+                <img src="./static/img/fisa_logo_after.png"  style="vertical-align: middle;" alt="우리 FISA 로고">
+                <span style="font-size: 1.5rem; font-weight: bold; margin-left: 10px;">예/적금 추천 서비스</span>
+            </a>
+        </div>
+        <div class="nav-links" style="flex-grow: 1; text-align: center;">
+            <a href="{% url 'originreport' %}" style=" font-weight: bold; color: #121212;">금융분석 리포트</a> 
+            <div class="dropdown">
+                <a href="#" style=" font-weight: bold; color: #121212;">예/적금 추천</a>
+                <div class="dropdown-content">
+                    <a href="savings_info1" style="font-size: 0.9rem;">신규적금추천</a>
+                    <a href="compare_products" style="font-size: 0.9rem;">기존상품비교</a>
+                </div>
+            </div> 
+            <a href="spending_mbti" style=" font-weight: bold; color: #121212;">소비MBTI</a>
+        </div>
+           <!-- 회원 정보 및 마이페이지 -->
+        <div class="user-info">
+            <span style="font-size: 1.1rem;">{{ user_name }}님</span> <a href="./mypage" style="margin-left: 15px; text-decoration: none; font-size: 1.1rem; font-weight: bold; color: #121212;">마이페이지</a> 
+            <button style="margin-left: 10px; margin-right: 5px; padding: 5px 10px; font-size: 0.9rem; font-weight: bold; background-color: #007BFF; color: white; border: none; border-radius: 5px; cursor: pointer;">
+            로그아웃
+        </button>
+        </div>
     </div>
+    </header>
+
 
     <!-- 메인 콘텐츠 -->
     <div class="container">
-        <div class="title">@@님의 소비 성향입니다!</div>
-        
         <div class="content-row">
-            <!-- 차트 섹션 -->
+            <!-- 차트 1 -->
             <div class="chart-container">
+                <div class="chart-header">
+                    <div class="chart-title">지출 빈도별 소비</div>
+                    <div class="date-range-buttons">
+                        <button onclick="filterData(7)">최근 7일</button>
+                        <button onclick="filterData(14)">최근 14일</button>
+                        <button onclick="filterData(30)">최근 30일</button>
+                    </div>
+                </div>
+                <!-- 정렬 및 날짜 선택 -->
+                <div class="filter-section">
+                    <div class="sort-container">
+                        <label for="sortFrequency">정렬:</label>
+                        <select id="sortFrequency" onchange="handleSort('frequency')">
+                            <option value="default">전체</option>
+                            <option value="ascending">오름차순</option>
+                            <option value="descending">내림차순</option>
+                        </select>
+                    </div>
+                    <div class="date-container">
+                        <label for="dateFrequency">날짜:</label>
+                        <input type="date" id="dateFrequency" />
+                    </div>
+                </div>
                 <canvas id="frequencyChart" class="chart"></canvas>
-                <p>지출 빈도별 소비 차트</p>
-                <canvas id="amountChart" class="chart"></canvas>
-                <p>지출 금액별 소비 차트</p>
             </div>
+    
+            <!-- 차트 2 -->
+            <div class="chart-container">
+                <div class="chart-header">
+                    <div class="chart-title">지출 금액별 소비</div>
+                    <div class="date-range-buttons">
+                        <button onclick="filterData(7)">최근 7일</button>
+                        <button onclick="filterData(14)">최근 14일</button>
+                        <button onclick="filterData(30)">최근 30일</button>
+                    </div>
+                </div>
+                <!-- 정렬 및 날짜 선택 -->
+                <div class="filter-section">
+                    <div class="sort-container">
+                        <label for="sortAmount">정렬:</label>
+                        <select id="sortAmount" onchange="handleSort('amount')">
+                            <option value="default">전체</option>
+                            <option value="ascending">오름차순</option>
+                            <option value="descending">내림차순</option>
+                        </select>
+                    </div>
+                    <div class="date-container">
+                        <label for="dateAmount">날짜:</label>
+                        <input type="date" id="dateAmount" />
+                    </div>
+                </div>
+                <canvas id="amountChart" class="chart"></canvas>
+            </div>
+        </div>
+    </div>
 
             <!-- 설명 섹션 -->
-            <div class="description">
+            <div class="container description">
                 <p>{{ user_name }}님은 전체적으로 <span class="highlight">1. 식비</span> 2. 쇼핑에서 가장 소비가 많은 행복추구형~!!</p>
                 <p>식비 분야가 가장 많은 빈도로 사용</p>
                 <p>쇼핑 분야가 가장 큰 금액 결제...?</p>
@@ -153,24 +390,83 @@
             </div>
         </div>
 
-        <!-- 소비 예측 섹션 -->
-        <div class="prediction-section">
-            <div class="title">다음 달 예측 소비</div>
-            <div class="content-row">
-                <div class="chart-container">
-                    <canvas id="predictionChart" class="chart"></canvas>
-                    <p>예측 소비 차트</p>
+      <!-- 소비 예측 섹션 -->
+      <div class="prediction-section container">
+        <!-- 행으로 배치 -->
+        <div class="content-row">
+            <!-- 꺾은선 그래프 -->
+            <div class="chart-container">
+                <div class="chart-header">
+                    <div class="chart-title">다음 달 예측 소비</div>
+                    <div class="filter-section">
+                        <label for="categorySelect">항목 선택:</label>
+                        <select id="categorySelect" onchange="updatePredictionChart()">
+                            <option value="total">총합</option>
+                            <option value="식비">식비</option>
+                            <option value="쇼핑">쇼핑</option>
+                            <option value="교통">교통</option>
+                            <option value="취미">취미</option>
+                            <option value="카페">카페</option>
+                        </select>
+                    </div>
                 </div>
-                <div class="description">
-                    <p>다음 달 예상 소비 금액은 <span class="highlight">##원</span>입니다. </p>
-                    <p><span class="highlight">식비</span>와 <span class="highlight">쇼핑</span> 항목에서 가장 큰 소비가 예상됩니다.</p>
-                    <p>이 분야에서 소비를 줄이려면, 혜택이 큰 카드를 사용해보세요!</p>
-                    <p>예상 절감 금액: <span class="highlight">##원</span></p>
+                <canvas id="predictionLineChart" class="chart"></canvas>
+            </div>
+    
+            <!-- 카드 추천 박스 -->
+            <div class="card-container">
+                <div class="card-box">
+                    <a href="https://card-website1.com" target="_blank" class="card-image-box">
+                        <img src="https://via.placeholder.com/80x50" alt="카드 이미지">
+                        <div class="card-name">은행사 이름 - 카드 이름</div>
+                    </a>
+                    <div class="card-description-box">
+                        <div class="card-description">
+                            카드 설명: 식비 혜택이 풍부하여 외식을 즐기는 분들에게 적합합니다. <br>
+                            카드 혜택: 외식 시 10% 할인, 영화관 5% 캐시백 제공
+                        </div>
+                    </div>
+                </div>
+    
+                <div class="card-box">
+                    <a href="https://card-website2.com" target="_blank" class="card-image-box">
+                        <img src="https://via.placeholder.com/80x50" alt="카드 이미지">
+                        <div class="card-name">은행사 이름 - 카드 이름</div>
+                    </a>
+                    <div class="card-description-box">
+                        <div class="card-description">
+                            카드 설명: 쇼핑과 의류 구매에 대한 할인 혜택이 제공됩니다. <br>
+                            카드 혜택: 백화점 및 온라인 쇼핑 10% 할인
+                        </div>
+                    </div>
+                </div>
+    
+                <div class="card-box">
+                    <a href="https://card-website3.com" target="_blank" class="card-image-box">
+                        <img src="https://via.placeholder.com/80x50" alt="카드 이미지">
+                        <div class="card-name">은행사 이름 - 카드 이름</div>
+                    </a>
+                    <div class="card-description-box">
+                        <div class="card-description">
+                            카드 설명: 교통비와 대중교통 이용 시 추가 적립 혜택이 있습니다. <br>
+                            카드 혜택: 지하철 및 버스 요금 5% 적립
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
+    
+        <!-- 설명 박스 단독 컨테이너 -->
+        <div class="container description">
+            <p>다음 달 예상 소비 금액은 <span class="highlight">##원</span>입니다.</p>
+            <p><span class="highlight">식비</span>와 <span class="highlight">쇼핑</span> 항목에서 가장 큰 소비가 예상됩니다.</p>
+            <p>이 분야에서 소비를 줄이려면, 혜택이 큰 카드를 사용해보세요!</p>
+            <p>예상 절감 금액: <span class="highlight">##원</span></p>
+        </div>
+    </div>
+    
     <script>
         // 데이터는 예시입니다. 필요에 따라 실제 데이터를 사용하세요.
         const frequencyData = {
@@ -189,86 +485,143 @@
             }]
         };
 
-        const predictionData = {
-            labels: ['식비', '쇼핑', '교통', '취미', '카페'],
-            datasets: [{
-                data: [28, 30, 12, 18, 12],
-                backgroundColor: ['#ff6384', '#36a2eb', '#ffce56', '#4bc0c0', '#9966ff']
-            }]
-        };
-
         // 차트 생성
         new Chart(document.getElementById('frequencyChart'), {
             type: 'pie',
             data: frequencyData,
-            options: { responsive: true }
+            options: { 
+                responsive: true,
+                maintainAspectRatio: false,
+                aspectRatio: 1.5,
+                plugins: {
+                    legend: {
+                        display: true, // 범례 표시
+                        position: 'right', // 범례 위치
+                    },
+                },
+            }
         });
-
+        
         new Chart(document.getElementById('amountChart'), {
             type: 'pie',
             data: amountData,
-            options: { responsive: true }
+            options: { 
+                responsive: true,
+                maintainAspectRatio: false,
+                aspectRatio: 1.5,
+                plugins: {
+                    legend: {
+                        display: true, // 범례 표시
+                        position: 'right', // 범례 위치
+                    },
+                },
+            }
         });
+        const predictionLineData = {
+            labels: ['9월', '10월', '11월', '12월'], // 월별 레이블
+            datasets: [
+                {
+                    label: '월별 소비 총합', // 데이터셋 이름
+                    data: [1200000, 1350000, 1280000, 1400000], // 각 월별 소비 총합 데이터
+                    borderColor: '#36a2eb',
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    fill: false, // 꺾은선 아래 채우기
+                },
+            ],
+        };
 
-        new Chart(document.getElementById('predictionChart'), {
-            type: 'pie',
-            data: predictionData,
-            options: { responsive: true }
-        });
+        function filterData(days) {
+            console.log(`최근 ${days}일 데이터를 불러옵니다.`);
+            // 여기서 days 값을 이용해 데이터를 필터링하고 차트를 업데이트하는 로직 추가
+            // 예: AJAX 요청 또는 데이터 업데이트
+        }
+
+        //다음 달 예측 소비
+        // 월별 소비 데이터
+        const consumptionData = {
+            total: [1200000, 1350000, 1280000, 1400000], // 총합
+            식비: [450000, 470000, 500000, 520000],      // 식비
+            쇼핑: [650000, 700000, 720000, 750000],      // 쇼핑
+            교통: [200000, 210000, 220000, 230000],      // 교통
+            취미: [300000, 310000, 320000, 330000],      // 취미
+            카페: [100000, 110000, 120000, 130000]       // 카페
+        };
+
+        // 차트 객체 저장 변수
+        let predictionChart;
+
+        // 꺾은선 그래프 생성/업데이트 함수
+        function renderPredictionChart(data, category) {
+            const ctx = document.getElementById('predictionLineChart').getContext('2d');
+
+            // 기존 차트가 있으면 삭제
+            if (predictionChart) {
+                predictionChart.destroy();
+            }
+
+            // 새로운 차트 생성
+            predictionChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['9월', '10월', '11월', '12월'], // X축 레이블
+                    datasets: [
+                        {
+                            label: `${category} 소비 금액 (원)`, // 데이터셋 이름
+                            data: data, // 선택된 항목의 데이터
+                            borderColor: '#36a2eb',
+                            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                            fill: false // 꺾은선 아래 채우기
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: '월'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: '소비 금액 (원)'
+                            },
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        // 드롭다운 선택값에 따라 차트 업데이트
+        function updatePredictionChart() {
+            const selectedCategory = document.getElementById('categorySelect').value;
+            const selectedData = consumptionData[selectedCategory];
+            renderPredictionChart(selectedData, selectedCategory);
+        }
+
+        // 초기화: 페이지 로드 시 기본 데이터로 차트 렌더링
+        window.onload = function () {
+            document.getElementById('categorySelect').value = 'total'; // 기본값 설정
+            updatePredictionChart(); // 차트 렌더링
+        };
+
     </script>
-
-     <!-- 카드 추천 섹션 -->
-     <div class="container">
-        <div class="title">카드 추천</div>
-        
-        <!-- 카드 1 -->
-        <div class="card-container">
-            <div class="card-box">
-                <a href="https://card-website1.com" target="_blank" class="card-image-box">
-                    <img src="https://via.placeholder.com/80x50" alt="카드 이미지">
-                    <div class="card-name">은행사 이름 - 카드 이름</div>
-                </a>
-                <div class="card-description-box">
-                    <div class="card-description">
-                        카드 설명: 식비 혜택이 풍부하여 외식을 즐기는 분들에게 적합합니다. <br>
-                        카드 혜택: 외식 시 10% 할인, 영화관 5% 캐시백 제공
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- 카드 2 -->
-        <div class="card-container">
-            <div class="card-box">
-                <a href="https://card-website2.com" target="_blank" class="card-image-box">
-                    <img src="https://via.placeholder.com/80x50" alt="카드 이미지">
-                    <div class="card-name">은행사 이름 - 카드 이름</div>
-                </a>
-                <div class="card-description-box">
-                    <div class="card-description">
-                        카드 설명: 쇼핑과 의류 구매에 대한 할인 혜택이 제공됩니다. <br>
-                        카드 혜택: 백화점 및 온라인 쇼핑 10% 할인
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- 카드 3 -->
-        <div class="card-container">
-            <div class="card-box">
-                <a href="https://card-website3.com" target="_blank" class="card-image-box">
-                    <img src="https://via.placeholder.com/80x50" alt="카드 이미지">
-                    <div class="card-name">은행사 이름 - 카드 이름</div>
-                </a>
-                <div class="card-description-box">
-                    <div class="card-description">
-                        카드 설명: 교통비와 대중교통 이용 시 추가 적립 혜택이 있습니다. <br>
-                        카드 혜택: 지하철 및 버스 요금 5% 적립
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+    
+    <footer>
+        <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0;">서울특별시 마포구 월드컵북로 434 상암IT타워 6층</p> 
+        <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0;">고객지원 : 02-3151-7000 | 이메일: worifisa@worifisa.com </p >
+        <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0;">COPYRIGHT©우리팀이름~</p >
+    </footer >
 
 </body>
 </html>
