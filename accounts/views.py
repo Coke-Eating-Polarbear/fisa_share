@@ -16,6 +16,20 @@ def generate_temp_password(length=8):
     characters = string.ascii_letters + string.digits
     return ''.join(random.choice(characters) for _ in range(length))
 
+def check_user_id(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)  # 요청 데이터 파싱
+            user_id = data.get("userId")  # 입력된 아이디 가져오기
+            # CustomerID 필드를 기준으로 중복 체크
+            if UserProfile.objects.filter(CustomerID=user_id).exists():
+                return JsonResponse({"exists": True})  # 이미 존재하는 아이디
+            else:
+                return JsonResponse({"exists": False})  # 사용 가능한 아이디
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=400)
+    return JsonResponse({"error": "Invalid request method"}, status=405)
+
 def signup(request):
     if request.method == 'POST':
         form = UserProfileForm(request.POST)

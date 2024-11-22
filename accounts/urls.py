@@ -13,4 +13,5 @@ urlpatterns = [
     path('terms5', views.terms_content5, name='terms5'),
     path('findid/', views.findid, name='findid'),
     path('findpw/', views.findpw, name='findpw'),
+    path("check_user_id", views.check_user_id, name="check_user_id"),
 ]

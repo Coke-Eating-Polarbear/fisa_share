@@ -123,6 +123,7 @@
             padding: 20px;
             margin: 20px 0;
             position: relative;
+            margin-bottom: 5px;
         }
         /* 요약 섹션 자세히 보기 버튼 */
         .summary .details-button {
@@ -134,6 +135,7 @@
             color: white;
             text-decoration: none;
             border-radius: 5px;
+            margin-bottom: 10px;
         }
         .summary .details-button:hover {
             background-color: #34a8c5;
@@ -191,26 +193,6 @@
         .learn-more-button:hover {
             background-color: #34a8c5;
         }
-        /* .footer {
-            display: flex;
-            justify-content: space-between;
-            padding: 20px;
-            border-top: 1px solid #ccc;
-            box-sizing: border-box;
-            background-color: #f0f0f0;
-        }
-        .footer .box {
-            flex: 1;
-            margin: 5px;
-            min-width: 150px;
-            height: 150px;
-            box-sizing: border-box;
-            background-color: #e9ecef;
-            text-align: center;
-            line-height: 150px;
-            font-size: 18px;
-            color: #333;
-        } */
 
         .container_news {
             display: flex;
@@ -224,15 +206,22 @@
             overflow: hidden;
             left: 5%;
         }
-        
+
         .news-summary {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr); /* 3개의 동일한 크기 컬럼 */
+            display: grid;            
             width: 70%; /* 뉴스 섹션 너비 조정 */
             gap: 20px;
             height: stretch;  /* 높이 설정 */
             margin-left: 15px;
-        }
+            position: relative;
+            grid-template-columns: repeat(3, 1fr); /* 3개의 동일한 크기 컬럼 */
+            padding: 20px; /* 내부 여백 */
+            margin: 20px; /* 각 박스 간격 */
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            background-color: #ffffff;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* 그림자 효과 */
+            }
         
         .word-cloud {
             width: 25%; /* 워드클라우드 섹션 너비 조정 */
@@ -296,6 +285,16 @@
     font-size: 1.1rem;
     font-weight: bold;
     }
+    .news-analyze {
+    margin-top: 10px; /* 위쪽 요소와 10px 간격 */
+    padding: 15px; /* 내부 여백 */
+    background-color: #f9f9f9; /* 배경색 */
+    border: 1px solid #ddd; /* 테두리 */
+    border-radius: 5px; /* 둥근 모서리 */
+    color: #000000; /* 텍스트 색상 */
+    line-height: 1.5; /* 텍스트 간격 조정 */
+}
+    
     </style>
 </head>
 <body>
@@ -366,9 +365,9 @@
             {% if news_entries %}
                 {% for news in news_entries %}
                 <a href="{{ news.url }}" target="_blank" class="summary-box">
-                        <div class="title">{{ news.title }}</div>
-                        <div class="summary">{{ news.summary }}</div>
-                    </a>
+                    <div class="title">{{ news.title }}</div>
+                    <div class="news-analyze">{{ news.summary }}</div>
+                </a>
                 {% endfor %}
             {% else %}
                 <p>뉴스가 없습니다.</p>
@@ -387,7 +386,7 @@
     <footer>
         <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0;">서울특별시 마포구 월드컵북로 434 상암IT타워 6층</p> 
         <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0;">고객지원 : 02-3151-7000 | 이메일: worifisa@worifisa.com </p >
-        <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0;">COPYRIGHT©우리팀이름~</p >
+        <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0;">COPYRIGHT©천만해요</p >
     </footer >
 
     <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script> -->
