@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect # type: ignore
+from django.shortcuts import render, redirect,get_object_or_404 # type: ignore
 from django.contrib.auth import authenticate, login,logout # type: ignore
 from django.utils import timezone # type: ignore
 from datetime import timedelta
@@ -7,7 +7,7 @@ import base64
 import io
 from matplotlib import font_manager, rc # type: ignore
 from django.contrib import messages # type: ignore
-from .forms import UserProfileForm  # UserProfileForm을 가져옵니다
+from .forms import UserProfileForm
 from blog.models import UserProfile,Recommend, DsProduct, Wc, News, Favorite,MyData, Average,card  # UserProfile 모델도 가져옵니다
 from django.contrib.auth.hashers import check_password# type: ignore
 from django.views.decorators.http import require_POST# type: ignore
@@ -22,6 +22,7 @@ import json
 import os
 from dotenv import load_dotenv # type: ignore
 from collections import defaultdict
+from accounts.views import map_person
 es = Elasticsearch([os.getenv('ES')])  # Elasticsearch 설정
 load_dotenv()
 rc('font', family='Malgun Gothic')
@@ -44,6 +45,77 @@ def logout_view(request):
     
     # main.html로 리다이렉트
     return redirect('main')  # 'main'은 urls.py에서 정의된 main.html의 URL name
+
+def update_profile(request):
+    # 세션에서 user_id 가져오기
+    user_id = request.session.get('user_id')
+    if not user_id:
+        return redirect('login')  # 로그인 페이지로 리디렉션
+
+    # 데이터베이스에서 회원 정보 가져오기
+    user = UserProfile.objects.get(CustomerID=user_id)
+    birth_year = user.Birth.year
+    current_year = datetime.now().year
+    age = current_year - birth_year
+
+    # 역매핑 계산
+    reverse_data = reverse_mapping_with_age(user.stageclass, age)
+
+    if request.method == 'POST':
+        # 사용자 입력 데이터 가져오기
+        username = request.POST['username']
+        pw = request.POST['Pw']
+        email = request.POST['Email']
+        phone = request.POST['Phone']
+
+        # 결혼 여부, 자녀 여부, 자녀 나이대
+        marital_status = request.POST['marital_status']
+        children_status = request.POST.get('children_status') == 'Y'
+        children_age = request.POST.get('children_age')
+
+        # StageClass 다시 매핑
+        updated_stage_class = map_person(age, marital_status, children_status, children_age)
+
+        # 데이터 업데이트
+        user.username = username
+        user.Pw = pw
+        user.Email = email
+        user.Phone = phone
+        user.stageclass = updated_stage_class
+        user.save()
+
+        return redirect('mypage')  # 프로필 페이지로 리디렉션
+
+    # GET 요청 시 회원 정보 렌더링
+    context = {
+        'user': user,
+        'reverse_data': reverse_data,
+    }
+    return render(request, 'update_profile.html', context)
+
+def reverse_mapping_with_age(category, age):
+    if category == 'A':
+        return {'marriage_status': 'N', 'children_status': 'N', 'children_age': None, 'age_range': '20대'}
+    elif category == 'B':
+        if 30 <= age < 40:
+            return {'marriage_status': 'N', 'children_status': 'N', 'children_age': None, 'age_range': '30대'}
+        elif 40 <= age < 50:
+            return {'marriage_status': 'N', 'children_status': 'N', 'children_age': None, 'age_range': '40대'}
+    elif category == 'C':
+        return {'marriage_status': 'Y', 'children_status': 'N', 'children_age': None, 'age_range': '20~40대'}
+    elif category == 'D':
+        return {'marriage_status': 'Y', 'children_status': 'Y', 'children_age': '초등생', 'age_range': '20~30대'}
+    elif category == 'E':
+        return {'marriage_status': 'Y', 'children_status': 'Y', 'children_age': '초등생', 'age_range': '40대'}
+    elif category == 'F':
+        return {'marriage_status': 'Y', 'children_status': 'Y', 'children_age': '중고등생', 'age_range': '40대'}
+    elif category == 'G':
+        return {'marriage_status': 'Y', 'children_status': 'Y', 'children_age': '중고등생', 'age_range': '50대'}
+    elif category == 'H':
+        return {'marriage_status': 'Y', 'children_status': 'Y', 'children_age': '성인자녀', 'age_range': '50대'}
+    elif category == 'I':
+        if age >= 60:
+            return {'marriage_status': None, 'children_status': None, 'children_age': None, 'age_range': '60대'}
 
 @login_required_session
 def mypage(request):

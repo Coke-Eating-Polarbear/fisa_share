@@ -17,4 +17,5 @@ urlpatterns = [
     path('remove_favorite/', views.remove_favorite, name='remove_favorite'),
     path('originreport/', views.originreport_page, name='originreport'),
     path('logout/', views.logout_view, name='logout'),
+    path('update/', views.update_profile, name='update_profile'),
 ]

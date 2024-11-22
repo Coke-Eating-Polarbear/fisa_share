@@ -8,7 +8,8 @@ from blog.forms import UserProfileForm  # UserProfileForm 폼 클래스
 from django.http import JsonResponse
 from django.contrib.auth.hashers import make_password
 from django.core.mail import send_mail, BadHeaderError
-
+from django.utils import timezone # type: ignore
+import datetime
 # Create your views here.
 
 def generate_temp_password(length=8):
@@ -30,15 +31,64 @@ def check_user_id(request):
             return JsonResponse({"error": str(e)}, status=400)
     return JsonResponse({"error": "Invalid request method"}, status=405)
 
+def map_person(age, marital_status, children=None, children_age=None):
+    """
+    조건에 따라 사람 유형을 매핑합니다.
+    """
+    if age >= 20 and age < 30 and marital_status == "미혼":
+        return "A"
+    elif age >= 30 and age < 50 and marital_status == "미혼":
+        return "B"
+    elif age >= 20 and age < 50 and marital_status == "기혼" and not children:
+        return "C"
+    elif age >= 20 and age < 40 and marital_status == "기혼" and children and children_age == "초등생":
+        return "D"
+    elif age >= 40 and age < 50 and marital_status == "기혼" and children and children_age == "초등생":
+        return "E"
+    elif age >= 40 and age < 50 and marital_status == "기혼" and children and children_age == "중고등생":
+        return "F"
+    elif age >= 50 and age < 60 and marital_status == "기혼" and children and children_age in ["중고등생", "대학생"]:
+        return "G"
+    elif age >= 50 and age < 60 and marital_status == "기혼" and children and children_age == "성인자녀":
+        return "H"
+    elif age >= 60:
+        return "I"
+    else:
+        return "A"  # 기본값
+
 def signup(request):
     if request.method == 'POST':
         form = UserProfileForm(request.POST)
         if form.is_valid():
             user_profile = form.save(commit=False)
+
+            # 성별 설정
             user_profile.sex = 'M' if user_profile.SerialNum in ['1', '3'] else 'F'
-            print(form.cleaned_data)  # 로그 출력
-            user_profile.save()  # 데이터베이스에 저장
-            return redirect('accounts/login.html')
+
+            # 사용자 입력 데이터 가져오기
+            marriage_status = request.POST.get('marriage-status', 'N')
+            children_status = request.POST.get('children-status', 'N')
+            children_age = request.POST.get('children-age', '')
+
+            # 자녀 여부를 Boolean 값으로 변환
+            has_children = True if children_status == 'Y' else False
+
+            # 나이 계산 (생년월일 기반)
+            birth_year = int(user_profile.Birth[:4])  # 주민번호 앞자리에서 연도 추출
+            current_year = datetime.datetime.now().year
+            age = current_year - birth_year
+
+            # 매핑
+            user_profile.category = map_person(
+                age=age,
+                marital_status="기혼" if marriage_status == 'Y' else "미혼",
+                children=has_children,
+                children_age=children_age
+            )
+
+            # 데이터베이스 저장
+            user_profile.save()
+            return redirect('accounts:login')  # 로그인 페이지로 리다이렉트
         else:
             print(form.errors)  # 폼 에러 출력
             return render(request, 'accounts/signup.html', {'form': form})
