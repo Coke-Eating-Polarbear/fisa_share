@@ -176,3 +176,6 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = os.getenv('EMAIL')  # 발신자 이메일
 EMAIL_HOST_PASSWORD = os.getenv('EMAILPASSWD')  # 발신자 이메일 비밀번호
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+
+MODEL_PATH = os.path.join(BASE_DIR, 'models', 'customer_income_model.h5')

@@ -1,6 +1,6 @@
+from django.db.models import UniqueConstraint
 from django.db import models # type: ignore
 from django.contrib.auth.hashers import make_password # type: ignore
-
 
 # UserProfile 모델 (회원 정보)
 class UserProfile(models.Model):
@@ -100,22 +100,6 @@ class Favorite(models.Model):
         return f"{self.CustomerID.CustomerID} - {self.DSID.dsid}"
     
 
-class MyData(models.Model):
-    CustomerID = models.CharField(max_length=256, primary_key=True)  # 고객 ID
-    pDate = models.DateField()  # 결제 날짜
-    bizcode = models.CharField(max_length=256)  # 산업 분류 코드
-    store = models.CharField(max_length=256)  # 결제 상호명
-    price = models.IntegerField()  # 결제 금액
-    Income = models.IntegerField()  # 수입
-    Total = models.IntegerField()  # 계좌 잔액
-    estate = models.BigIntegerField()  # 부동산 (bigint)
-    credit = models.IntegerField()  # 입금 내역
-    spend = models.IntegerField()  # 지출
-
-    class Meta:
-        db_table = 'mydata'  # 테이블 이름 지정
-
-
 class Average(models.Model):
     stageclass = models.CharField(max_length=10, primary_key=True)  # StageClass 컬럼
     inlevel = models.IntegerField()  # Inlevel 컬럼
@@ -123,17 +107,17 @@ class Average(models.Model):
     income = models.IntegerField()  # 수입
     asset = models.IntegerField()  # 자산
     finance = models.IntegerField()  # 금융
-    eat = models.IntegerField()  # 식사
-    transfer = models.IntegerField()  # 교통
-    utility = models.IntegerField()  # 공과금
-    phone = models.IntegerField()  # 통신
-    home = models.IntegerField()  # 주거
-    hobby = models.IntegerField()  # 취미
-    fashion = models.IntegerField()  # 패션
-    party = models.IntegerField()  # 파티
-    allowance = models.IntegerField()  # 용돈
-    study = models.IntegerField()  # 학업
-    medical = models.IntegerField()  # 의료
+    eat = models.DecimalField(max_digits=4, decimal_places=2)  # 식사
+    transfer = models.DecimalField(max_digits=4, decimal_places=2)  # 교통
+    utility = models.DecimalField(max_digits=4, decimal_places=2)  # 공과금
+    phone = models.DecimalField(max_digits=4, decimal_places=2)  # 통신
+    home = models.DecimalField(max_digits=4, decimal_places=2)  # 주거
+    hobby = models.DecimalField(max_digits=4, decimal_places=2)  # 취미
+    fashion = models.DecimalField(max_digits=4, decimal_places=2)  # 패션
+    party = models.DecimalField(max_digits=4, decimal_places=2)  # 파티
+    allowance = models.DecimalField(max_digits=4, decimal_places=2)  # 용돈
+    study = models.DecimalField(max_digits=4, decimal_places=2)  # 학업
+    medical = models.DecimalField(max_digits=4, decimal_places=2)  # 의료
 
     class Meta:
         db_table = 'average'  # 테이블 이름
@@ -152,8 +136,6 @@ class spend(models.Model):
     Category = models.CharField(max_length=256)
     Frequency = models.IntegerField()
     Amount = models.BigIntegerField()
-    store = models.CharField(max_length=256)
-    bizCode = models.CharField(max_length=256)
 
     class Meta:
         db_table = 'spend'
@@ -169,3 +151,77 @@ class card(models.Model):
 
     class Meta:
         db_table = 'card'
+
+class MyDataAsset(models.Model):
+    CustomerID = models.CharField(max_length=256, primary_key=True)  # CustomerID
+    income = models.IntegerField()  # Income
+    total = models.BigIntegerField()  # Total
+    estate = models.BigIntegerField()  # Estate
+    financial = models.BigIntegerField()  # Financial
+    ect = models.BigIntegerField()  # Ect
+
+    def __str__(self):
+        return self.CustomerID
+    
+    class Meta:
+        db_table = 'mydata_asset'
+    
+class MyDataDS(models.Model):
+    CustomerID = models.CharField(max_length=256)  # CustomerID
+    AccountID = models.CharField(max_length=256)  # AccountID
+    bank_name = models.CharField(max_length=256)  # BankName
+    pname = models.CharField(max_length=256)  # PName
+    balance = models.BigIntegerField()  # Balance
+    ds_rate = models.DecimalField(max_digits=4, decimal_places=2)  # DSRate
+    end_date = models.DateField()  # EndDate
+
+    class Meta:
+        db_table = 'mydata_ds'  # 테이블 이름
+        managed = False 
+        unique_together = ('CustomerID', 'AccountID')  # 복합 기본키 설정
+        constraints = [
+            models.UniqueConstraint(fields=['CustomerID', 'AccountID'], name='unique_customer_account')
+        ] 
+
+    def __str__(self):
+        return f"{self.CustomerID} - {self.AccountID}"
+    
+class MyDataPay(models.Model):
+    CustomerID = models.CharField(max_length=256)  # CustomerID
+    pdate = models.DateField()  # Pdate
+    bizcode = models.CharField(max_length=256)  # Bizcode
+    store = models.CharField(max_length=256)  # Store
+    price = models.IntegerField()  # Price
+    type = models.CharField(max_length=256)  # Type
+
+    def __str__(self):
+        return f"{self.CustomerID} - {self.store} ({self.pdate})"
+    
+    class Meta:
+        db_table = 'mydata_pay'
+
+class SpendAmount(models.Model):
+    CustomerID = models.CharField(max_length=256, primary_key=True)  # CustomerID
+    SDate = models.CharField(max_length=20)  # SDate
+    eat_amount = models.IntegerField(null=True, blank=True)  # eat_Amount
+    transfer_amount = models.IntegerField(null=True, blank=True)  # transfer_Amount
+    utility_amount = models.IntegerField(null=True, blank=True)  # utility_Amount
+    phone_amount = models.IntegerField(null=True, blank=True)  # phone_Amount
+    home_amount = models.IntegerField(null=True, blank=True)  # home_Amount
+    hobby_amount = models.IntegerField(null=True, blank=True)  # hobby_Amount
+    fashion_amount = models.IntegerField(null=True, blank=True)  # fashion_Amount
+    party_amount = models.IntegerField(null=True, blank=True)  # party_Amount
+    allowance_amount = models.IntegerField(null=True, blank=True)  # allowance_Amount
+    study_amount = models.IntegerField(null=True, blank=True)  # study_Amount
+    medical_amount = models.IntegerField(null=True, blank=True)  # medical_Amount
+    TotalAmount = models.IntegerField(null=True, blank=True)  # TotalAmount
+
+    class Meta:
+        db_table = 'spend_amount'
+        managed = False  # Django가 테이블을 생성하거나 수정하지 않음
+        constraints = [
+            models.UniqueConstraint(fields=['CustomerID', 'SDate'], name='unique_customer_sdate')
+        ]  # 복합 키 대체로 설정
+
+    def __str__(self):
+        return f"{self.CustomerID} - {self.SDate}"

@@ -205,7 +205,6 @@
         // Django에서 전달된 데이터를 JavaScript로 로드
         const barData = JSON.parse('{{ bar_data|safe }}');
         const averageData = JSON.parse('{{ average_data|safe }}');
-
         // 데이터 키와 값
         const categories = Object.keys(barData); // ['총자산', '현금자산', '수입', '지출']
         const userValues = Object.values(barData);

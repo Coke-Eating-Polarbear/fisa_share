@@ -8,7 +8,7 @@ import io
 from matplotlib import font_manager, rc # type: ignore
 from django.contrib import messages # type: ignore
 from .forms import UserProfileForm
-from blog.models import UserProfile,Recommend, DsProduct, Wc, News, Favorite,MyData, Average,card  # UserProfile 모델도 가져옵니다
+from blog.models import UserProfile,Recommend, DsProduct, Wc, News, Favorite, Average,card, MyDataAsset, MyDataDS, MyDataPay,SpendAmount  # UserProfile 모델도 가져옵니다
 from django.contrib.auth.hashers import check_password# type: ignore
 from django.views.decorators.http import require_POST# type: ignore
 from django.http import HttpResponse,JsonResponse# type: ignore
@@ -23,8 +23,9 @@ import os
 from dotenv import load_dotenv # type: ignore
 from collections import defaultdict
 from accounts.views import map_person
+from .utils import income_model
 es = Elasticsearch([os.getenv('ES')])  # Elasticsearch 설정
-load_dotenv()
+load_dotenv() 
 rc('font', family='Malgun Gothic')
 logger = logging.getLogger(__name__)
 def login_required_session(view_func):
@@ -467,7 +468,8 @@ def originreport_page(request):
         user = UserProfile.objects.get(CustomerID=customer_id)
         print("Customer ID:", customer_id)  # 디버깅용 출력
         print("User Data:", user)
-
+        now = datetime.now()
+        current_month = now.strftime("%Y-%m")
         # Average 테이블에서 고객 소득분위 기준 데이터 조회
         average_data = Average.objects.filter(
             stageclass=user.stageclass,
@@ -479,30 +481,36 @@ def originreport_page(request):
         print("Average Data:", average_data)  # 디버깅용 출력
 
         # MyData에서 고객 데이터 조회
-        user_data = MyData.objects.filter(CustomerID=customer_id).first()
-        if not user_data:
+        user_asset_data = MyDataAsset.objects.filter(CustomerID=customer_id).first()
+        if not user_asset_data:
             raise ValueError(f"사용자 데이터를 찾을 수 없습니다. (Customer ID: {customer_id})")
-        print("User Financial Data:", user_data)  # 디버깅용 출력
+        user_spend_data = SpendAmount.objects.filter(CustomerID=customer_id).first()
+        if not user_spend_data:
+            raise ValueError(f"사용자 데이터를 찾을 수 없습니다. (Customer ID: {customer_id})")
+        print("User Financial Data:", user_asset_data)  # 디버깅용 출력
+        print("User Financial Data:", user_spend_data)  # 디버깅용 출력
 
         # 데이터 준비
         bar_data = {
-            '총자산': user_data.Total * 10000,
-            '현금자산': user_data.credit * 10000,
-            '수입': user_data.Income * 10000,
-            '지출': user_data.spend * 10000
+            '총자산': user_asset_data.total,
+            '현금자산': user_asset_data.financial,
+            '수입': user_asset_data.income,
+            '지출': abs(user_spend_data.TotalAmount)
         }
-
+        print("Debug: bar_data contents:", bar_data)
         average_values = {
-            '총자산': (average_data.asset + average_data.finance) * 10000,
-            '현금자산': average_data.asset * 10000,
-            '수입': average_data.income * 10000,
-            '지출': average_data.spend * 10000
+            '총자산': (average_data.asset + average_data.finance),
+            '현금자산': average_data.finance,
+            '수입': average_data.income,
+            '지출': average_data.spend
         }
+        print("Debug: bar_data contents:", average_values)
+
 
         # JSON 직렬화된 데이터를 템플릿에 전달
         context = {
-            'bar_data': json.dumps(bar_data),
-            'average_data': json.dumps(average_values),
+            'bar_data': json.dumps(bar_data, ensure_ascii=False),
+            'average_data': json.dumps(average_values, ensure_ascii=False),
             'user_name': user_name,
         }
 
