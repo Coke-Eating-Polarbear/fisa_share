@@ -7,18 +7,21 @@
     <title>회원가입</title>
     <style>
         body {
+            font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            width: 100%;
+            box-sizing: border-box;
             background-color: #ffffff;
-            font-family: Arial, sans-serif;
+            height: 100vh; /* 전체 화면 높이 */
+            display: flex;
+            flex-direction: column; /* Flexbox로 세로 정렬 */
         }
     
         .container {
-            margin: 50px auto;
-            width: 60%;
-            max-width: 60%;
-            padding: 100px 0;
+            margin: 30px auto; /* 전체 컨테이너 여백 */
+            width: 100%; /* 컨테이너 너비를 줄임 */
+            max-width: 600px; /* 최대 너비 설정 */
+            padding: 40px 20px; /* 내부 여백 줄임 */
             background-color: #ffffff;
         }
         
@@ -28,7 +31,7 @@
             justify-content: flex-start;
             border-bottom: 1px solid #ccc;
             font-size: 1rem;
-            padding: 20px 0; /* 각 행의 위아래 간격 */
+            padding: 10px 0; /* 각 행의 위아래 간격 */
             gap: 20px; /* 인풋박스와 버튼 사이의 간격 */
         }
         
@@ -38,19 +41,23 @@
 
         .form-group.inline input {
             flex: 1;
-            max-width: 300px; /* 인풋박스의 최대 너비 */
+            max-width: 200px; /* 인라인 입력 필드 크기 줄임 */
             margin-left: 30px; /* 입력 박스 전체적으로 오른쪽으로 이동 */
+
         }
         
         .form-group.inline button {
-            flex: 0 0 auto; /* 버튼 크기 고정 */
-            max-width: 120px; /* 버튼의 최대 너비 */
+            flex: 1;
+            background-color: #291e4ee5;
+            max-width: 100px; /* 버튼 너비 줄임 */
+            padding: 8px 15px; /* 버튼 패딩 줄임 */
+            font-size: 0.8rem; /* 버튼 폰트 크기 줄임 */
         }
     
         .signup-form h2 {
             text-align: center;
             margin-bottom: 20px;
-            font-size: 1.8rem;
+            font-size: 1.5rem;
             font-weight: bold;
             color: #333;
         }
@@ -61,11 +68,12 @@
             justify-content: flex-start;
             border-bottom: 1px solid #ccc;
             font-size: 1rem;
-            padding: 20px 0; /* 각 행의 위아래 간격을 넓게 */
+            padding: 10px 0; /* 각 행의 위아래 간격을 넓게 */
         }
         
         .form-group label {
-            flex: 0 0 150px; /* 고정 너비 */
+            flex: 0 0 120px; /* 라벨 너비 줄임 */
+            font-size: 0.9rem; /* 라벨 폰트 크기 줄임 */
             font-weight: bold;
             color: #333;
             text-align: left;
@@ -84,11 +92,11 @@
         .form-group select,
         .form-group button {
             flex: 1;
-            max-width: 300px;
-            padding: 10px;
+            max-width: 250px; /* 입력 필드 너비 줄임 */
+            padding: 8px; /* 입력 필드 내부 여백 줄임 */
             border: 1px solid #ccc;
             border-radius: 5px;
-            font-size: 1rem;
+            font-size: 0.9rem; /* 입력 필드 폰트 크기 줄임 */
             box-sizing: border-box;
             margin-left: 50px; /* 입력 박스 전체적으로 오른쪽으로 이동 */
             text-align: left;
@@ -103,7 +111,7 @@
     
         .form-group button {
             max-width: 100px;
-            background-color: #007bff;
+            background-color: #0056b3;
             color: white;
             border: none;
             cursor: pointer;
@@ -111,7 +119,7 @@
         }
     
         .form-group button:hover {
-            background-color: #0056b3;
+            background-color: #291e4ee5;
         }
     
         .form-actions {
@@ -120,6 +128,7 @@
             margin-top: 20px;
             gap: 20px;
             padding-top: 10px;
+            font-size: 0.9rem; /* 버튼 폰트 크기 줄임 */
         }
     
         .cancel-btn,
@@ -133,9 +142,15 @@
         }
     
         .cancel-btn {
-            background-color: #f5f5f5; /* 취소 버튼 기본 색상 */
-            color: #333;
-            border: 1px solid #ccc;
+            display: block;
+            margin: 10px 0;
+            cursor: pointer;
+            background-color: #f5f5f5; /* 버튼 배경색 */
+            color: #333; /* 버튼 텍스트 색 */
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            text-align: center;
         }
     
         .cancel-btn:hover {
@@ -143,9 +158,15 @@
         }
     
         .submit-btn {
-            background-color: #007bff; /* 가입하기 버튼 색상 */
-            color: white;
+            display: block;
+            margin: 10px 0;
+            cursor: pointer;
+            background-color: #291e4ee5; /* 버튼 배경색 */
+            color: #fff; /* 버튼 텍스트 색 */
             border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            text-align: center;
         }
     
         .submit-btn:hover {
@@ -183,7 +204,7 @@
             display: flex;
             align-items: center;
             gap: 5px; /* 라디오 버튼과 텍스트 사이의 간격 */
-            font-size: 1rem;
+            font-size: 0.9rem;
             background-color: transparent; /* 개별 라벨은 배경색 없음 */
         }
 
@@ -196,7 +217,7 @@
         .email-container select,
         .email-container input {
             flex: 1;
-            max-width: 140px; /* 입력 필드와 선택 박스의 최대 너비 */
+            max-width: 120px; /* 입력 필드와 선택 박스의 최대 너비 */
             padding: 10px;
             border: 1px solid #ccc;
             border-radius: 5px;
@@ -221,7 +242,7 @@
         
         .ssn-inline input {
             flex: 1;
-            max-width: 100px; /* 주민번호 필드의 최대 너비 */
+            max-width: 80px; /* 주민번호 필드의 최대 너비 */
             padding: 10px;
             border: 1px solid #ccc;
             border-radius: 5px;
@@ -269,97 +290,107 @@
         
         /* 헤더와 푸터 스타일 */
         header, footer {
+            /* background-color: #ffffff; */
             text-align: center;
-            width: 100%;
-        }
+            width: 100vw;
+            }
+            header {
+                background-color: #ffffff;
+                position: fixed; 
+                padding: 0px;
+                top: 0; 
+                z-index: 1; 
+            }
+            footer {
+                background-color: #F5F6F7;
+                height: 10%; /* 화면 높이의 10% 차지 */
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                text-align: center;
+                padding: 10px;
+            }
+                /* .nav-box {
+                    border: 1px solid #ccc;
+                    padding: 10px;
+                } */
+        
+                /* 드롭다운 메뉴 스타일 */
+            .dropdown {
+                position: relative;
+                display: inline-block;
+            }
+            .navbar {
+                display: flex;
+                justify-content: space-between; /* 좌측 로고와 우측 버튼 배치 */
+                /* justify-content: flex-end; 오른쪽 정렬 */
+                align-items: center;
+                padding: 10px 20px;
+                font-size: 0.3rem;
+                background-color: #ffffff;
+            }
+            .nav-links {
+                margin-right: 10px; /* 회원 정보와의 구분 */
+                display: flex; 
+                justify-content: flex-end; 
+                align-items: center; 
+                flex-grow: 1; 
+                text-align: center;
+            }
+            .navbar a {
+                /* margin: 0 20px; 링크 간격 */
+                font-size: 1.1rem; /* 글씨 크기 */
+                font-weight: bold; /* 글씨 진하게 */
+                margin-left: 15px; /* 각 링크 사이의 간격 */
+                text-decoration: none;
+                color: #333;
+            }
+        
+            .dropdown-content {
+                display: none;
+                position: absolute; /*부모요소 바로 아래에 위치*/
+                top: 100%;
+                left: 0;
+                background-color: #fff;
+                /* box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); */
+                padding: 0% ;
+                width: 150px; /*드롭다운이 전체 넓이를 차지*/
+                z-index: 1000;
+                border-top: 1px solid #ddd;
+                border-bottom: 1px solid #ddd;
+                /* border: 1px solid #ddd; */
+            }
+        
+            .dropdown-content a {
+                padding: 10px 20px;
+                display: block;
+                text-align: left;
+                color: #333;
+                text-decoration: none;
+                /* white-space: nowrap; */
+            }
+        
+            .dropdown-content a:hover {
+                background-color: #f1f1f1;
+            }
+        
+            /* 마우스를 올렸을 때 드롭다운 표시 */
+            .dropdown:hover .dropdown-content {
+                display: block;
+            }
+        
+            /* 링크 스타일 */
+            .nav-box nav a {
+                color: #333;
+                margin: 0 10px;
+                text-decoration: none;
+            }
+        
+            .nav-box nav a:hover {
+                font-weight: bold;
+            }
 
-        header {
-            background-color: #ffffff;
-            position: fixed;
-            padding: 0px;
-            top: 0;
-            z-index: 1;
-        }
-
-        footer {
-            position: relative;
-            background-color: #291e4ee5;
-            padding: 10px;
-            bottom: 0;
-            left: 0;
-        }
-
-        /* 드롭다운 스타일 */
-        .dropdown {
-            position: relative;
-            display: inline-block;
-        }
-
-        .navbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 20px;
-            font-size: 1rem;
-            background-color: #ffffff;
-        }
-
-        .nav-links {
-            margin-right: 10px;
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-            flex-grow: 1;
-            text-align: center;
-        }
-
-        .navbar a {
-            font-size: 1.2rem;
-            font-weight: bold;
-            margin-left: 15px;
-            text-decoration: none;
-            color: #333;
-        }
-
-        .dropdown-content {
-            display: none;
-            position: absolute;
-            top: 100%;
-            left: 0;
-            background-color: #fff;
-            padding: 0%;
-            width: 150px;
-            z-index: 1000;
-            border-top: 1px solid #ddd;
-            border-bottom: 1px solid #ddd;
-        }
-
-        .dropdown-content a {
-            padding: 10px 20px;
-            display: block;
-            text-align: left;
-            color: #333;
-            text-decoration: none;
-        }
-
-        .dropdown-content a:hover {
-            background-color: #f1f1f1;
-        }
-
-        .dropdown:hover .dropdown-content {
-            display: block;
-        }
-
-        /* 링크 스타일 */
-        .nav-box nav a {
-            color: #333;
-            margin: 0 10px;
-            text-decoration: none;
-        }
-
-        .nav-box nav a:hover {
-            font-weight: bold;
-        }
 
     </style>
 </head>
@@ -369,22 +400,21 @@
     <div class="navbar">
         <div class="logo">
             <a href="{% url 'main' %}">
-                <img src="{% static 'img/fisa_logo_after.png' %}" style="vertical-align: middle;" alt="우리 FISA 로고">
-                <span style="font-size: 1.5rem; font-weight: bold; margin-left: 10px;">예/적금 추천 서비스</span>
-        </div>
-        <div class="nav-links" style="flex-grow: 1; text-align: center;">
-                <a href="./report.html" style=" font-weight: bold; color: #121212;">금융분석 리포트</a> 
+                <img src="{% static 'C:\ITStudy\Final\fisa_share\static\img\header_logo.png' %}" style="vertical-align: middle; margin-left: 220px;" alt="로고">
+            </div>
+            <div class="nav-links" style="flex-grow: 1; text-align: center; margin-right: 220px;">
+                <a href="{% url 'originreport' %}" style=" font-weight: bold; color: #121212;">금융분석 리포트</a> 
                 <div class="dropdown">
                     <a href="#" style=" font-weight: bold; color: #121212;">예/적금 추천</a>
                     <div class="dropdown-content">
-                        <a href="savings_info1.html" style="font-size: 0.9rem;">신규적금추천</a>
-                        <a href="compare_products.html" style="font-size: 0.9rem;">기존상품비교</a>
+                        <a href="savings_info1" style="font-size: 0.8rem;">신규적금추천</a>
+                        <a href="compare_products" style="font-size: 0.8rem;">기존상품비교</a>
                     </div>
                 </div> 
-                <a href="#" style=" font-weight: bold; color: #121212;">소비MBTI</a>
+                <a href="spending_mbti" style=" font-weight: bold; color: #121212;">소비MBTI</a>
+            </div>
         </div>
-    </div>
-    </header>
+        </header>
 
 
     <div class="container">
@@ -514,9 +544,9 @@
         </form>
     </div>
     <footer>
-        <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0;">서울특별시 마포구 월드컵북로 434 상암IT타워 6층</p> 
-        <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0;">고객지원 : 02-3151-7000 | 이메일: worifisa@worifisa.com </p >
-        <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0;">COPYRIGHT©우리팀이름~</p >
+        <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #000000;">서울특별시 마포구 월드컵북로 434 상암IT타워 6층</p> 
+        <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #000000;">고객지원 : 02-3151-7000 | 이메일: worifisa@worifisa.com </p >
+        <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #000000;">COPYRIGHT©2024 우리 천만해요</p >
     </footer>
     <script>
         function checkPasswords() {
