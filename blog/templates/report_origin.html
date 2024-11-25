@@ -8,69 +8,125 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body {
+            background-color: #f4f4f6;
             font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
+            width: 100vw;
+            padding-top: 150px;
+            /* margin: 0;
+            padding: 0; */
             box-sizing: border-box;
-            background-color: #ffffff;
+            min-height: 100%;
+            position: relative;
+            overflow-x: hidden; /* 좌우 스크롤 제거 */
+            max-width: 100%;
         }
         header, footer {
-            padding: 10px;
+            /* background-color: #ffffff; */
             text-align: center;
             width: 100vw;
-        }
-        header { 
-            top: 0; 
-            background-color: #ffffff;
-            position: fixed;
-            padding: 0px;
-            z-index: 1;
-        }
-        footer { 
-            bottom: 0; 
-            background-color: #291e4ee5;
-            padding: 10px;
-            left : 0;
-        }
-        .container {
-            padding-top: 80px;
-            padding-bottom: 80px;
-            width: 100%;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        .navbar {
-        display: flex;
-        justify-content: space-between; /* 좌측 로고와 우측 버튼 배치 */
-        /* justify-content: flex-end; 오른쪽 정렬 */
-        align-items: center;
-        padding: 10px 20px;
-        font-size: 1rem;
-        background-color: #ffffff;
-        }
-
-        .nav-links {
-        margin-right: 20px; /* 회원 정보와의 구분 */
-        }
-
-        .navbar a {
-            /* margin: 0 20px; 링크 간격 */
-            font-size: 1.2rem; /* 글씨 크기 */
-            font-weight: bold; /* 글씨 진하게 */
-            margin-left: 15px; /* 각 링크 사이의 간격 */
-            text-decoration: none;
-            color: #333;
-        }
-
-        .nav-box nav a {
-            color: #333;
-            margin: 0 10px;
-            text-decoration: none;
-        }
+            }
+            header {
+                background-color: #ffffff;
+                position: fixed;
+                top: 0;
+                z-index: 2; /* 헤더가 항상 위로 보이게 설정 */
+                height: 80px; /* 헤더 높이를 고정 */
+                width: 100%;
+                display: flex;
+                align-items: center;
+                padding: 0 20px;
+            }
+            footer {
+                background-color: #F5F6F7;
+                height: 10%; /* 화면 높이의 10% 차지 */
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                text-align: center;
+                padding: 10px;
+            }
+                /* .nav-box {
+                    border: 1px solid #ccc;
+                    padding: 10px;
+                } */
         
-        .nav-box nav a:hover {
-            font-weight: bold;
-        }
+                /* 드롭다운 메뉴 스타일 */
+            .dropdown {
+                position: relative;
+                display: inline-block;
+            }
+            .navbar {
+                display: flex;
+                justify-content: space-between; /* 좌측 로고와 우측 버튼 배치 */
+                /* justify-content: flex-end; 오른쪽 정렬 */
+                align-items: center;
+                padding: 10px 20px;
+                font-size: 0.3rem;
+                background-color: #ffffff;
+            }
+            .nav-links {
+                margin-right: 10px; /* 회원 정보와의 구분 */
+                display: flex; 
+                justify-content: flex-end; 
+                align-items: center; 
+                flex-grow: 1; 
+                text-align: center;
+            }
+            .navbar a {
+                /* margin: 0 20px; 링크 간격 */
+                font-size: 1.1rem; /* 글씨 크기 */
+                font-weight: bold; /* 글씨 진하게 */
+                margin-left: 15px; /* 각 링크 사이의 간격 */
+                text-decoration: none;
+                color: #333;
+            }
+        
+            .dropdown-content {
+                display: none;
+                position: absolute; /*부모요소 바로 아래에 위치*/
+                top: 100%;
+                left: 0;
+                background-color: #fff;
+                /* box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); */
+                padding: 0% ;
+                width: 150px; /*드롭다운이 전체 넓이를 차지*/
+                z-index: 1000;
+                border-top: 1px solid #ddd;
+                border-bottom: 1px solid #ddd;
+                /* border: 1px solid #ddd; */
+            }
+        
+            .dropdown-content a {
+                padding: 10px 20px;
+                display: block;
+                text-align: left;
+                color: #333;
+                text-decoration: none;
+                /* white-space: nowrap; */
+            }
+        
+            .dropdown-content a:hover {
+                background-color: #f1f1f1;
+            }
+        
+            /* 마우스를 올렸을 때 드롭다운 표시 */
+            .dropdown:hover .dropdown-content {
+                display: block;
+            }
+        
+            /* 링크 스타일 */
+            .nav-box nav a {
+                color: #333;
+                margin: 0 10px;
+                text-decoration: none;
+            }
+        
+            .nav-box nav a:hover {
+                font-weight: bold;
+            }
+
+
 
         .dropdown {
             position: relative;
@@ -147,23 +203,51 @@
     </style>
 </head>
 <body>
+    {% csrf_token %}
     <header>
-        <div class="navbar">
-            <div class="logo">
-                <a href="./main">
-                    <img src="{% static 'img/fisa_logo_after.png' %}" style="vertical-align: middle;" alt="우리 FISA 로고">
-                    <span style="font-size: 1.5rem; font-weight: bold; margin-left: 10px;">예/적금 추천 서비스</span>
+    <div class="navbar">
+        <div class="logo">
+            <a href="{% url 'main' %}">
+                <img src="{% static 'C:\ITStudy\Final\fisa_share\static\img\header_logo.png' %}" style="vertical-align: middle; margin-left: 100px;" alt="로고">
             </div>
-            <div class="nav-links">
-                <a href="#report">금융분석 리포트</a>
-                <a href="#recommendation">예/적금 추천</a>
-                <a href="{% url 'spending_mbti' %}">소비MBTI</a>
+            <div class="nav-links" style="flex-grow: 1; text-align: center; margin-right: 220px;">
+                <a href="./loginmain" style=" font-weight: bold; color: #121212;">금융분석 리포트</a> 
+                <div class="dropdown">
+                    <a href="#" style=" font-weight: bold; color: #121212;">예/적금 추천</a>
+                    <div class="dropdown-content">
+                        <a href="savings_info1" style="font-size: 0.8rem;">신규적금추천</a>
+                        <a href="compare_products" style="font-size: 0.8rem;">기존상품비교</a>
+                    </div>
+                </div> 
+                <a href="spending_mbti" style=" font-weight: bold; color: #121212;">소비MBTI</a>
             </div>
-            <div class="user-info">
-                <span>{{ user_name }}님</span> | <a href="#mypage">마이페이지</a>
-            </div>
+           <!-- 회원 정보 및 마이페이지 -->
+        <div class="user-info">
+            <span style="font-size: 1.1rem;">{{ user_name }}님</span> 
+            <a href="./mypage" style="margin-left: 15px; 
+            text-decoration: none; 
+            font-size: 1.1rem; 
+            font-weight: bold; 
+            color: #121212;">마이페이지</a> 
+            <form method="POST" action="{% url 'logout' %}" style="display: inline;">
+                {% csrf_token %}
+                <button name="logout" style="margin-left: 10px; 
+                margin-right: 100px; 
+                padding: 5px 10px; 
+                font-size: 0.9rem; 
+                font-weight: bold; 
+                background-color: #291e4ee5; 
+                color: white; 
+                border: none; 
+                border-radius: 5px; 
+                cursor: pointer;">
+                    로그아웃
+                </button>
+            </form>
         </div>
+    </div>
     </header>
+
     <div class="container">
         <div class="content">
             <div class="box">
@@ -293,5 +377,11 @@
         createBarChart('chartIncome', '수입', userValues[2], averageValues[2]);
         createBarChart('chartSpend', '지출', userValues[3], averageValues[3]);
     </script>
+
+    <footer>
+        <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0;">서울특별시 마포구 월드컵북로 434 상암IT타워 6층</p> 
+        <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0;">고객지원 : 02-3151-7000 | 이메일: worifisa@worifisa.com </p >
+        <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0;">COPYRIGHT©우리팀이름~</p >
+    </footer >
 </body>
 </html>
