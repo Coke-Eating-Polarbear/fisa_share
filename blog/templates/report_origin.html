@@ -8,12 +8,10 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body {
-            background-color: #f4f4f6;
+            background-color: #F5F6F7;
             font-family: Arial, sans-serif;
             width: 100vw;
-            padding-top: 150px;
-            /* margin: 0;
-            padding: 0; */
+            padding-top: 30px; /* 헤더 높이에 맞춰 여백 조정 */
             box-sizing: border-box;
             min-height: 100%;
             position: relative;
@@ -21,12 +19,12 @@
             max-width: 100%;
         }
         header, footer {
-            /* background-color: #ffffff; */
+            /* background-color: #F5F6F7; */
             text-align: center;
             width: 100vw;
             }
             header {
-                background-color: #ffffff;
+                background-color: #F5F6F7;
                 position: fixed;
                 top: 0;
                 z-index: 2; /* 헤더가 항상 위로 보이게 설정 */
@@ -63,7 +61,7 @@
                 align-items: center;
                 padding: 10px 20px;
                 font-size: 0.3rem;
-                background-color: #ffffff;
+                background-color: #F5F6F7;
             }
             .nav-links {
                 margin-right: 10px; /* 회원 정보와의 구분 */
@@ -170,7 +168,7 @@
             margin: 20px auto;
             padding: 20px;
             width: 90%;
-            max-width: 1000px;
+            max-width: 1200px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
         .score-summary {
@@ -192,13 +190,63 @@
         .report-summary {
             font-size: 16px;
         }
-        canvas {
-            max-width: 400px;
+
+        /* 큰 컨테이너 */
+        .main-container {
+            display: flex;
+            justify-content: space-between; /* 좌우 정렬 */
+            gap: 20px;
             margin: 20px auto;
+            max-width: 1200px;
+            padding: 20px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
-        .chart-container {
-            margin-bottom: 40px;
+        
+        /* 막대 그래프 박스 (2x2 레이아웃) */
+        .bar-chart-container {
+            flex: 2;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr); /* 2열 구성 */
+            gap: 20px; /* 셀 간격 */
+        }
+        
+        /* 파이 차트 박스 (위아래 레이아웃) */
+        .pie-chart-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        /* 공통 스타일 */
+        .chart-box {
+            background-color: #f9f9f9;
+            /*border: 1px solid #ddd;
+            border-radius: 10px;*/
+            padding: 10px;
             text-align: center;
+            /*box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);*/
+        }
+        .chart-box small {
+            background-color: #f9f9f9;
+            padding: 10px;
+            text-align: center;
+            /*border: none !important; /* 테두리 제거 */
+            box-shadow: none !important; /* 그림자 제거 */*/
+        }
+        .chart-box h3 {
+            font-size: 1rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        
+        canvas {
+            max-width: 100%;
+            max-height: 200px; /* 동일한 높이로 제한 */
         }
     </style>
 </head>
@@ -256,26 +304,40 @@
             <div class="box score-summary">
                 <p>금융 자산 분석 점수: <span id="analysis-score">88점</span> 🔍 | 한 줄 요약: <span id="summary">키워드로? 아님 진짜 한줄 요약으로</span></p>
             </div>
-                <div class="box graphs">
-                    <div class="chart-container">
+            <div class="main-container">
+                <!-- 막대 그래프 박스 -->
+                <div class="bar-chart-container chart-box">
+                    <div class="chart-box small">
                         <h3>총자산</h3>
                         <canvas id="chartTotal"></canvas>
                     </div>
-                    <div class="chart-container">
+                    <div class="chart-box small">
                         <h3>현금자산</h3>
                         <canvas id="chartCash"></canvas>
                     </div>
-                    <div class="chart-container">
+                    <div class="chart-box small">
                         <h3>수입</h3>
                         <canvas id="chartIncome"></canvas>
                     </div>
-                    <div class="chart-container">
+                    <div class="chart-box small">
                         <h3>지출</h3>
                         <canvas id="chartSpend"></canvas>
                     </div>
                 </div>
+            
+                <!-- 파이 차트 박스 -->
+                <div class="pie-chart-container chart-box">
+                    <div class="chart-box small">
+                        <h3>수입 구성 비율</h3>
+                        <canvas id="pieChart2"></canvas>
+                    </div>
+                    <div class="chart-box small">
+                        <h3>지출 구성 비율</h3>
+                        <canvas id="pieChart1"></canvas>
+                    </div>
+                </div>
             </div>
-        </div>
+            
         <div class="box report-summary">
             <h3>금융 리포트 종합 요약</h3>
             <p id="full-report">
@@ -375,6 +437,53 @@
         createBarChart('chartCash', '현금자산', userValues[1], averageValues[1]);
         createBarChart('chartIncome', '수입', userValues[2], averageValues[2]);
         createBarChart('chartSpend', '지출', userValues[3], averageValues[3]);
+
+
+
+
+        // 파이 차트 데이터
+        const pieData1 = {
+            labels: ['식비', '교통비', '쇼핑', '기타'],
+            datasets: [
+                {
+                    label: '지출 구성 비율',
+                    data: [40, 20, 25, 15],
+                    backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0']
+                }
+            ]
+        };
+
+        const pieData2 = {
+            labels: ['월급', '이자수익', '기타수익'],
+            datasets: [
+                {
+                    label: '수입 구성 비율',
+                    data: [70, 20, 10],
+                    backgroundColor: ['#4BC0C0', '#FF9F40', '#9966FF']
+                }
+            ]
+        };
+
+        // 파이 차트 생성 함수
+        function createPieChart(chartId, data) {
+            const ctx = document.getElementById(chartId).getContext('2d');
+            new Chart(ctx, {
+                type: 'pie',
+                data: data,
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'right'
+                        }
+                    }
+                }
+            });
+        }
+        // 파이 차트 생성
+        createPieChart('pieChart1', pieData1);
+        createPieChart('pieChart2', pieData2);
     </script>
 
     <footer>
