@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>회원가입 추가 정보</title>
+    <style>
+        /* 스타일 조정 */
+        .info-container {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            background-color: #f9f9f9;
+            text-align: center;
+        }
+
+        .info-container h2 {
+            color: #ff1111;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .info-container p {
+            color: #555;
+            font-size: 16px;
+        }
+
+        .info-container img {
+            width: 50px;
+            height: 50px;
+            margin-top: 10px;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="info-container">
+        <h2>❤</h2>
+        <p>
+            추가로 정보를 입력해주시면 더 자세한 분석과 추천이 가능해요!
+        </p>
+    </div>
+
+    <form id="signup-form">
+        <!-- 배우자 유무 -->
+        <label>
+            <input type="checkbox" id="spouse-checkbox" name="spouse" value="yes">
+            배우자 유무
+        </label>
+        <br>
+
+        <!-- 자식 유무 -->
+        <label>
+            <input type="checkbox" id="children-checkbox" name="children" value="yes" onchange="toggleChildrenOptions()">
+            자식 유무
+        </label>
+        <br>
+
+        <!-- 자녀 수 선택 (드롭박스) -->
+        <div id="children-options" class="hidden">
+            <label>
+                초등생 이하 자녀 수:
+                <select name="young-children" id="young-children">
+                    <option value="0">0</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4+</option>
+                </select>
+            </label>
+            <br>
+
+            <label>
+                중고등생 이하 자녀 수:
+                <select name="teen-children" id="teen-children">
+                    <option value="0">0</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4+</option>
+                </select>
+            </label>
+            <br>
+
+            <label>
+                대학생/성인 자녀 수:
+                <select name="adult-children" id="adult-children">
+                    <option value="0">0</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4+</option>
+                </select>
+            </label>
+        </div>
+        <br>
+
+        <button type="submit">회원가입</button>
+    </form>
+
+    <script>
+        // 자식 유무 체크박스의 상태에 따라 옵션 표시/숨기기
+        function toggleChildrenOptions() {
+            const childrenCheckbox = document.getElementById('children-checkbox');
+            const childrenOptions = document.getElementById('children-options');
+            
+            if (childrenCheckbox.checked) {
+                childrenOptions.classList.remove('hidden');
+            } else {
+                childrenOptions.classList.add('hidden');
+                // 체크 해제 시 선택값 초기화
+                document.getElementById('young-children').value = "0";
+                document.getElementById('teen-children').value = "0";
+                document.getElementById('adult-children').value = "0";
+            }
+        }
+    </script>
+</body>
+</html>
