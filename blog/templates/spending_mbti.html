@@ -9,7 +9,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body {
-            background-color: #f4f4f6;
+            background-color: #F5F6F7;
             font-family: Arial, sans-serif;
             width: 100vw;
             padding-top: 150px;
@@ -22,12 +22,12 @@
             max-width: 100%;
         }
         header, footer {
-            /* background-color: #ffffff; */
+            /* background-color: #F5F6F7; */
             text-align: center;
             width: 100vw;
             }
             header {
-                background-color: #ffffff;
+                background-color: #F5F6F7;
                 position: fixed; 
                 padding: 0px;
                 top: 0; 
@@ -60,7 +60,7 @@
                 align-items: center;
                 padding: 10px 20px;
                 font-size: 0.3rem;
-                background-color: #ffffff;
+                background-color: #F5F6F7;
             }
             .nav-links {
                 margin-right: 10px; /* 회원 정보와의 구분 */
@@ -131,32 +131,44 @@
             border-radius: 10px;
         }
         .content-row {
-            display: flex; /* 차트를 가로로 나열 */
-            justify-content: space-between; /* 차트 간 간격을 유지 */
-            align-items: flex-start; /* 상단 맞춤 */
-            gap: 20px;
+            display: flex; /* 차트와 설명을 가로로 배치 */
+            justify-content:center; /* 왼쪽 정렬 */
+            align-items: flex-start; /* 상단 정렬 */
+            gap: 20px; /* 차트와 설명 간 간격 */
+            margin-bottom: 20px; /* 행 간 간격 */
         }
         .chart-container {
-            flex: 1;
-            position: relative;
-            max-width: 48%; /* 각 차트 컨테이너의 최대 너비 */
             display: flex;
-            flex-direction: column;
-            align-items: center;
+            flex-direction: column; /* 헤더와 차트를 수직으로 배치 */
+            align-items: center; /* 차트를 중앙 정렬 */
+            max-width: 400px; /* 차트 컨테이너 최대 너비 */
+            margin: 0; /* 외부 여백 제거 */
+            padding: 0; /* 내부 여백 제거 */
         }
         .chart-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-            border-bottom: 2px solid #ddd;
-            padding-bottom: 10px;
-            width: 100%;
+            display: flex; /* 가로로 배치 */
+            justify-content: space-between; /* 제목은 왼쪽, 버튼은 오른쪽 */
+            align-items: center; /* 수직 가운데 정렬 */
+            width: 100%; /* 컨테이너의 전체 너비 */
+            margin-bottom: 10px; /* 헤더와 차트 사이 간격 */
+            position: relative; /* ::after 위치 설정을 위한 기준 */
+            padding-bottom: 10px; /* 헤더와 바 사이 간격 */
+        }
+        
+        .chart-header::after {
+            content: ''; /* 가상의 요소 생성 */
+            position: absolute; /* 헤더 아래에 위치 */
+            bottom: 0; /* 헤더의 아래쪽에 고정 */
+            left: 0;
+            width: 100%; /* 헤더의 전체 너비 */
+            height: 1.5px; /* 바 두께 */
+            background-color: #ddd; /* 바 색상 */
         }
         .chart-title {
-            font-size: 16px;
+            font-size: 14px;
             font-weight: bold;
             color: #333;
+            text-align: left; /* 제목 중앙 정렬 */
         }
         .filter-section {
             display: flex;
@@ -181,13 +193,15 @@
             gap: 10px;  
         }
         .date-container {
-            display: flex;
-            align-items: center;
-            gap: 5px;
+            display: flex; /* 가로로 배치 */
+            justify-content: flex-end; /* 오른쪽 정렬 */
+            align-items: center; /* 수직 가운데 정렬 */
+            width: 100%; /* 컨테이너의 전체 너비 */
+            gap: 5px; /* 필드 간 간격 */
         }
         .date-range-buttons button {
-            padding: 8px 15px;
-            font-size: 14px;
+            padding: 3px 7.5px;
+            font-size: 12px;
             border: 1px solid #007bff;
             background-color: #ffffff;
             color: #007bff;
@@ -195,6 +209,7 @@
             cursor: pointer;
             transition: background-color 0.3s, color 0.3s, box-shadow 0.3s;
             outline: none;
+            
         }
     
         .date-range-buttons button:hover {
@@ -214,17 +229,16 @@
             margin-left: 20px; /* 범례 간격 */
         }
         .chart {
-            width: 100%; /* 차트가 컨테이너에 맞게 크기 조정 */
-            height: auto;
-            max-height: 400px; /* 차트의 최대 높이 설정 */
+            flex: 1; /* 차트가 컨테이너에서 남은 공간을 채우도록 설정 */
+            max-height: 200px; /* 차트 최대 높이 */
+            width: 100%; /* 차트가 컨테이너 너비를 차지 */
         }
         .description {
-            width: 100%; /* 섹션 전체 너비 */
-            font-size: 16px;
-            line-height: 1.6;
-            color: #333;
-            text-align: left; /* 텍스트 중앙 정렬 */
-            margin: 0 auto; /* 섹션 자체 중앙 정렬 */
+            display: flex;
+            flex-direction: column; /* 설명 텍스트를 수직으로 배치 */
+            justify-content: flex-start; /* 텍스트 위쪽 정렬 */
+            align-items: flex-start; /* 텍스트 왼쪽 정렬 */
+            max-width: 300px; /* 설명 컨테이너 최대 너비 */
         }
         .highlight {
             font-weight: bold;
@@ -352,7 +366,7 @@
 
 
     <!-- 메인 콘텐츠 -->
-    <div class="container">
+    <div class="container" style=" display: grid; grid-template-columns: 7fr 3fr; align-items: center;">
         <div class="content-row">
             <!-- 차트 1 -->
             <div class="chart-container">
@@ -367,12 +381,6 @@
                 <!-- 정렬 및 날짜 선택 -->
                 <div class="filter-section">
                     <div class="sort-container">
-                        <label for="sortFrequency">정렬:</label>
-                        <select id="sortFrequency" onchange="handleSort('frequency')">
-                            <option value="default">전체</option>
-                            <option value="ascending">오름차순</option>
-                            <option value="descending">내림차순</option>
-                        </select>
                     </div>
                     <div class="date-container">
                         <label for="dateFrequency">날짜:</label>
@@ -395,12 +403,6 @@
                 <!-- 정렬 및 날짜 선택 -->
                 <div class="filter-section">
                     <div class="sort-container">
-                        <label for="sortAmount">정렬:</label>
-                        <select id="sortAmount" onchange="handleSort('amount')">
-                            <option value="default">전체</option>
-                            <option value="ascending">오름차순</option>
-                            <option value="descending">내림차순</option>
-                        </select>
                     </div>
                     <div class="date-container">
                         <label for="dateAmount">날짜:</label>
@@ -410,19 +412,16 @@
                 <canvas id="amountChart" class="chart"></canvas>
             </div>
         </div>
+
+        <!-- 설명 섹션 -->
+        <div class="description">
+            <p>다음 달 예상 소비 금액은 <span class="highlight">##원</span>입니다.</p>
+            <p><span class="highlight">식비</span>와 <span class="highlight">쇼핑</span> 항목에서 가장 큰 소비가 예상됩니다.</p>
+            <p>이 분야에서 소비를 줄이려면, 혜택이 큰 카드를 사용해보세요!</p>
+            <p>예상 절감 금액: <span class="highlight">##원</span></p>
+        </div>
     </div>
 
-            <!-- 설명 섹션 -->
-            <div class="container description">
-                <p>{{ user_name }}님은 전체적으로 <span class="highlight">1. 식비</span> 2. 쇼핑에서 가장 소비가 많은 행복추구형~!!</p>
-                <p>식비 분야가 가장 많은 빈도로 사용</p>
-                <p>쇼핑 분야가 가장 큰 금액 결제...?</p>
-                <p>다음 달 예상 소비 금액은 <span class="highlight">##원</span> 입니다~</p>
-                <br>
-                <p>{{ user_name }}님, <span class="highlight">##</span> 분야의 혜택이 큰 카드를 사용하면 소비를 줄일 수 있다~</p>
-                <p>⇒ 이건 뒤에 보여줄 카드 중 해당 분야 혜택이 가장 큰 카드 기준으로 계산해서 보여주기</p>
-            </div>
-        </div>
 
       <!-- 소비 예측 섹션 -->
       <div class="prediction-section container">
@@ -492,15 +491,18 @@
     </div>
 
     
-        <!-- 설명 박스 단독 컨테이너 -->
-        <div class="container description">
-            <p>다음 달 예상 소비 금액은 <span class="highlight">##원</span>입니다.</p>
-            <p><span class="highlight">식비</span>와 <span class="highlight">쇼핑</span> 항목에서 가장 큰 소비가 예상됩니다.</p>
-            <p>이 분야에서 소비를 줄이려면, 혜택이 큰 카드를 사용해보세요!</p>
-            <p>예상 절감 금액: <span class="highlight">##원</span></p>
-        </div>
-    </div>
-    
+
+                <!-- 설명 섹션 -->
+                <div class="container">
+                    <p>{{ user_name }}님은 전체적으로 <span class="highlight">1. 식비</span> 2. 쇼핑에서 가장 소비가 많은 행복추구형~!!</p>
+                    <p>식비 분야가 가장 많은 빈도로 사용</p>
+                    <p>쇼핑 분야가 가장 큰 금액 결제...?</p>
+                    <p>다음 달 예상 소비 금액은 <span class="highlight">##원</span> 입니다~</p>
+                    <br>
+                    <p>{{ user_name }}님, <span class="highlight">##</span> 분야의 혜택이 큰 카드를 사용하면 소비를 줄일 수 있다~</p>
+                    <p>⇒ 이건 뒤에 보여줄 카드 중 해당 분야 혜택이 가장 큰 카드 기준으로 계산해서 보여주기</p>
+                </div>
+            </div>
     <script>
         // 데이터는 예시입니다. 필요에 따라 실제 데이터를 사용하세요.
         const frequencyData = {
