@@ -4,7 +4,6 @@ from django.contrib.auth.hashers import make_password # type: ignore
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
 
-
 # UserProfile 모델 (회원 정보)
 class UserProfile(models.Model):
     CustomerID = models.CharField(max_length=100, unique=True, primary_key=True)  # 아이디
@@ -15,7 +14,7 @@ class UserProfile(models.Model):
     SerialNum = models.CharField(max_length=1)  # 주민번호 뒷자리
     Phone = models.CharField(max_length=11)  # 전화번호
     sex = models.CharField(max_length=1, blank=True)  # 성별 (M, F)
-    Stageclass = models.CharField(max_length=1)
+    Stageclass = models.CharField(max_length=1) 
     Inlevel = models.SmallIntegerField()
 
     def save(self, *args, **kwargs):
@@ -116,7 +115,6 @@ class Average(models.Model):
     allowance = models.DecimalField(max_digits=4, decimal_places=2)  # decimal(4,2)
     study = models.DecimalField(max_digits=4, decimal_places=2)  # decimal(4,2)
     medical = models.DecimalField(max_digits=4, decimal_places=2)  # decimal(4,2)
-
     class Meta:
         db_table = 'average'  # 테이블 이름
         managed = False  # Django가 테이블을 생성/수정하지 않도록 설정
@@ -259,36 +257,38 @@ class DProduct(models.Model):
 
 
 class SProduct(models.Model):
-    DSID = models.AutoField(primary_key=True)  # int PK
-    ProductName = models.TextField()  # text
-    BankName = models.TextField()  # text
-    BaseRate = models.FloatField()  # float
-    MaxPreferentialRate = models.FloatField()  # float
-    ProductType = models.TextField()  # text
-    Period = models.TextField()  # text
-    Amount = models.TextField()  # text
-    JoinMethod = models.TextField()  # text
-    Target = models.TextField()  # text
-    AccumulationMethod = models.TextField()  # text
-    PreferentialConditions = models.TextField()  # text
-    InterestPayment = models.TextField()  # text
-    Precautions = models.TextField()  # text
-    DepositProtection = models.TextField()  # text
-    Review = models.TextField()  # text
-    PreferentialRateConditions = models.TextField()  # text
-    PreferentialConditionDescription = models.TextField()  # text
-    RateType = models.TextField()  # text
-    DetailedDescription = models.TextField()  # text
-    Category = models.TextField()  # text
-    MinPeriod = models.FloatField()  # float
-    MaxPeriod = models.FloatField()  # float
-    MaxAmount = models.FloatField()  # float
-    MinAmount = models.FloatField()  # float
-    PeriodMin = models.FloatField()  # float
-    PeriodMax = models.FloatField()  # float
+    dsid = models.IntegerField(primary_key=True)  # DSID를 Primary Key로 설정
+    product_name = models.CharField(max_length=255)  # 상품명
+    bank_name = models.CharField(max_length=255)  # 은행명
+    base_rate = models.FloatField()  # 기본금리
+    max_preferential_rate = models.FloatField()  # 최고우대금리
+    product_type = models.CharField(max_length=255)  # 상품유형
+    period = models.CharField(max_length=255)  # 기간
+    amount = models.CharField(max_length=255)  # 금액
+    signup_method = models.CharField(max_length=255, null=True, blank=True)  # 가입방법
+    target = models.TextField()  # 대상
+    saving_method = models.CharField(max_length=255, null=True, blank=True)  # 적립방법
+    preferential_conditions = models.CharField(max_length=255)  # 우대조건
+    interest_payment = models.CharField(max_length=255, null=True, blank=True)  # 이자지급
+    notes = models.TextField(null=True, blank=True)  # 유의사항
+    deposit_protection = models.CharField(max_length=255, null=True, blank=True)  # 예금자보호
+    approval = models.CharField(max_length=255, null=True, blank=True)  # 심의필
+    preferential_rate_conditions = models.TextField()  # 우대금리조건
+    preferential_conditions_description = models.TextField(null=True, blank=True)  # 우대조건설명
+    rate_type = models.CharField(max_length=255)  # 금리유형
+    details = models.TextField(null=True, blank=True)  # 상세설명
+    main_category = models.CharField(max_length=255)  # 대분류
+    cluster1 = models.IntegerField()  # 클러스터
+    tokenized_texts = models.TextField()  # 토큰화된 텍스트
+    min_period = models.FloatField(null=True, blank=True)  # 최소기간
+    max_period = models.FloatField(null=True, blank=True)  # 최대기간
+    max_amount = models.FloatField(null=True, blank=True)  # 최대금액
+    min_amount = models.FloatField(null=True, blank=True)  # 최소금액
+    min_duration = models.FloatField(null=True, blank=True)  # 기간최소
+    max_duration = models.FloatField(null=True, blank=True)  # 기간최대
 
     class Meta:
-        db_table = 's_product'  # 기존 테이블 이름 유지
+        db_table = 's_product'  # 데이터베이스 테이블 이름과 매핑
 
 class SpendFreq(models.Model):
     CustomerID = models.CharField(max_length=256, primary_key=True)  # CustomerID

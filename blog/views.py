@@ -406,8 +406,17 @@ def summary_view(request):
     # 적금 추천 상품 처리
     csv_path = os.path.join(settings.BASE_DIR, 'static', 'cluster_savings_updated.csv')
 
-    # Pandas로 CSV 읽기
-    cluster_savings = pd.read_csv(csv_path)
+    ## 적금 추천 상품 top 3
+    # Django ORM을 사용하여 데이터 가져오기
+    cluster_savings = SProduct.objects.all()
+
+    # 필요한 데이터를 Pandas DataFrame으로 변환
+    import pandas as pd
+
+    data = list(cluster_savings.values())  # ORM QuerySet을 리스트로 변환
+    cluster_savings = pd.DataFrame(data)
+    # 결과를 저장할 빈 데이터프레임 생성 (모든 열 포함)
+
     final_result = pd.DataFrame(columns=cluster_savings.columns)
 
     def assign_cluster(stage_class, sex, age):
