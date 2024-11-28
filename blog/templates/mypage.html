@@ -3,7 +3,6 @@
 <html lang="ko">
 <head>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>금융 분석 페이지</title>
@@ -16,37 +15,110 @@
         background-color: #ffffff;
     }
     header, footer {
-        /* background-color: #ffffff; */
-        padding: 10px;
-        text-align: center;
-        width: 100%;
-        z-index: 1;
-        border-bottom: 1px solid #ddd;
-    }
-    header {
-        background-color: #ffffff;
-        top: 0;
-        position: fixed;
-    }
-    footer {
-        /* position: fixed;  */
-        background-color: #39334f;
-        bottom: 0; 
-        left: 0; 
-        width: 100%;
-    }
-    .navbar {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin: 0 20px;
-    }
-    .navbar div a {
-        margin: 0 10px;
-        text-decoration: none;
-        color: #333;
-        font-size: 14px;
-    }
+            /* background-color: #ffffff; */
+            text-align: center;
+            width: 100vw;
+            }
+            header {
+                background-color: #ffffff;
+                position: fixed;
+                top: 0;
+                z-index: 2; /* 헤더가 항상 위로 보이게 설정 */
+                height: 80px; /* 헤더 높이를 고정 */
+                width: 100%;
+                display: flex;
+                align-items: center;
+                padding: 0 20px;
+            }
+            footer {
+                background-color: #F5F6F7;
+                height: 10%; /* 화면 높이의 10% 차지 */
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                text-align: center;
+                padding: 10px;
+            }
+                /* .nav-box {
+                    border: 1px solid #ccc;
+                    padding: 10px;
+                } */
+        
+                /* 드롭다운 메뉴 스타일 */
+            .dropdown {
+                position: relative;
+                display: inline-block;
+            }
+            .navbar {
+                display: flex;
+                justify-content: space-between; /* 좌측 로고와 우측 버튼 배치 */
+                /* justify-content: flex-end; 오른쪽 정렬 */
+                align-items: center;
+                padding: 10px 20px;
+                font-size: 0.3rem;
+                background-color: #ffffff;
+            }
+            .nav-links {
+                margin-right: 10px; /* 회원 정보와의 구분 */
+                display: flex; 
+                justify-content: flex-end; 
+                align-items: center; 
+                flex-grow: 1; 
+                text-align: center;
+            }
+            .navbar a {
+                /* margin: 0 20px; 링크 간격 */
+                font-size: 1.1rem; /* 글씨 크기 */
+                font-weight: bold; /* 글씨 진하게 */
+                margin-left: 15px; /* 각 링크 사이의 간격 */
+                text-decoration: none;
+                color: #333;
+            }
+        
+            .dropdown-content {
+                display: none;
+                position: absolute; /*부모요소 바로 아래에 위치*/
+                top: 100%;
+                left: 0;
+                background-color: #fff;
+                /* box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); */
+                padding: 0% ;
+                width: 150px; /*드롭다운이 전체 넓이를 차지*/
+                z-index: 1000;
+                border-top: 1px solid #ddd;
+                border-bottom: 1px solid #ddd;
+                /* border: 1px solid #ddd; */
+            }
+        
+            .dropdown-content a {
+                padding: 10px 20px;
+                display: block;
+                text-align: left;
+                color: #333;
+                text-decoration: none;
+                /* white-space: nowrap; */
+            }
+        
+            .dropdown-content a:hover {
+                background-color: #f1f1f1;
+            }
+        
+            /* 마우스를 올렸을 때 드롭다운 표시 */
+            .dropdown:hover .dropdown-content {
+                display: block;
+            }
+        
+            /* 링크 스타일 */
+            .nav-box nav a {
+                color: #333;
+                margin: 0 10px;
+                text-decoration: none;
+            }
+        
+            .nav-box nav a:hover {
+                font-weight: bold;
+            }
     .container {
         padding-top: 80px;
         padding-bottom: 50px; /* footer 높이만큼 하단 여백 추가 */
@@ -56,18 +128,74 @@
         grid-template-columns: 2fr 3fr;
         gap: 20px;
     }
-    .left-box, .right-box {
-        background-color: #ffffff;
-        border: 1px solid #ddd;
-        border-radius: 10px;
+    
+    /* 아래쪽 container 스타일 */
+    .full-width-container {
+        display: block; /* 그리드 레이아웃 해제 */
+        width: 100%; /* 전체 너비 차지 */
         padding: 20px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
-    .left-box h2, .right-box h2 {
-        font-size: 16px;
-        margin-bottom: 10px;
-        font-weight: normal;
+
+    /* 아래쪽 right-box가 전체 차지 */
+    .full-width-container .right-box {
+        width: 100%;
     }
+
+    .right-box {
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    
+}
+.right-box h2 {
+    font-size: 20px; /* 더 큰 폰트 크기 */
+    margin-bottom: 15px; /* 아래쪽 간격 */
+    font-weight: bold; /* 텍스트 굵게 */
+    color: #333; /* 텍스트 색상 추가 */
+}
+
+.right-box p {
+    font-size: 14px; /* 글씨 크기 */
+    text-align: center; /* 텍스트 중앙 정렬 */
+    color: #000; /* 글씨 색상 검정색으로 변경 */
+    margin-bottom: 20px; /* 아래쪽 간격 */
+}
+.left-box {
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    display: flex; /* Flexbox 활성화 */
+    flex-direction: column; /* 세로 정렬 */
+    justify-content: center; /* 수직 중앙 정렬 */
+    align-items: center; /* 가로 중앙 정렬 */
+    text-align: center; /* 텍스트 중앙 정렬 */
+    height: auto; /* 필요한 만큼만 높이 설정 */
+}
+.left-box h2 {
+    font-size: 20px; /* 더 큰 폰트 크기 */
+    margin-bottom: 15px; /* 아래쪽 간격 */
+    font-weight: bold; /* 텍스트 굵게 */
+    color: #333; /* 텍스트 색상 추가 */
+}
+.edit-profile-button {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: bold;
+    text-align: center;
+    margin-top: 10px; /* 버튼 위쪽에 여백 추가 */
+}
+.edit-profile-button:hover {
+    background-color: #0056b3;
+}    
+
     .info {
         background-color: #f9f9f9;
         padding: 10px;
@@ -89,154 +217,308 @@
     .progress-bar-inner {
         height: 100%;
         border-radius: 13px;
-        background-color: #4caf50;
+        background-color: #007bff;
         text-align: center;
         color: white;
         line-height: 20px;
     }
-    .goal-progress img {
-        width: 100%;
+    .edit-profile-button {
+        display: inline-block;
+        margin-top: 20px;
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+        font-weight: bold;
     }
-    .calendar {
-        margin-top: 10px;
-        font-size: 14px;
+    .edit-profile-button:hover {
+        background-color: #0056b3;
     }
-    .calendar table {
-        width: 100%;
-        margin-top: 10px;
-        border-collapse: collapse;
-        font-size: 14px;
+    .pie-chart canvas {
+    max-width: 70%; /* 파이 차트 최대 너비를 70%로 설정 */
+    margin: 0 auto; /* 차트를 수평 중앙 정렬 */
+    display: block; /* 블록 요소로 설정 */
+}
+
+    /* 탭과 박스 스타일 */
+    .tab-container {
+    display: flex;
+    gap: 0px; /* 버튼 간 간격 */
+    margin-bottom: 0px; /* 아래 콘텐츠와 간격 */
+    margin-left: 240px;
     }
-    .calendar td {
-        padding: 5px;
-        text-align: left;
-        border-bottom: 1px solid #ddd;
+    .tab-button {
+        background-color: #ddd;
+        padding: 13px 159px;
+        border: none;
+        margin: 0 ;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: bold;
     }
-    .footer-box {
-        grid-column: 1 / span 2;
+    .tab-button.active {
+        background-color: #007bff;
+        color: white;
+    }
+    .tab-box-container {
         background-color: #ffffff;
         border: 1px solid #ddd;
         border-radius: 10px;
-        padding: 15px;
-        text-align: center;
-        font-size: 14px;
+        padding: 20px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        max-width: 1000px; /* 컨테이너 너비 제한 */
+        margin: 0 auto; /* 가운데 정렬 */
+        margin-bottom: 50px;
     }
-    #pieChart {
-        width: 100%;
-        height: 300px;
+    .tab-content {
+        display: none;
+        margin-top: 20px;
     }
-    hr {
-        border: 0;
-        border-top: 1px solid #ddd;
-        margin: 20px 0;
+    .tab-content.active {
+        display: block;
     }
-    .edit-profile-button {
-    display: inline-block;
-    margin-top: 20px;
-    padding: 10px 20px;
-    background-color: #007bff;
-    color: white;
-    text-decoration: none;
+
+    .product-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border: 1px solid #ddd;
     border-radius: 5px;
+    padding: 15px;
+    margin-bottom: 15px;
+    background-color: #f9f9f9;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.product-details {
+    flex: 3; /* 왼쪽 영역 비율 */
+}
+.additional-box {
+    flex: 3; /* 오른쪽 영역 비율 */
+    background-color: #007bff; /* 강조된 배경 */
+    color: white; /* 텍스트 색상 */
+    padding: 30px; /* 내용 여백 */
+    margin-left: 15px; /* 왼쪽 요소와 간격 */
+    border-radius: 5px; /* 둥근 모서리 */
+    font-size: 0.95rem; /* 글씨 크기 */
+    font-weight: bold; /* 글씨 굵게 */
+    text-align: center; /* 텍스트 가운데 정렬 */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+
+.product-container h3 {
+    margin: 0 0 10px 0;
+    font-size: 1.1rem;
     font-weight: bold;
 }
 
-.edit-profile-button:hover {
-    background-color: #0056b3;
+.product-container p {
+    margin: 5px 0;
+    font-size: 0.95rem;
 }
+
+
+    .hidden-product {
+        display: none; /* 숨겨진 상품 */
+    }
+    .show-more-text {
+        text-align: center; /* 가운데 정렬 */
+        color: #888; /* 흐린 글씨 */
+        font-size: 0.9rem; /* 글씨 크기 */
+        margin-top: 15px; /* 위쪽 간격 */
+        cursor: pointer; /* 클릭 가능한 텍스트로 설정 */
+    }
+    .show-more-text:hover {
+        text-decoration: underline; /* 호버 시 밑줄 표시 */
+    }
+    .expiring-container {
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    margin: 20px auto;
+    max-width: 800px; /* 컨테이너 너비 제한 */
+    color: #333;
+}
+
+.expiring-container strong {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #333; /* 강조 텍스트 색상 */
+}
+
+/* 링크 스타일 */
+.expiring-container a {
+    color: #007bff; /* 파란색 텍스트 */
+    text-decoration: none; /* 밑줄 제거 */
+    font-size: 1rem; /* 텍스트 크기 */
+    font-weight: bold; /* 글씨 두껍게 */
+}
+
+.expiring-container a:hover {
+    text-decoration: underline; /* 호버 시 밑줄 표시 */
+    color: #0056b3; /* 호버 시 약간 진한 파란색 */
+}
+
+
 </style>
 </head>
 <body>
 
-<header>
-    <div class="navbar">
-        <div class="logo">
-            <a href="./">
-                <img src="{% static 'img/fisa_logo_after.png' %}" style="vertical-align: middle;" alt="우리 FISA 로고">
-                <span style="font-size: 1.5rem; font-weight: bold; margin-left: 10px;">예/적금 추천 서비스</span>
-        </div>
-        <div>
-            <a href="#report">금융분석 리포트</a> |
-            <a href="#comparison">예/적금 비교</a> |
-            <a href="#spending">소비MBTI</a>
-        </div>
-        <a>{{ user_name }}님 |</a>
-        <a href="#mypage">마이페이지</a>
-    </div>
-</header>
-
-<div class="container">
-    <!-- Left Box -->
-    <div class="left-box">
-        <h2>{{ user_name }}님</h2>
-        <div class="info">
-            <p>이번달 목표 소비액 : <span id="goalAmount">500,000</span>원</p>
-            <p>실제 이번달 지출 총액 : <span id="spentAmount">200,000</span>원</p>
-            <div class="progress-bar">
-                <div class="progress-bar-inner" id="savingsProgressBar">50%</div>
+    <header>
+        <div class="navbar">
+            <div class="logo">
+                <a href="{% url 'main' %}">
+                    <img src="{% static 'C:\ITStudy\Final\fisa_share\static\img\header_logo.png' %}" style="vertical-align: middle; margin-left: 100px;" alt="로고">
+                </div>
+                <div class="nav-links" style="flex-grow: 1; text-align: center; margin-right: 220px;">
+                    <a href="./loginmain" style=" font-weight: bold; color: #121212;">금융분석 리포트</a> 
+                    <div class="dropdown">
+                        <a href="#" style=" font-weight: bold; color: #121212;">예/적금 추천</a>
+                        <div class="dropdown-content">
+                            <a href="savings_info1" style="font-size: 0.8rem;">신규적금추천</a>
+                            <a href="compare_products" style="font-size: 0.8rem;">기존상품비교</a>
+                        </div>
+                    </div> 
+                    <a href="spending_mbti" style=" font-weight: bold; color: #121212;">소비MBTI</a>
+                </div>
+               <!-- 회원 정보 및 마이페이지 -->
+            <div class="user-info">
+                <span style="font-size: 1.1rem;">{{ user_name }}님</span> 
+                <a href="./mypage" style="margin-left: 15px; 
+                text-decoration: none; 
+                font-size: 1.1rem; 
+                font-weight: bold; 
+                color: #121212;">마이페이지</a> 
+                <form method="POST" action="{% url 'logout' %}" style="display: inline;">
+                    {% csrf_token %}
+                    <button name="logout" style="margin-left: 10px; 
+                    margin-right: 100px; 
+                    padding: 5px 10px; 
+                    font-size: 0.9rem; 
+                    font-weight: bold; 
+                    background-color: #291e4ee5; 
+                    color: white; 
+                    border: none; 
+                    border-radius: 5px; 
+                    cursor: pointer;">
+                        로그아웃
+                    </button>
+                </form>
             </div>
-            <p id="result">목표 소비액보다 200,000원 덜 쓰셨어요<br>
-            잘하고 있어요~ 지금처럼만 ✨<br></p>
         </div>
+        </header>
+
+        <div class="container">
+            <!-- Left Box -->
+            <div class="left-box">
+                <h2>{{ user_name }}님</h2>
+                <div class="info">
+                    <p>이번달 목표 소비액 : <span id="goalAmount">500,000</span>원</p>
+                    <p>실제 이번달 지출 총액 : <span id="spentAmount">200,000</span>원</p>
+                    <div class="progress-bar">
+                        <div class="progress-bar-inner" id="savingsProgressBar">50%</div>
+                    </div>
+                    <p id="result">목표 소비액보다 200,000원 덜 쓰셨어요<br>잘하고 있어요~ 지금처럼만 ✨<br></p>
+                </div>
+                <a href="{% url 'update_profile' %}" class="edit-profile-button">프로필 수정</a>
+            </div>
+        
+            <!-- Right Box -->
+            <div class="right-box">
+                <h2>카드 결제 내역 분석</h2>
+                <p>- 카테고리별 카드 사용 비율 -</p>
+                <div class="pie-chart">
+                    <!-- 차트를 제대로 참조할 수 있도록 canvas ID를 고유하게 유지 -->
+                    <canvas id="pieChart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 탭과 상품 정보 영역 -->
+<div class="tab-container">
+    <button class="tab-button active" onclick="showTab('all')">전체</button>
+    <button class="tab-button" onclick="showTab('deposit')">예금</button>
+    <button class="tab-button" onclick="showTab('savings')">적금</button>
+</div>
+
+<div class="tab-box-container">
+    <!-- 전체 상품 정보 -->
+    <div id="all" class="tab-content active">
+        <h2>전체 상품</h2>
+        <div class="product-list">
+            {% for product in all_products %}
+            <div class="product-container hidden-product">
+                <div class="product-details">
+                    <h3>{{ product.name }}</h3>
+                    <p>현재 자산: {{현재자산 넣어줘}} </p>
+                    <p>금리: {{ product.interest_rate }}%</p>
+                    <p>기간: {{ product.start_date }} ~ {{ product.end_date }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <p class="show-more-text" onclick="showMoreProducts('all')">더보기</p>
     </div>
 
-    <!-- Right Box -->
-    <div class="right-box">
-
-        <!-- 카드 사용 비율 파이차트 -->
-        <h2>카드 결제 내역 분석</h2>
-        <p>카테고리별 카드 사용 비율</p>
-        <div class="pie-chart">
-            <canvas id="pieChart"></canvas>
+    <!-- 예금 상품 정보 -->
+    <div id="deposit" class="tab-content">
+        <h2>예금 상품</h2>
+        <div class="product-list">
+            {% for deposit in deposit_products %}
+            <div class="product-container hidden-product">
+                <div class="product-details">
+                    <h3>{{ deposit.name }}</h3>
+                    <p>금리: {{ deposit.interest_rate }}%</p>
+                    <p>기간: {{ deposit.start_date }} ~ {{ deposit.end_date }}</p>
+                </div>
+                <div class="additional-box">
+                    <strong>
+                    {% if deposit.maturity_amount %}
+                        만기일에 받을 수 있는 예상 금액은 {{ deposit.maturity_amount }}원입니다!
+                    {% else %}
+                        현재 잔액은 {{ deposit.current_balance }}원입니다.
+                    {% endif %}
+                    </strong>
+                </div>
+            </div>
+            {% endfor %}
         </div>
+        <p class="show-more-text" onclick="showMoreProducts('deposit')">더보기</p>
+    </div>
 
+    <!-- 적금 상품 정보 -->
+    <div id="savings" class="tab-content">
+        <h2>적금 상품</h2>
+        <div class="product-list">
+            {% for savings in savings_products %}
+            <div class="product-container hidden-product">
+                <div class="product-details">
+                    <h3>{{ savings.name }}</h3>
+                    <p>금리: {{ savings.interest_rate }}%</p>
+                    <p>기간: {{ savings.start_date }} ~ {{ savings.end_date }}</p>
+                </div>
+                <div class="additional-box">
+                    <strong>목표 금액 달성까지 {{ savings.remaining_days }}일 남았습니다!</strong>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <p class="show-more-text" onclick="showMoreProducts('savings')">더보기</p>
     </div>
 </div>
 
-<div class="container">
-    <!-- Left Box -->
-    <div class="left-box">
-        <h2>{{ user_name }}님</h2>
-        <div class="info">
-            <p>이번달 목표 소비액 : <span id="goalAmount">500,000</span>원</p>
-            <p>실제 이번달 지출 총액 : <span id="spentAmount">200,000</span>원</p>
-            <div class="progress-bar">
-                <div class="progress-bar-inner" id="savingsProgressBar">50%</div>
-            </div>
-            <p id="result">목표 소비액보다 200,000원 덜 쓰셨어요<br>
-            잘하고 있어요~ 지금처럼만 ✨<br></p>
-        </div>
-        <!-- 프로필 수정 버튼 -->
-        <a href="{% url 'update_profile'%}" class="edit-profile-button">프로필 수정</a>
-    </div>
-    <!-- Right Box -->
-    <div class="right-box">
-        <!-- <h2>저축 목표 현황</h2>-->
-        <div class="goal">
-            <div class="goal-progress">
-                <div class="progress-bar">
-                    <div class="progress-bar-inner" id="savingsProgressBar">20%</div>
-                </div>
-                <div>
-                    <p>저축 상품명: <span id="productName">적금 상품명</span></p>
-                    <p>현재 금액: <span id="currentAmount">1,000,000</span>원</p>
-                    <p>목표 금액: <span id="targetAmount">10,000,000</span>원</p>
-                    <p>현재 적용금리: <span id="currentInterestRate">2.5</span>%</p>
-                    <p>목표 기간: <span id="goalPeriod">2024-10-20 ~ 2025-10-20</span></p>
-                    <p>만기 시 예상 금액: <span id="expectedAmount">10,250,000</span>원</p>
-                </div>
-            </div>
-            <p id="savingsResult">저축 목표 10% 달성! 축하드립니다 🎉</p>
-        </div>
-    </div>
-</div>
-
-<div class="container">
-    목표 달성 90% 정도 (예/적금 만기) 다가오면 만기 시 고려 사항 제공
+<div id="expiring-notification" class="expiring-container" style="display: none;">
+    <p><strong>얼마 뒤면 <span id="expiring-product-name"></span>이 만기에요!</strong></p>
+    <p><a href="savings_info1" style="color: #007bff; text-decoration: none;">상품 둘러보러가기</a></p>
 </div>
 
 <script>
-    // 소비 진행률 바 설정
+    document.addEventListener('DOMContentLoaded', () => {
+    // 소비 진행률 계산
     const goalAmount = parseFloat(document.getElementById('goalAmount').innerText.replace(/,/g, ''));
     const spentAmount = parseFloat(document.getElementById('spentAmount').innerText.replace(/,/g, ''));
     const progressBarInner = document.getElementById('savingsProgressBar');
@@ -247,82 +529,137 @@
     progressBarInner.innerText = Math.floor(progress) + '%';
 
     if (progress < 100) {
-        result.innerHTML = `목표 소비액보다 ${goalAmount - spentAmount}원 덜 쓰셨어요<br>잘하고 있어요~ 지금처럼만 ✨<br>`;
+        result.innerHTML = `목표 소비액보다 ${(goalAmount - spentAmount).toLocaleString()}원 덜 쓰셨어요<br>잘하고 있어요~ 지금처럼만 ✨<br>`;
     } else {
         result.innerHTML = `이번달 목표 예산을 초과했어요 😡`;
     }
 
-    // 파이차트 데이터 설정 및 생성
-    const ctx = document.getElementById('pieChart').getContext('2d');
-    // 예시 데이터 (DB에서 불러온 데이터를 대체)
-    const cardData = {
-        categories: ['식비', '쇼핑', '교통', '유흥', '기타'],
-        amounts: [200000, 150000, 80000, 5000, 70000] // 각각의 카테고리별 사용 금액
-    };
-    const totalAmount = cardData.amounts.reduce((acc, curr) => acc + curr, 0);
+    // 파이 차트 초기화
+    const pieChartElement = document.getElementById('pieChart'); // canvas 요소 참조
+    if (pieChartElement) {
+        const ctx = pieChartElement.getContext('2d');
+        const cardData = {
+            categories: ['식비', '쇼핑', '교통', '유흥', '기타'],
+            amounts: [200000, 150000, 80000, 5000, 70000]
+        };
+        const totalAmount = cardData.amounts.reduce((acc, curr) => acc + curr, 0);
 
-    // 저축 진행률 바 설정 및 만기 시 예상 금액 계산
-    const productName = "적금 상품명"; // 데이터베이스에서 가져온 값
-    const currentAmount = parseFloat(document.getElementById('currentAmount').innerText.replace(/,/g, ''));
-    const targetAmount = parseFloat(document.getElementById('targetAmount').innerText.replace(/,/g, ''));
-    const currentInterestRate = parseFloat(document.getElementById('currentInterestRate').innerText.replace(/,/g, ''));
-    const goalPeriodMonths = 12; // 데이터베이스에서 가져온 값
-    const goalPeriod = new Date('2024-10-20'); // 데이터베이스에서 가져온 시작 날짜
-    goalPeriod.setMonth(goalPeriod.getMonth() + goalPeriodMonths);
-    document.getElementById('goalPeriod').innerText = `2024-10-20 ~ ${goalPeriod.getFullYear()}-${(goalPeriod.getMonth() + 1).toString().padStart(2, '0')}-${goalPeriod.getDate().toString().padStart(2, '0')}`;
-
-    const savingsProgressBar = document.getElementById('savingsProgressBar');
-    const savingsResult = document.getElementById('savingsResult');
-
-    const savingsProgress = (currentAmount / targetAmount) * 100;
-    savingsProgressBar.style.width = savingsProgress + '%' ;
-    savingsProgressBar.innerText = Math.floor(progress) + '%';
-
-    const pieChart = new Chart(ctx, {
-        type: 'pie',
-        data: {
-            labels: cardData.categories,
-            datasets: [{
-                label: '카테고리별 카드 사용 비율',
-                data: cardData.amounts,
-                backgroundColor: ['#ff6384', '#36a2eb', '#ffce56', '#4caf50', '#ff9f40'],
-                hoverOffset: 4
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: {
-                    position: 'right' // 범례를 오른쪽으로 이동
-                },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            const amount = context.raw;
-                            const percentage = ((amount / totalAmount) * 100).toFixed(2);
-                            return `${context.label}: ${amount.toLocaleString()}원 (${percentage}%)`;
+        new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: cardData.categories,
+                datasets: [
+                    {
+                        data: cardData.amounts,
+                        backgroundColor: ['#ff6384', '#36a2eb', '#ffce56', '#4caf50', '#ff9f40']
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'right'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function (context) {
+                                const amount = context.raw;
+                                const percentage = ((amount / totalAmount) * 100).toFixed(2);
+                                return `${context.label}: ${amount.toLocaleString()}원 (${percentage}%)`;
+                            }
                         }
                     }
-                },
+                }
+            }
+        });
+    }
+});
+
+// 탭 전환 기능
+function showTab(tabId) {
+    document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+    document.querySelectorAll('.tab-button').forEach(button => button.classList.remove('active'));
+
+    document.getElementById(tabId).classList.add('active');
+    event.target.classList.add('active');
+}
+
+</script>
+<script>
+    // 최대 5개 상품만 표시하고 나머지는 숨김
+document.addEventListener('DOMContentLoaded', () => {
+    const allTabs = document.querySelectorAll('.tab-content');
+    allTabs.forEach(tab => {
+        const products = tab.querySelectorAll('.product-container');
+        products.forEach((product, index) => {
+            if (index < 5) {
+                product.classList.remove('hidden-product');
+            }
+        });
+
+        // 숨겨진 상품이 없으면 "더보기" 숨기기
+        const hiddenProducts = tab.querySelectorAll('.hidden-product');
+        if (hiddenProducts.length === 0) {
+            const moreText = tab.querySelector('.show-more-text');
+            moreText.style.display = 'none';
         }
-    },// Data Labels 플러그인 활성화
+    });
+});
+
+// 더보기 클릭 시 추가 상품 표시
+function showMoreProducts(tabId) {
+    const tab = document.getElementById(tabId);
+    const hiddenProducts = tab.querySelectorAll('.hidden-product');
+    hiddenProducts.forEach((product, index) => {
+        if (index < 5) {
+            product.classList.remove('hidden-product');
+        }
     });
 
-    //파이차트 클릭 이벤트 추가
-    document.getElementById('pieChart').onclick = function(evt) {
-        const points = pieChart.getElementsAtEventForMode(evt, 'nearest', { intersect: true }, true);
-        if (points.length) {
-            const index = points[0].index;
-            const amount = cardData.amounts[index];
-            const percentage = ((amount / totalAmount) * 100).toFixed(2);
-            alert(`${cardData.categories[index]}: ${amount.toLocaleString()}원 (${percentage}%)`);
-        }}
+    // 더 이상 숨겨진 상품이 없으면 "더보기" 숨김
+    if (hiddenProducts.length <= 5) {
+        const moreText = tab.querySelector('.show-more-text');
+        moreText.style.display = 'none';
+    }
+}
+
+// 서버에서 예적금 만기 변수 필요
+document.addEventListener('DOMContentLoaded', () => {
+    const expiringProducts = [
+        { name: '적금 A', daysRemaining: 95 },
+        { name: '적금 B', daysRemaining: 80 },
+        { name: '적금 C', daysRemaining: 10 }
+    ]; // 예시 데이터: 서버에서 받아올 수 있음
+
+    // 만기에 가까운 상품 찾기
+    const threshold = 90; // 90일 이내 만기
+    const nearExpiry = expiringProducts.find(product => product.daysRemaining <= threshold);
+
+    if (nearExpiry) {
+        const expiringContainer = document.getElementById('expiring-notification');
+        const productNameSpan = document.getElementById('expiring-product-name');
+
+        // 상품명 설정
+        productNameSpan.textContent = nearExpiry.name;
+
+        // 알림 컨테이너 표시
+        expiringContainer.style.display = 'block';
+    }
+});
+
+
 </script>
 
+
+
+<!-- footer는 컨테이너 밖으로 이동 -->
 <footer>
-    <p>고객지원: 1234-5678 | 이메일: support@finance.com</p>
-    <p>©2024 YourCompany. All rights reserved.</p>
+    <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0;">서울특별시 마포구 월드컵북로 434 상암IT타워 6층</p> 
+    <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0;">고객지원 : 02-3151-7000 | 이메일: worifisa@worifisa.com </p>
+    <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0;">COPYRIGHT©우리팀이름~</p>
 </footer>
+
 
 </body>
 </html>
