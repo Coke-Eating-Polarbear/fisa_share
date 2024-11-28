@@ -409,7 +409,7 @@ def summary_view(request):
     product_details = list(unique_product_details)[:5]
 
     # 적금 추천 상품 처리
-    cluster_savings = pd.read_csv('C:/Users/audwn/ITstudy/final_project/final/blog/cluster_savings_updated.csv')
+    cluster_savings = pd.read_csv('./blog/cluster_savings_updated.csv')
     final_result = pd.DataFrame(columns=cluster_savings.columns)
 
     def assign_cluster(stage_class, sex, age):
