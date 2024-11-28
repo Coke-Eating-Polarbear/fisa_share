@@ -96,23 +96,26 @@ class Favorite(models.Model):
     
 
 class Average(models.Model):
-    stageclass = models.CharField(max_length=10, primary_key=True)  # StageClass 컬럼
-    inlevel = models.IntegerField()  # Inlevel 컬럼
-    spend = models.IntegerField()  # 소비
-    income = models.IntegerField()  # 수입
-    asset = models.IntegerField()  # 자산
-    finance = models.IntegerField()  # 금융
-    eat = models.DecimalField(max_digits=4, decimal_places=2)  # 식사
-    transfer = models.DecimalField(max_digits=4, decimal_places=2)  # 교통
-    utility = models.DecimalField(max_digits=4, decimal_places=2)  # 공과금
-    phone = models.DecimalField(max_digits=4, decimal_places=2)  # 통신
-    home = models.DecimalField(max_digits=4, decimal_places=2)  # 주거
-    hobby = models.DecimalField(max_digits=4, decimal_places=2)  # 취미
-    fashion = models.DecimalField(max_digits=4, decimal_places=2)  # 패션
-    party = models.DecimalField(max_digits=4, decimal_places=2)  # 파티
-    allowance = models.DecimalField(max_digits=4, decimal_places=2)  # 용돈
-    study = models.DecimalField(max_digits=4, decimal_places=2)  # 학업
-    medical = models.DecimalField(max_digits=4, decimal_places=2)  # 의료
+    stageclass = models.CharField(max_length=10, primary_key=True)  # varchar(10), Primary Key
+    inlevel = models.IntegerField()  # int, Primary Key
+    spend = models.BigIntegerField()  # bigint
+    income = models.BigIntegerField()  # bigint
+    asset = models.BigIntegerField()  # bigint
+    finance = models.BigIntegerField()  # bigint
+    estate = models.BigIntegerField()  # bigint
+    etc = models.BigIntegerField()  # bigint
+    debt = models.BigIntegerField()  # bigint
+    eat = models.DecimalField(max_digits=4, decimal_places=2)  # decimal(4,2)
+    transfer = models.DecimalField(max_digits=4, decimal_places=2)  # decimal(4,2)
+    utility = models.DecimalField(max_digits=4, decimal_places=2)  # decimal(4,2)
+    phone = models.DecimalField(max_digits=4, decimal_places=2)  # decimal(4,2)
+    home = models.DecimalField(max_digits=4, decimal_places=2)  # decimal(4,2)
+    hobby = models.DecimalField(max_digits=4, decimal_places=2)  # decimal(4,2)
+    fashion = models.DecimalField(max_digits=4, decimal_places=2)  # decimal(4,2)
+    party = models.DecimalField(max_digits=4, decimal_places=2)  # decimal(4,2)
+    allowance = models.DecimalField(max_digits=4, decimal_places=2)  # decimal(4,2)
+    study = models.DecimalField(max_digits=4, decimal_places=2)  # decimal(4,2)
+    medical = models.DecimalField(max_digits=4, decimal_places=2)  # decimal(4,2)
 
     class Meta:
         db_table = 'average'  # 테이블 이름

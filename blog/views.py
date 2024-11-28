@@ -149,6 +149,100 @@ def mypage(request):
     }
     return render(request, 'mypage.html', context)
 
+def fetch_sql_processed_data():
+    """
+    SQL에서 전처리된 데이터를 가져오는 함수.
+    Returns:
+        DataFrame: SQL에서 처리된 데이터를 Pandas DataFrame으로 반환
+    """
+    db_config = {
+        'host': '118.67.131.22:3306',
+        'user': 'fisaai',
+        'password': 'woorifisa3!W',
+        'database': 'manduck'
+    }
+    db_connection = f"mysql+pymysql://{db_config['user']}:{db_config['password']}@{db_config['host']}/{db_config['database']}"
+    engine = create_engine(db_connection)
+
+    query = """
+    SELECT 
+        Pyear,
+        Pmonth,
+        Bizcode,
+        SUM(Price) AS TotalPrice,
+        SUM(SUM(Price)) OVER (PARTITION BY Pyear, Pmonth) AS TotalSpending,
+        SUM(Price) * 1.0 / SUM(SUM(Price)) OVER (PARTITION BY Pyear, Pmonth) AS Ratio
+    FROM mydata_pay
+    GROUP BY Pyear, Pmonth, Bizcode
+    ORDER BY Pyear, Pmonth, Bizcode;
+    """
+    df = pd.read_sql(query, engine)
+
+    # Pivot 변환: Bizcode를 열로 만들고 각 Ratio 값을 채움
+    pivot_data = df.pivot(index=['Pyear', 'Pmonth'], columns='Bizcode', values='Ratio').fillna(0)
+
+    # TotalSpending 추가
+    pivot_data['TotalSpending'] = df.drop_duplicates(subset=['Pyear', 'Pmonth'])[['Pyear', 'Pmonth', 'TotalSpending']].set_index(['Pyear', 'Pmonth'])
+
+    return pivot_data
+
+def predict_next_month(preprocessed_data, model_features):
+    """
+    가장 최근 데이터를 모델 입력으로 사용하여 다음 달 예측.
+    Parameters:
+        preprocessed_data (DataFrame): SQL에서 전처리된 데이터
+        model_features (list): 모델이 학습된 Bizcode 목록
+    Returns:
+        Series: 다음 달 예측 결과
+    """
+    # 가장 최근 데이터 가져오기
+    most_recent_period = preprocessed_data.index.max()
+    most_recent_data = preprocessed_data.loc[most_recent_period]
+
+    # 디버깅: 가장 최근 데이터 확인
+    print(f"가장 최근 데이터 (모델 입력 전):\n{most_recent_data}")
+
+    # Series에서 모델 입력 데이터 생성
+    model_input = most_recent_data.drop(labels=['TotalSpending'], errors='ignore')
+
+    # 디버깅: 모델 입력 데이터 확인
+    print(f"모델 입력 데이터 (가장 최근 데이터):\n{model_input}")
+
+    # 모델 로드 및 예측
+    model = load('rfm_Consumption_prediction.joblib')
+    X_test = model_input.values.reshape(1, -1)
+    predicted_total = model.predict(X_test)[0]
+
+    # Bizcode별 소비 금액 계산
+    predicted_ratios = model_input.values
+    predicted_spending = predicted_ratios * predicted_total
+
+    # 결과 반환
+    result = pd.Series(
+        data=np.append(predicted_spending, predicted_total),
+        index=list(model_input.index) + ['predicted_total']
+    )
+    result.name = (most_recent_period[0], most_recent_period[1] + 1)
+    return result
+
+def senter():
+    """
+    메인 함수: 데이터 처리, 예측, 출력 수행
+    """
+    print("SQL에서 전처리된 데이터를 가져옵니다...")
+    preprocessed_data = fetch_sql_processed_data()
+    print("Preprocessed Data Columns:", preprocessed_data.columns)
+
+    print("저장된 모델의 입력 형식을 확인합니다...")
+    model = os.path.join(settings.BASE_DIR, 'models', 'rfm_Consumption_prediction.joblib')
+    model_features = list(model.feature_names_in_) if hasattr(model, 'feature_names_in_') else preprocessed_data.columns.drop('TotalSpending')
+
+    print("다음 달 예측 결과:")
+    next_month_prediction = predict_next_month(preprocessed_data, model_features)
+    print(f"연도: {next_month_prediction.name[0]}, 월: {next_month_prediction.name[1]}")
+    print(next_month_prediction)
+    return next_month_prediction
+
 @login_required_session
 def spending_mbti(request):
     customer_id = request.session.get('user_id')  
@@ -164,116 +258,17 @@ def spending_mbti(request):
 
     ## 소비예측 모델 넣기
     # MySQL 연결 정보
-    db_config = {
-        'host': '118.67.131.22:3306',
-        'user': 'fisaai',
-        'password': 'woorifisa3!W',
-        'database': 'manduck'
-    }
 
     pd.options.display.float_format = '{:,.2f}'.format
-
-    def fetch_sql_processed_data():
-        """
-        SQL에서 전처리된 데이터를 가져오는 함수.
-        Returns:
-            DataFrame: SQL에서 처리된 데이터를 Pandas DataFrame으로 반환
-        """
-        db_connection = f"mysql+pymysql://{db_config['user']}:{db_config['password']}@{db_config['host']}/{db_config['database']}"
-        engine = create_engine(db_connection)
-
-        query = """
-        SELECT 
-            Pyear,
-            Pmonth,
-            Bizcode,
-            SUM(Price) AS TotalPrice,
-            SUM(SUM(Price)) OVER (PARTITION BY Pyear, Pmonth) AS TotalSpending,
-            SUM(Price) * 1.0 / SUM(SUM(Price)) OVER (PARTITION BY Pyear, Pmonth) AS Ratio
-        FROM mydata_pay
-        GROUP BY Pyear, Pmonth, Bizcode
-        ORDER BY Pyear, Pmonth, Bizcode;
-        """
-        df = pd.read_sql(query, engine)
-
-        # Pivot 변환: Bizcode를 열로 만들고 각 Ratio 값을 채움
-        pivot_data = df.pivot(index=['Pyear', 'Pmonth'], columns='Bizcode', values='Ratio').fillna(0)
-
-        # TotalSpending 추가
-        pivot_data['TotalSpending'] = df.drop_duplicates(subset=['Pyear', 'Pmonth'])[['Pyear', 'Pmonth', 'TotalSpending']].set_index(['Pyear', 'Pmonth'])
-
-        return pivot_data
-
-    def predict_next_month(preprocessed_data, model_features):
-        """
-        가장 최근 데이터를 모델 입력으로 사용하여 다음 달 예측.
-        Parameters:
-            preprocessed_data (DataFrame): SQL에서 전처리된 데이터
-            model_features (list): 모델이 학습된 Bizcode 목록
-        Returns:
-            Series: 다음 달 예측 결과
-        """
-        # 가장 최근 데이터 가져오기
-        most_recent_period = preprocessed_data.index.max()
-        most_recent_data = preprocessed_data.loc[most_recent_period]
-
-        # 디버깅: 가장 최근 데이터 확인
-        print(f"가장 최근 데이터 (모델 입력 전):\n{most_recent_data}")
-
-        # Series에서 모델 입력 데이터 생성
-        model_input = most_recent_data.drop(labels=['TotalSpending'], errors='ignore')
-
-        # 디버깅: 모델 입력 데이터 확인
-        print(f"모델 입력 데이터 (가장 최근 데이터):\n{model_input}")
-
-        # 모델 로드 및 예측
-        model = load('rfm_Consumption_prediction.joblib')
-        X_test = model_input.values.reshape(1, -1)
-        predicted_total = model.predict(X_test)[0]
-
-        # Bizcode별 소비 금액 계산
-        predicted_ratios = model_input.values
-        predicted_spending = predicted_ratios * predicted_total
-
-        # 결과 반환
-        result = pd.Series(
-            data=np.append(predicted_spending, predicted_total),
-            index=list(model_input.index) + ['predicted_total']
-        )
-        result.name = (most_recent_period[0], most_recent_period[1] + 1)
-        return result
-
-    def main():
-        """
-        메인 함수: 데이터 처리, 예측, 출력 수행
-        """
-        print("SQL에서 전처리된 데이터를 가져옵니다...")
-        preprocessed_data = fetch_sql_processed_data()
-        print("Preprocessed Data Columns:", preprocessed_data.columns)
-
-        print("저장된 모델의 입력 형식을 확인합니다...")
-        model = load('rfm_Consumption_prediction.joblib')
-        model_features = list(model.feature_names_in_) if hasattr(model, 'feature_names_in_') else preprocessed_data.columns.drop('TotalSpending')
-
-        print("다음 달 예측 결과:")
-        next_month_prediction = predict_next_month(preprocessed_data, model_features)
-        print(f"연도: {next_month_prediction.name[0]}, 월: {next_month_prediction.name[1]}")
-        print(next_month_prediction)
-        return next_month_prediction
-
-
+    next_month_prediction = None
     if __name__ == "__main__":
-        prediction= main()
+        prediction= senter()
         # JSON 형식으로 변환
         next_month_prediction = json.dumps(prediction)
-
-
-
 
     context = {
         'user_name': user_name,
         'next_month_prediction' : next_month_prediction, # 다음 달 소비 예측 json.
-
     }
     return render(request, 'spending_mbti.html', context)
 
