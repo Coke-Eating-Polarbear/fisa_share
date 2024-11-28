@@ -1,0 +1,62 @@
+/* 기본 스타일 */
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 20px;
+    background-color: #f0f0f0;
+}
+
+.nav-box {
+    border: 1px solid #ccc;
+    padding: 10px;
+}
+
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: #fff;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    padding: 10px 0;
+    min-width: 150px;
+    z-index: 1;
+    border: 1px solid #ddd;
+}
+
+.dropdown-content a {
+    padding: 8px 20px;
+    display: block;
+    color: #333;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.dropdown-content a:hover {
+    background-color: #f1f1f1;
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+/* 로그인/회원가입 위치 설정 */
+.login-box {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    border: 1px solid #ccc;
+    padding: 10px;
+    background-color: #f0f0f0;
+}
+
+.login-box a {
+    text-decoration: none;
+    color: #333;
+}

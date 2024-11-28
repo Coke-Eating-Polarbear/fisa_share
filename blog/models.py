@@ -1,6 +1,8 @@
 from django.db.models import UniqueConstraint
 from django.db import models # type: ignore
 from django.contrib.auth.hashers import make_password # type: ignore
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes.fields import GenericForeignKey
 
 # UserProfile 모델 (회원 정보)
 class UserProfile(models.Model):
@@ -31,26 +33,21 @@ class UserProfile(models.Model):
 # Recommend 모델 (추천 상품 정보)
 class Recommend(models.Model):
     CustomerID = models.ForeignKey(UserProfile, on_delete=models.CASCADE, db_column='CustomerID')
-    DSID = models.ForeignKey('DsProduct', on_delete=models.CASCADE, db_column='DSID')
+    dproduct = models.ForeignKey('DProduct', on_delete=models.CASCADE, null=True, blank=True, db_column='DProductID')
+    sproduct = models.ForeignKey('SProduct', on_delete=models.CASCADE, null=True, blank=True, db_column='SProductID')
 
     class Meta:
         db_table = 'recommend'
         constraints = [
-            models.UniqueConstraint(fields=['CustomerID', 'DSID'], name='unique_recommend')
+            models.UniqueConstraint(fields=['CustomerID', 'dproduct'], name='unique_recommend_dproduct'),
+            models.UniqueConstraint(fields=['CustomerID', 'sproduct'], name='unique_recommend_sproduct'),
         ]
+
+    def __str__(self):
+        return f"{self.CustomerID.CustomerID} - {self.dproduct or self.sproduct}"
 
 
 # DsProduct 모델 (상품 정보)
-class DsProduct(models.Model):
-    dsid = models.CharField(max_length=256, primary_key=True)
-    bank = models.CharField(max_length=256)
-    baser = models.TextField()  # 기준 금리
-    maxir = models.TextField()  # 최대 금리
-    dstype = models.CharField(max_length=256)  # 상품 유형
-    dsname = models.CharField(max_length=256)  # 상품 이름
-
-    class Meta:
-        db_table = 'ds_product'
 
 
 # Wc 모델 (워드 클라우드 이미지 저장)
@@ -82,29 +79,26 @@ class Favorite(models.Model):
         on_delete=models.CASCADE,
         db_column='CustomerID'
     )
-    DSID = models.ForeignKey(
-        DsProduct,
-        on_delete=models.CASCADE,
-        db_column='DSID'
-    )
+    # DProduct와 SProduct를 선택적으로 참조
+    dproduct = models.ForeignKey('DProduct', on_delete=models.CASCADE, null=True, blank=True)
+    sproduct = models.ForeignKey('SProduct', on_delete=models.CASCADE, null=True, blank=True)
 
     class Meta:
         db_table = 'favorite'
-        managed = False  # Django가 테이블을 생성/수정하지 않도록 설정
-        unique_together = (('CustomerID', 'DSID'),)  # 복합 기본 키 설정
         constraints = [
-            models.UniqueConstraint(fields=['CustomerID', 'DSID'], name='unique_favorite')
+            models.UniqueConstraint(fields=['CustomerID', 'dproduct'], name='unique_favorite_dproduct'),
+            models.UniqueConstraint(fields=['CustomerID', 'sproduct'], name='unique_favorite_sproduct'),
         ]
 
     def __str__(self):
-        return f"{self.CustomerID.CustomerID} - {self.DSID.dsid}"
+        return f"{self.CustomerID.CustomerID} - {self.dproduct or self.sproduct}"
     
 
 class Average(models.Model):
     stageclass = models.CharField(max_length=10, primary_key=True)  # varchar(10), Primary Key
     inlevel = models.IntegerField()  # int, Primary Key
     spend = models.BigIntegerField()  # bigint
-    total_income = models.BigIntegerField()  # bigint
+    income = models.BigIntegerField()  # bigint
     asset = models.BigIntegerField()  # bigint
     finance = models.BigIntegerField()  # bigint
     estate = models.BigIntegerField()  # bigint
@@ -156,8 +150,7 @@ class card(models.Model):
 
 class MyDataAsset(models.Model):
     CustomerID = models.CharField(max_length=256, primary_key=True)  # CustomerID
-    income = models.IntegerField()  # Income
-    total = models.BigIntegerField()  # Totalq
+    total = models.BigIntegerField()  # Total
     estate = models.BigIntegerField()  # Estate
     financial = models.BigIntegerField()  # Financial
     ect = models.BigIntegerField()  # Ect
@@ -226,7 +219,7 @@ class SpendAmount(models.Model):
         db_table = 'spend_amount'
         managed = False  # Django가 테이블을 생성하거나 수정하지 않음
         constraints = [
-            models.UniqueConstraint(fields=['CustomerID', 'SDate'], name='unique_customer_sdate')
+            models.UniqueConstraint(fields=['CustomerID', 'SDate'], name='unique_amount_customer_sdate')
         ]  # 복합 키 대체로 설정
 
     def __str__(self):
@@ -296,3 +289,29 @@ class SProduct(models.Model):
 
     class Meta:
         db_table = 's_product'  # 데이터베이스 테이블 이름과 매핑
+
+class SpendFreq(models.Model):
+    CustomerID = models.CharField(max_length=256, primary_key=True)  # CustomerID
+    SDate = models.CharField(max_length=20)  # SDate
+    eat_Freq = models.IntegerField(null=True, blank=True)  # eat_Freq
+    transfer_Freq = models.IntegerField(null=True, blank=True)  # transfer_Freq
+    utility_Freq = models.IntegerField(null=True, blank=True)  # utility_Freq
+    phone_Freq = models.IntegerField(null=True, blank=True)  # phone_Freq
+    home_Freq = models.IntegerField(null=True, blank=True)  # home_Freq
+    hobby_Freq = models.IntegerField(null=True, blank=True)  # hobby_Freq
+    fashion_Freq = models.IntegerField(null=True, blank=True)  # fashion_Freq
+    party_Freq = models.IntegerField(null=True, blank=True)  # party_Freq
+    allowance_Freq = models.IntegerField(null=True, blank=True)  # allowance_Freq
+    study_Freq = models.IntegerField(null=True, blank=True)  # study_Freq
+    medical_Freq = models.IntegerField(null=True, blank=True)  # medical_Freq
+    TotalFreq = models.IntegerField(null=True, blank=True)  # TotalFreq
+
+    class Meta:
+        db_table = 'spend_freq'
+        managed = False  # Django가 테이블을 생성하거나 수정하지 않음
+        constraints = [
+            models.UniqueConstraint(fields=['CustomerID', 'SDate'], name='unique_freq_customer_sdate')
+        ]  # 복합 키 대체로 설정
+
+    def __str__(self):
+        return f"{self.CustomerID} - {self.SDate}"

@@ -6,8 +6,6 @@ from django.conf import settings
 
 
 
-print("Current working directory:", os.getcwd())
-print("Expected model path:", os.path.join(os.getcwd(), 'models', 'customer_income_model.h5'))
 
 
 def income_model(data):

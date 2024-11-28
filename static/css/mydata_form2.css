@@ -1,0 +1,5 @@
+body { font-family: Arial, sans-serif; line-height: 1.6; margin: 20px; }
+        h1 { text-align: center; font-size: 1.5em; }
+        h2 { font-size: 1.2em; color: #333; }
+        p, li { margin-bottom: 1em; }
+        .section { margin-bottom: 2em; }

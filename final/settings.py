@@ -15,7 +15,14 @@ import os
 from dotenv import load_dotenv
 import ssl
 from elasticsearch_dsl import connections
-
+import tensorflow as tf
+import logging
+import warnings
+warnings.filterwarnings("ignore", category=FutureWarning)
+# TensorFlow 로그 레벨 설정
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
+tf.get_logger().setLevel(logging.ERROR)
 load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -179,3 +186,25 @@ DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 
 MODEL_PATH = os.path.join(BASE_DIR, 'models', 'customer_income_model.h5')
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'level': 'ERROR',  # WARNING 이하 메시지 숨김
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'ERROR',  # WARNING 이하 메시지 숨김
+        },
+        'django.server': {
+            'handlers': ['console'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
+    },
+}
