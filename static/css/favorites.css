@@ -1,0 +1,12 @@
+.container {
+    max-width: 900px;
+    margin: 20px auto;
+    background-color: #ffffff;
+    padding: 20px;
+    border: 1px solid #dee2e6;
+    border-radius: 10px;
+}
+.favorite-item {
+    border-bottom: 1px solid #ddd;
+    padding: 10px 0;
+}
