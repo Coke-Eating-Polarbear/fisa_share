@@ -68,15 +68,34 @@
         <div class="product-section">
             <h2>{{ user_name }}님 맞춤 예/적금 상품 TOP 5!</h2>
     
-            <div class="product-list">
-                {% for product in product_details %}
-                    <div class="product-card">
-                        <p><strong>상품명:</strong> {{ product.dsname }}</p>
-                        <p><strong>은행:</strong> {{ product.bank }}</p>
-                        <p><strong>기준 금리:</strong> {{ product.baser }}</p>
-                        <p><strong>최대 금리:</strong> {{ product.maxir }}</p>
-                    </div>
-                {% endfor %}
+            <div class="recommend-section">
+                <!-- 적금 추천 Top 3 -->
+                <div class="product-list">
+                    {% for product in final_recommend %}
+                        <div class="product-card">
+                            <p><strong>상품명:</strong> {{ product.product_name }}</p>
+                            <p><strong>은행:</strong> {{ product.bank_name }}</p>
+                            <p><strong>기준 금리:</strong> {{ product.base_rate }}</p>
+                            <p><strong>최대 금리:</strong> {{ product.max_preferential_rate }}</p>
+                            <p><strong>가입 방법:</strong> {{ product.signup_method }}</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <div class="recommend-section">
+                <!-- <h2>예금 추천 Top 2</h2> -->
+                <div class="product-list">
+                    {% for product in deposit_recommend %}
+                        <div class="product-card">
+                            <p><strong>상품명:</strong> {{ product.dsname }}</p>
+                            <p><strong>은행:</strong> {{ product.bank }}</p>
+                            <p><strong>기준 금리:</strong> {{ product.baser }}</p>
+                            <p><strong>최대 금리:</strong> {{ product.maxir }}</p>
+                            <p><strong>가입 방법:</strong> {{ product.method }}</p>
+                        </div>
+                    {% endfor %}
+                </div>
             </div>
     
             <a href="{% url 'info' %}" class="learn-more-button">자세히 알아보기</a>
