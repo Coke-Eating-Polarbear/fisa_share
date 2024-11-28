@@ -267,7 +267,7 @@ def spending_mbti(request):
 
     context = {
         'user_name': user_name,
-        'next_month_prediction' : next_month_prediction, # 다음 달 소비 예측 json.
+        'next_month_prediction' : next_month_prediction, # 다음 달 소비 예측
     }
     return render(request, 'spending_mbti.html', context)
 
@@ -299,6 +299,7 @@ def main(request):
         'image_base64': image_base64,
         'news_entries': news_entries,
     }
+    # 으아아아아아악 깃이 안된다 으아아아아아아악
 
     return render(request, 'main.html', context)
 
