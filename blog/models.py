@@ -12,8 +12,8 @@ class UserProfile(models.Model):
     SerialNum = models.CharField(max_length=1)  # 주민번호 뒷자리
     Phone = models.CharField(max_length=11)  # 전화번호
     sex = models.CharField(max_length=1, blank=True)  # 성별 (M, F)
-    stageclass = models.CharField(max_length=1)
-    inlevel = models.SmallIntegerField()
+    Stageclass = models.CharField(max_length=1)
+    Inlevel = models.SmallIntegerField()
 
     def save(self, *args, **kwargs):
         # 비밀번호가 이미 해시되지 않은 경우에만 해시화
@@ -159,6 +159,10 @@ class MyDataAsset(models.Model):
     estate = models.BigIntegerField()  # Estate
     financial = models.BigIntegerField()  # Financial
     ect = models.BigIntegerField()  # Ect
+    monthly_income = models.FloatField()
+    financial = models.FloatField()
+    debt = models.FloatField()
+    total_income = models.FloatField()
 
     def __str__(self):
         return self.CustomerID
@@ -225,3 +229,33 @@ class SpendAmount(models.Model):
 
     def __str__(self):
         return f"{self.CustomerID} - {self.SDate}"
+    
+class DProduct(models.Model):
+    dsid = models.CharField(max_length=50, primary_key=True)  # Primary Key 설정
+    name = models.CharField(max_length=255, null=True, blank=True)
+    bank = models.CharField(max_length=255, null=True, blank=True)
+    baser = models.FloatField(null=True, blank=True)
+    maxir = models.FloatField(null=True, blank=True)
+    dtype = models.CharField(max_length=255, null=True, blank=True)
+    period = models.CharField(max_length=255, null=True, blank=True)
+    amount = models.CharField(max_length=255, null=True, blank=True)
+    method = models.TextField(null=True, blank=True)
+    customer = models.CharField(max_length=255, null=True, blank=True)
+    benefits = models.TextField(null=True, blank=True)
+    interestpay = models.TextField(null=True, blank=True)
+    notice = models.TextField(null=True, blank=True)
+    protect = models.TextField(null=True, blank=True)
+    conddesc = models.TextField(null=True, blank=True)
+    condit = models.TextField(null=True, blank=True)
+    ratetype = models.CharField(max_length=255, null=True, blank=True)
+    dsname = models.CharField(max_length=255, null=True, blank=True)
+    deep = models.CharField(max_length=255, null=True, blank=True)
+    big_clu = models.CharField(max_length=255, null=True, blank=True)
+    joincond = models.TextField(null=True, blank=True)
+    cluster = models.IntegerField(null=True, blank=True)
+    token = models.CharField(max_length=255, null=True, blank=True)
+    mindate = models.CharField(max_length=255, null=True, blank=True)
+    maxdate = models.CharField(max_length=255, null=True, blank=True)
+
+    class Meta:
+        db_table = 'd_product'  # 기존 데이터베이스 테이블 이름
