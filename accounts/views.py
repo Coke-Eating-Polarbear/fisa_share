@@ -13,7 +13,12 @@ import datetime
 import pandas as pd
 from sklearn.preprocessing import RobustScaler
 import numpy as np
-from keras.models import load_model
+import os
+from tensorflow.keras.models import load_model # type: ignore
+import joblib
+import pandas as pd # type: ignore
+from django.conf import settings
+
 
 # Create your views here.
 
@@ -74,7 +79,7 @@ def map_person(age, sex, monthly_income, Financial, debt, total_income):
     # 스케일링 (RobustScaler 사용)
     scaler = RobustScaler()
     X_data=scaler.fit_transform(X_data)
-    model_path = "C:/ITStudy/15/fisa_share/accounts/customer_income_no_family_model.keras"
+    model_path = os.path.join(settings.BASE_DIR, 'models', 'customer_income_no_family_model.keras')
     loaded_model = load_model(model_path)
     # 예측
     predictions = loaded_model.predict(X_data)

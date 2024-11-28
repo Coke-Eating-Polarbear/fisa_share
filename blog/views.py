@@ -128,20 +128,26 @@ def reverse_mapping_with_age(category, age):
 
 @login_required_session
 def mypage(request):
-    customer_id = request.session.get('user_id')  
+    customer_id = request.session.get('user_id')  # 세션에서 CustomerID 가져오기
     user_name = "사용자"
+    accounts = []  # 사용자 계좌 정보 저장
+
     if customer_id:
         try:
             # CustomerID로 UserProfile 조회
             user = UserProfile.objects.get(CustomerID=customer_id)
             user_name = user.username  # 사용자 이름 설정
+
+            # MyDataDS 모델에서 해당 CustomerID에 연결된 계좌 정보 가져오기
+            accounts = MyDataDS.objects.filter(CustomerID=customer_id).values('AccountID', 'balance')
         except UserProfile.DoesNotExist:
             pass  # 사용자가 없을 경우 기본값 유지
 
     context = {
-        'user_name': user_name,
+        'user_name': user_name,  # 사용자 이름
+        'accounts': accounts,   # 계좌 정보 리스트
     }
-    return render(request, 'mypage.html',context)
+    return render(request, 'mypage.html', context)
 
 @login_required_session
 def spending_mbti(request):

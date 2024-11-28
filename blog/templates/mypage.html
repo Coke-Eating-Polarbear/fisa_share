@@ -6,7 +6,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>금융 분석 페이지</title>
-<link rel="stylesheet" href="./static/css/mypage.css">
+<link rel="stylesheet" href="{% static 'css/mypage.css' %}">
 <style>
 </style>
 </head>
@@ -16,7 +16,7 @@
         <div class="navbar">
             <div class="logo">
                 <a href="{% url 'main' %}">
-                    <img src="{% static 'C:\ITStudy\Final\fisa_share\static\img\header_logo.png' %}" style="vertical-align: middle; margin-left: 100px;" alt="로고">
+                    <img src="{% static 'img\header_logo.png' %}" style="vertical-align: middle; margin-left: 100px;" alt="로고">
                 </div>
                 <div class="nav-links" style="flex-grow: 1; text-align: center; margin-right: 220px;">
                     <a href="./loginmain" style=" font-weight: bold; color: #121212;">금융분석 리포트</a> 
@@ -98,7 +98,8 @@
             <div class="product-container hidden-product">
                 <div class="product-details">
                     <h3>{{ product.name }}</h3>
-                    <p>현재 자산: {{현재자산 넣어줘}} </p>
+                    <td>{{ account.AccountID }}</td>
+                    <td>{{ account.balance }}</td>
                     <p>금리: {{ product.interest_rate }}%</p>
                     <p>기간: {{ product.start_date }} ~ {{ product.end_date }}</p>
                 </div>

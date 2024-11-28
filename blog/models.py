@@ -149,7 +149,6 @@ class card(models.Model):
 
 class MyDataAsset(models.Model):
     CustomerID = models.CharField(max_length=256, primary_key=True)  # CustomerID
-    income = models.IntegerField()  # Income
     total = models.BigIntegerField()  # Total
     estate = models.BigIntegerField()  # Estate
     financial = models.BigIntegerField()  # Financial
