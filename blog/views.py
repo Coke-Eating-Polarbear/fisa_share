@@ -320,6 +320,16 @@ def report_ex(request):
     }
     return render(request, 'report_ex.html', context)
 
+
+def assign_cluster(stage_class, sex, age):
+    if stage_class == 0:
+        if sex == 'M' and age in [19, 20, 21]:
+            return [5, 2, 1, 4]
+        else:
+            return [0, 1, 4]
+    else:
+        return [1, 4]
+
 @login_required_session
 def summary_view(request):
     customer_id = request.session.get('user_id')  # 세션에서 CustomerID 가져오기
@@ -415,14 +425,6 @@ def summary_view(request):
 
     final_result = pd.DataFrame(columns=cluster_savings.columns)
 
-    def assign_cluster(stage_class, sex, age):
-        if stage_class == 0:
-            if sex == 'M' and age in [19, 20, 21]:
-                return [5, 2, 1, 4]
-            else:
-                return [0, 1, 4]
-        else:
-            return [1, 4]
 
     birth_year = user.Birth.year  # 주민번호 앞자리로 연도 추출
     current_year = datetime.datetime.now().year
@@ -467,7 +469,10 @@ def summary_view(request):
     final_recommendations = pd.concat(filtered_results, ignore_index=True)
     top2 = final_recommendations.sort_values(by='maxir', ascending=False).head(2)
     deposit_recommend_json = top2.to_dict(orient='records')
-
+    request.session['final_recommend'] = final_recommend_json
+    request.session['deposit_recommend'] = deposit_recommend_json
+    print("Session Final Recommend:", request.session.get('final_recommend'))
+    print("Session Deposit Recommend:", request.session.get('deposit_recommend'))
     # 최종 데이터 전달
     context = {
         'product_details': product_details,
@@ -540,10 +545,15 @@ def top5(request):
             top5_products = favorites[:5]  # 필요한 로직에 따라 상위 5개만 선택
         except UserProfile.DoesNotExist:
             pass  # 사용자가 없을 경우 기본값 유지
-
+    final_recommend = request.session.get('final_recommend')
+    deposit_recommend = request.session.get('deposit_recommend')
+    print("Final Recommend:", final_recommend)
+    print("Deposit Recommend:", deposit_recommend)
     context = {
         'user_name': user_name,
         'top5_products': top5_products,
+        'final_recommend': final_recommend,  # 적금 Top 3
+        'deposit_recommend': deposit_recommend  # 예금 Top 2
     }
 
     return render(request, 'recommend_savings_top5.html', context)

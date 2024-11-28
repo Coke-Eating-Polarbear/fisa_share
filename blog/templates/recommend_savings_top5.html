@@ -6,75 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>맞춤 저축 방법 찾기</title>
     <link rel="stylesheet" href="{% static 'css/recommend_savings_top5.css' %}">
-    <style>
-    </style>
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const csrfToken = "{{ csrf_token }}";
-    
-            // 모든 하트 아이콘을 선택
-            document.querySelectorAll(".heart-icon").forEach((heart, index) => {
-                const productId = "product-" + (index + 1); // 각 상품의 고유 ID
-    
-                // 클릭 이벤트 추가
-                heart.addEventListener("click", function () {
-                    // 하트 상태 토글
-                    if (heart.classList.contains("liked")) {
-                        heart.classList.remove("liked");
-                        heart.innerText = "♡"; // 빈 하트
-                        removeFromFavorites(productId); // 즐겨찾기에서 제거
-                    } else {
-                        heart.classList.add("liked");
-                        heart.innerText = "♥"; // 빨간 하트
-                        addToFavorites(productId); // 즐겨찾기에 추가
-                    }
-                });
-            });
-    
-            // 서버에 즐겨찾기 추가 요청
-            function addToFavorites(productId) {
-                fetch("/add_favorite/", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "X-CSRFToken": csrfToken
-                    },
-                    body: JSON.stringify({ product_id: productId })
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error("Failed to add favorite");
-                    }
-                    console.log("Added to favorites:", productId);
-                })
-                .catch(error => {
-                    console.error(error);
-                });
-            }
-    
-            // 서버에 즐겨찾기 제거 요청
-            function removeFromFavorites(productId) {
-                fetch("/remove_favorite/", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "X-CSRFToken": csrfToken
-                    },
-                    body: JSON.stringify({ product_id: productId })
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error("Failed to remove favorite");
-                    }
-                    console.log("Removed from favorites:", productId);
-                })
-                .catch(error => {
-                    console.error(error);
-                });
-            }
-        });
-    </script>
-    </script>
 </head>
 <body>
 
@@ -99,68 +30,29 @@
                         사회초년생<br># 재테크의 신으로
                     </div>
                 </div>
-                <a href="{% url 'info' %}"class="new-action-button">자세히 설정하기</a>
-                <div class="card">
-                    <span class="card-title">추천 1 <span class="heart-icon">♡</span></span>
-                    <div class="card-content">
-                        저축명<br>은행명<br>기본 + 우대금리
-                    </div>
-                    <button class="card-button" onclick="toggleDetails(this)">자세히보기</button>
-                    <div class="details-box">
-                        <span class="close-button" onclick="closeDetails(this)">✕</span>
-                        <p>금리 및 이율<br>유의사항<br>이용약관<br><br>해당 상품 추천 이유</p>
-                        <button class="join-button">가입하기</button>
-                    </div>
+                <div class="product-list">
+                    {% for product in final_recommend %}
+                        <div class="product-card">
+                            <p><strong>상품명:</strong> {{ product.product_name }}</p>
+                            <p><strong>은행:</strong> {{ product.bank_name }}</p>
+                            <p><strong>기준 금리:</strong> {{ product.base_rate }}</p>
+                            <p><strong>최대 금리:</strong> {{ product.max_preferential_rate }}</p>
+                            <p><strong>가입 방법:</strong> {{ product.signup_method }}</p>
+                        </div>
+                    {% endfor %}
+                
+                    {% for product in deposit_recommend %}
+                        <div class="product-card">
+                            <p><strong>상품명:</strong> {{ product.name }}</p>
+                            <p><strong>은행:</strong> {{ product.bank }}</p>
+                            <p><strong>기준 금리:</strong> {{ product.baser }}</p>
+                            <p><strong>최대 금리:</strong> {{ product.maxir }}</p>
+                            <p><strong>가입 방법:</strong> {{ product.method }}</p>
+                        </div>
+                    {% endfor %}
                 </div>
-                <div class="card">
-                    <span class="card-title">추천 2 <span class="heart-icon">♡</span></span>
-                    <div class="card-content">
-                        저축명<br>은행명<br>기본 + 우대금리
-                    </div>
-                    <button class="card-button" onclick="toggleDetails(this)">자세히보기</button>
-                    <div class="details-box">
-                        <span class="close-button" onclick="closeDetails(this)">✕</span>
-                        <p>금리 및 이율<br>유의사항<br>이용약관<br><br>해당 상품 추천 이유</p>
-                        <button class="join-button">가입하기</button>
-                    </div>
-                </div>
-                <div class="card">
-                    <span class="card-title">추천 3 <span class="heart-icon">♡</span></span>
-                    <div class="card-content">
-                        저축명<br>은행명<br>기본 + 우대금리
-                    </div>
-                    <button class="card-button" onclick="toggleDetails(this)">자세히보기</button>
-                    <div class="details-box">
-                        <span class="close-button" onclick="closeDetails(this)">✕</span>
-                        <p>금리 및 이율<br>유의사항<br>이용약관<br><br>해당 상품 추천 이유</p>
-                        <button class="join-button">가입하기</button>
-                    </div>
-                </div>
-                <div class="card">
-                    <span class="card-title">추천 4 <span class="heart-icon">♡</span></span>
-                    <div class="card-content">
-                        저축명<br>은행명<br>기본 + 우대금리
-                    </div>
-                    <button class="card-button" onclick="toggleDetails(this)">자세히보기</button>
-                    <div class="details-box">
-                        <span class="close-button" onclick="closeDetails(this)">✕</span>
-                        <p>금리 및 이율<br>유의사항<br>이용약관<br><br>해당 상품 추천 이유</p>
-                        <button class="join-button">가입하기</button>
-                    </div>
-                </div>
-                <div class="card">
-                    <span class="card-title">추천 5 <span class="heart-icon">♡</span></span>
-                    <div class="card-content">
-                        저축명<br>은행명<br>기본 + 우대금리
-                    </div>
-                    <button class="card-button" onclick="toggleDetails(this)">자세히보기</button>
-                    <div class="details-box">
-                        <span class="close-button" onclick="closeDetails(this)">✕</span>
-                        <p>금리 및 이율<br>유의사항<br>이용약관<br><br>해당 상품 추천 이유</p>
-                        <button class="join-button">가입하기</button>
-                    </div>
-                    
-                </div>
+                <a href="{% url 'info' %}" class="new-action-button">자세히 설정하기</a>
+                
             </div>
         </div>
 

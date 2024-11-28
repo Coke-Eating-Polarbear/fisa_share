@@ -160,3 +160,22 @@ body {
 .card .new-action-button:hover {
     background-color: #34a8c5 !important;
 }
+
+.product-card {
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 15px;
+    width: calc(20% - 10px); /* 5개의 카드가 한 줄에 채워지도록 설정 */
+    min-width: 150px; /* 최소 너비 설정 */
+    color: #333;
+    box-sizing: border-box;
+    }
+
+    .product-list {
+        display: flex;
+        justify-content: space-around;
+        gap: 10px;
+        padding-bottom: 80px;
+        position: relative;
+    }
