@@ -30,7 +30,7 @@ import pandas as pd
 from sqlalchemy import create_engine
 from joblib import load
 import numpy as np
-
+from django.conf import settings
 
 es = Elasticsearch([os.getenv('ES')])  # Elasticsearch 설정
 load_dotenv() 
@@ -409,7 +409,10 @@ def summary_view(request):
     product_details = list(unique_product_details)[:5]
 
     # 적금 추천 상품 처리
-    cluster_savings = pd.read_csv('C:/Users/audwn/ITstudy/final_project/final/blog/cluster_savings_updated.csv')
+    csv_path = os.path.join(settings.BASE_DIR, 'static', 'cluster_savings_updated.csv')
+
+    # Pandas로 CSV 읽기
+    cluster_savings = pd.read_csv(csv_path)
     final_result = pd.DataFrame(columns=cluster_savings.columns)
 
     def assign_cluster(stage_class, sex, age):
