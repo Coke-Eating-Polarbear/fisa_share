@@ -418,7 +418,7 @@
 
 
     <div class="container">
-        <form method="post" class="signup-form">
+        <form method="POST" class="signup-form">
             {% csrf_token %}
             <h2>회원가입</h2>
             <div class="form-group inline">
@@ -469,31 +469,7 @@
                 <label for="Phone">휴대전화번호</label>
                 <input type="text" id="Phone" name="Phone" placeholder="전화번호를 입력하세요">
             </div>
-            <div class="form-group">
-                <label>결혼유무</label>
-                <div class="inline-radio">
-                    <label><input type="radio" name="marriage-status" value="Y" onclick="toggleDependentFields()"> Y</label>
-                    <label><input type="radio" name="marriage-status" value="N" onclick="toggleDependentFields()"> N</label>
-                </div>
-            </div>
             
-            <div class="form-group">
-                <label>자녀유무</label>
-                <div class="inline-radio">
-                    <label><input type="radio" name="children-status" value="Y" onclick="toggleChildrenFields()"> Y</label>
-                    <label><input type="radio" name="children-status" value="N" onclick="toggleChildrenFields()"> N</label>
-                </div>
-            </div>
-            
-            <div class="form-group">
-                <label for="children-age">자녀 연령대</label>
-                <select id="children-age" name="children-age" disabled>
-                    <option value="" selected>선택</option>
-                    <option value="초등생">초등생</option>
-                    <option value="중고등생">중고등생</option>
-                    <option value="성인자녀">성인자녀</option>
-                </select>
-            </div>
             
             <script>
                 function toggleDependentFields() {
@@ -539,7 +515,7 @@
             </script>
             <div class="form-actions">
                 <button type="button" class="cancel-btn" onclick="window.location.href='{% url 'accounts:login' %}'">취소하기</button>
-                <button type="button" class="submit-btn" onclick="submitForm()">회원가입</button>
+                <button type="submit" class="submit-btn" onclick="submitForm()">회원가입</button>
             </div>
         </form>
     </div>

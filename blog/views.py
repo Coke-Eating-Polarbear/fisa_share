@@ -8,7 +8,7 @@ import io
 from matplotlib import font_manager, rc # type: ignore
 from django.contrib import messages # type: ignore
 from .forms import UserProfileForm
-from blog.models import UserProfile,Recommend, DsProduct, Wc, News, Favorite, Average,card, MyDataAsset, MyDataDS, MyDataPay,SpendAmount  # UserProfile 모델도 가져옵니다
+from blog.models import UserProfile,Recommend, DsProduct, Wc, News, Favorite, Average,card, MyDataAsset, MyDataDS, MyDataPay,SpendAmount, DProduct  # UserProfile 모델도 가져옵니다
 from django.contrib.auth.hashers import check_password# type: ignore
 from django.views.decorators.http import require_POST# type: ignore
 from django.http import HttpResponse,JsonResponse# type: ignore
@@ -24,6 +24,10 @@ from dotenv import load_dotenv # type: ignore
 from collections import defaultdict
 from accounts.views import map_person
 from .utils import income_model
+import pandas as pd
+import datetime
+
+
 es = Elasticsearch([os.getenv('ES')])  # Elasticsearch 설정
 load_dotenv() 
 rc('font', family='Malgun Gothic')
@@ -270,14 +274,166 @@ def summary_view(request):
     # 로그에 product_details 출력
     logger.info("Product details: %s", product_details)
 
+    
+
+
+    ## 적금 추천 상품 top 3
+    cluster_savings = pd.read_csv('C:/ITStudy/15/fisa_share/blog/cluster_savings_updated.csv')
+    # 결과를 저장할 빈 데이터프레임 생성 (모든 열 포함)
+    final_result = pd.DataFrame(columns=cluster_savings.columns)
+
+    # 고객
+    def assign_cluster(StageClass,Sex,age):
+        if StageClass == 0:
+            if Sex == 'M' and age in [19, 20, 21]:
+                return [5, 2, 1, 4]
+            else:
+                return [0, 1, 4]
+        else:
+            return [1, 4]
+    
+    # 나이 계산 (생년월일 기반)
+    birth_year = (user.Birth.year) # 주민번호 앞자리에서 연도 추출
+    current_year = datetime.datetime.now().year
+    age = current_year - birth_year
+    StageClass = user.Stageclass
+    sex = user.sex
+    cluster = assign_cluster(StageClass,age,sex)
+
+
+
+    # 고객 클러스터에 따라 필터링하고 정렬된 결과 출력
+    for i in cluster:
+        # print(f"현재 처리 중인 클러스터: {i}")
+        filtered_df = cluster_savings[cluster_savings['cluster1'] == i]  # 해당 클러스터의 데이터 필터링
+        # 해당 클러스터 최고우대금리, 기본금리 순서로 최대값으로 정렬
+
+        if not filtered_df.empty:  # 필터링된 데이터프레임이 비어있지 않은 경우
+            # 최고우대금리, 기본금리 순서로 내림차순 정렬
+            sorted_df = filtered_df.sort_values(
+                by=['최고우대금리', '기본금리'],
+                ascending=[False, False]  # 둘 다 내림차순 정렬
+            )
+
+        if not sorted_df.empty:  # 필터링된 데이터프레임이 비어있지 않은 경우
+            # 최고우대금리가 최대값인 행만 추출
+            max_rate = sorted_df['최고우대금리'].max()
+            max_rate_df = sorted_df[sorted_df['최고우대금리'] == max_rate]
+
+            # 최종 결과에서 '우리은행'이 있는 경우 가장 먼저 선택
+            if '우리은행' in sorted_df['은행명'].values:
+                top_result = sorted_df[sorted_df['은행명'] == '우리은행'].head(1)
+            else:
+                # '우리은행'이 없으면 가나다 순으로 첫 번째 선택
+                top_result = sorted_df.head(1)
+
+            # 결과를 최종 데이터프레임에 추가
+            final_result = pd.concat([final_result, top_result], ignore_index=True)
+        else:
+            print(f"클러스터 {i}에 해당하는 데이터가 없습니다.")
+
+    # 최종 결과 출력
+    # print(final_result[["상품명","은행명","최고우대금리","기본금리","cluster1"]])
+    final_cluster= final_result["cluster1"][0:2].tolist()
+
+    final_recommend = pd.DataFrame(columns=cluster_savings.columns)
+
+    for i in final_cluster:
+        filtered_df = cluster_savings[cluster_savings['cluster1'] == i]  # 해당 클러스터의 데이터 필터링
+        if not filtered_df.empty:  # 필터링된 데이터프레임이 비어있지 않은 경우
+            # 최고우대금리, 기본금리 순서로 내림차순 정렬
+            sorted_df = filtered_df.sort_values(
+                by=['최고우대금리', '기본금리'],
+                ascending=[False, False]  # 둘 다 내림차순 정렬
+            )
+
+        if not sorted_df.empty:  # 필터링된 데이터프레임이 비어있지 않은 경우
+            # 최고우대금리가 최대값인 행 및 두 번째로 큰 값을 추출
+            sorted_rate_df = filtered_df.sort_values(by='최고우대금리', ascending=False)  # 내림차순 정렬
+            top_two_rates = sorted_rate_df.head(2)  # 상위 2개의 행 선택
+
+            final_recommend = pd.concat([final_recommend, top_two_rates], ignore_index=True)
+        else:
+            print(f"클러스터 {i}에 해당하는 데이터가 없습니다.")
+
+    
+    # 마지막 행 제거
+    final_recommend = final_recommend.drop(final_recommend.index[-1])
+
+    # 결과 확인
+    print(final_recommend[["상품명","은행명","최고우대금리","기본금리","가입방법"]])
+    # 데이터프레임을 JSON으로 변환
+    final_recommend_json = final_recommend[["상품명", "은행명", "최고우대금리", "기본금리", "가입방법"]].to_dict(orient='records')
+    
+    ## 예금 top 3
+    customer_class_pred = user.Stageclass
+    income_group_pred = user.Inlevel
+    recommended_clusters = []
+    customer_class = customer_class_pred
+    income_group = income_group_pred
+    # 초기 점수 설정
+    cluster_scores = {i: 0 for i in range(7)}  # 클러스터 0~6
+
+    # 고객분류에 따른 가중치 추가
+    if customer_class in [0, 1, 2, 3]:
+        for cluster in [2, 4, 5, 6]:
+            cluster_scores[cluster] += 1
+    elif customer_class in [4, 5, 6, 7]:
+        for cluster in [0, 1, 2, 3, 4, 5, 6]:
+            cluster_scores[cluster] += 1
+
+    # 소득분위에 따른 가중치 추가
+    if income_group in [0, 1]:
+        for cluster in [0, 1, 2, 6]:
+            cluster_scores[cluster] += 1
+    elif income_group in [2, 3, 4]:
+        for cluster in [3, 4, 5]:
+            cluster_scores[cluster] += 1
+
+    # 클러스터 점수를 기반으로 상위 2개 클러스터 추천
+    sorted_clusters = sorted(cluster_scores.items(), key=lambda x: x[1], reverse=True)
+    top_clusters = [cluster[0] for cluster in sorted_clusters[:2]]
+    recommended_clusters.append(top_clusters)
+
+    print("recommended_clusters",recommended_clusters)   
+
+    # selected_columns = ['Name', 'Bank', 'MaxIR', 'BaseR', 'Method']
+    filtered_results = []
+    for clusters in recommended_clusters:
+        
+        filtered_deposits_query = DProduct.objects.filter(cluster__in=clusters).values(
+        'dsid', 'name', 'bank', 'baser', 'maxir', 'cluster'  # 필요한 필드만 선택
+        )
+
+        # QuerySet을 Pandas DataFrame으로 변환
+        filtered_deposits = pd.DataFrame(filtered_deposits_query)
+
+        # 고객 정보 추가
+        filtered_deposits["custom_num"] = customer_class
+        filtered_deposits["amount_num"] = income_group
+        filtered_results.append(filtered_deposits)
+
+    # 최종 결과 데이터프레임 생성
+    final_recommendations = pd.concat(filtered_results, ignore_index=True)
+
+    # maxir 기준으로 내림차순 정렬 후 상위 2개 추출
+    top2 = final_recommendations.sort_values(by='maxir', ascending=False).iloc[1:3]
+
+    print("예금 : final_recommendations",top2)
+    deposit_recommend_json = top2.to_dict(orient='records')
+    
     # 모든 데이터를 하나의 context 딕셔너리로 전달
     context = {
         'product_details': product_details,
         'image_base64': image_base64,
         'news_entries': news_entries,
         'user_name': user_name,
+        'final_recommend': final_recommend_json,  # 적금 top 3
+        'deposit_recommend': deposit_recommend_json , # 예금 top2 
     }
-    
+
+        
+        
     return render(request, 'loginmain.html', context)
 
 @login_required_session
