@@ -144,3 +144,19 @@ body {
     background-color: #666;
     border-radius: 10px;
 }
+
+.card .new-action-button {
+    display: block;
+    margin: 10px auto;
+    padding: 10px 20px;
+    background-color: #44cfe8 !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 5px !important;
+    cursor: pointer !important;
+    text-align: center;
+}
+
+.card .new-action-button:hover {
+    background-color: #34a8c5 !important;
+}
