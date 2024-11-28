@@ -26,11 +26,10 @@ from accounts.views import map_person
 from .utils import income_model
 import pandas as pd
 import datetime
-import pandas as pd
 from sqlalchemy import create_engine
 from joblib import load
 import numpy as np
-
+from django.conf import settings
 
 es = Elasticsearch([os.getenv('ES')])  # Elasticsearch 설정
 load_dotenv() 
@@ -149,6 +148,100 @@ def mypage(request):
     }
     return render(request, 'mypage.html', context)
 
+def fetch_sql_processed_data():
+    """
+    SQL에서 전처리된 데이터를 가져오는 함수.
+    Returns:
+        DataFrame: SQL에서 처리된 데이터를 Pandas DataFrame으로 반환
+    """
+    db_config = {
+        'host': '118.67.131.22:3306',
+        'user': 'fisaai',
+        'password': 'woorifisa3!W',
+        'database': 'manduck'
+    }
+    db_connection = f"mysql+pymysql://{db_config['user']}:{db_config['password']}@{db_config['host']}/{db_config['database']}"
+    engine = create_engine(db_connection)
+
+    query = """
+    SELECT 
+        Pyear,
+        Pmonth,
+        Bizcode,
+        SUM(Price) AS TotalPrice,
+        SUM(SUM(Price)) OVER (PARTITION BY Pyear, Pmonth) AS TotalSpending,
+        SUM(Price) * 1.0 / SUM(SUM(Price)) OVER (PARTITION BY Pyear, Pmonth) AS Ratio
+    FROM mydata_pay
+    GROUP BY Pyear, Pmonth, Bizcode
+    ORDER BY Pyear, Pmonth, Bizcode;
+    """
+    df = pd.read_sql(query, engine)
+
+    # Pivot 변환: Bizcode를 열로 만들고 각 Ratio 값을 채움
+    pivot_data = df.pivot(index=['Pyear', 'Pmonth'], columns='Bizcode', values='Ratio').fillna(0)
+
+    # TotalSpending 추가
+    pivot_data['TotalSpending'] = df.drop_duplicates(subset=['Pyear', 'Pmonth'])[['Pyear', 'Pmonth', 'TotalSpending']].set_index(['Pyear', 'Pmonth'])
+
+    return pivot_data
+
+def predict_next_month(preprocessed_data, model_features):
+    """
+    가장 최근 데이터를 모델 입력으로 사용하여 다음 달 예측.
+    Parameters:
+        preprocessed_data (DataFrame): SQL에서 전처리된 데이터
+        model_features (list): 모델이 학습된 Bizcode 목록
+    Returns:
+        Series: 다음 달 예측 결과
+    """
+    # 가장 최근 데이터 가져오기
+    most_recent_period = preprocessed_data.index.max()
+    most_recent_data = preprocessed_data.loc[most_recent_period]
+
+    # 디버깅: 가장 최근 데이터 확인
+    print(f"가장 최근 데이터 (모델 입력 전):\n{most_recent_data}")
+
+    # Series에서 모델 입력 데이터 생성
+    model_input = most_recent_data.drop(labels=['TotalSpending'], errors='ignore')
+
+    # 디버깅: 모델 입력 데이터 확인
+    print(f"모델 입력 데이터 (가장 최근 데이터):\n{model_input}")
+
+    # 모델 로드 및 예측
+    model = load('rfm_Consumption_prediction.joblib')
+    X_test = model_input.values.reshape(1, -1)
+    predicted_total = model.predict(X_test)[0]
+
+    # Bizcode별 소비 금액 계산
+    predicted_ratios = model_input.values
+    predicted_spending = predicted_ratios * predicted_total
+
+    # 결과 반환
+    result = pd.Series(
+        data=np.append(predicted_spending, predicted_total),
+        index=list(model_input.index) + ['predicted_total']
+    )
+    result.name = (most_recent_period[0], most_recent_period[1] + 1)
+    return result
+
+def senter():
+    """
+    메인 함수: 데이터 처리, 예측, 출력 수행
+    """
+    print("SQL에서 전처리된 데이터를 가져옵니다...")
+    preprocessed_data = fetch_sql_processed_data()
+    print("Preprocessed Data Columns:", preprocessed_data.columns)
+
+    print("저장된 모델의 입력 형식을 확인합니다...")
+    model = os.path.join(settings.BASE_DIR, 'models', 'rfm_Consumption_prediction.joblib')
+    model_features = list(model.feature_names_in_) if hasattr(model, 'feature_names_in_') else preprocessed_data.columns.drop('TotalSpending')
+
+    print("다음 달 예측 결과:")
+    next_month_prediction = predict_next_month(preprocessed_data, model_features)
+    print(f"연도: {next_month_prediction.name[0]}, 월: {next_month_prediction.name[1]}")
+    print(next_month_prediction)
+    return next_month_prediction
+
 @login_required_session
 def spending_mbti(request):
     customer_id = request.session.get('user_id')  
@@ -164,116 +257,17 @@ def spending_mbti(request):
 
     ## 소비예측 모델 넣기
     # MySQL 연결 정보
-    db_config = {
-        'host': '118.67.131.22:3306',
-        'user': 'fisaai',
-        'password': 'woorifisa3!W',
-        'database': 'manduck'
-    }
 
     pd.options.display.float_format = '{:,.2f}'.format
-
-    def fetch_sql_processed_data():
-        """
-        SQL에서 전처리된 데이터를 가져오는 함수.
-        Returns:
-            DataFrame: SQL에서 처리된 데이터를 Pandas DataFrame으로 반환
-        """
-        db_connection = f"mysql+pymysql://{db_config['user']}:{db_config['password']}@{db_config['host']}/{db_config['database']}"
-        engine = create_engine(db_connection)
-
-        query = """
-        SELECT 
-            Pyear,
-            Pmonth,
-            Bizcode,
-            SUM(Price) AS TotalPrice,
-            SUM(SUM(Price)) OVER (PARTITION BY Pyear, Pmonth) AS TotalSpending,
-            SUM(Price) * 1.0 / SUM(SUM(Price)) OVER (PARTITION BY Pyear, Pmonth) AS Ratio
-        FROM mydata_pay
-        GROUP BY Pyear, Pmonth, Bizcode
-        ORDER BY Pyear, Pmonth, Bizcode;
-        """
-        df = pd.read_sql(query, engine)
-
-        # Pivot 변환: Bizcode를 열로 만들고 각 Ratio 값을 채움
-        pivot_data = df.pivot(index=['Pyear', 'Pmonth'], columns='Bizcode', values='Ratio').fillna(0)
-
-        # TotalSpending 추가
-        pivot_data['TotalSpending'] = df.drop_duplicates(subset=['Pyear', 'Pmonth'])[['Pyear', 'Pmonth', 'TotalSpending']].set_index(['Pyear', 'Pmonth'])
-
-        return pivot_data
-
-    def predict_next_month(preprocessed_data, model_features):
-        """
-        가장 최근 데이터를 모델 입력으로 사용하여 다음 달 예측.
-        Parameters:
-            preprocessed_data (DataFrame): SQL에서 전처리된 데이터
-            model_features (list): 모델이 학습된 Bizcode 목록
-        Returns:
-            Series: 다음 달 예측 결과
-        """
-        # 가장 최근 데이터 가져오기
-        most_recent_period = preprocessed_data.index.max()
-        most_recent_data = preprocessed_data.loc[most_recent_period]
-
-        # 디버깅: 가장 최근 데이터 확인
-        print(f"가장 최근 데이터 (모델 입력 전):\n{most_recent_data}")
-
-        # Series에서 모델 입력 데이터 생성
-        model_input = most_recent_data.drop(labels=['TotalSpending'], errors='ignore')
-
-        # 디버깅: 모델 입력 데이터 확인
-        print(f"모델 입력 데이터 (가장 최근 데이터):\n{model_input}")
-
-        # 모델 로드 및 예측
-        model = load('rfm_Consumption_prediction.joblib')
-        X_test = model_input.values.reshape(1, -1)
-        predicted_total = model.predict(X_test)[0]
-
-        # Bizcode별 소비 금액 계산
-        predicted_ratios = model_input.values
-        predicted_spending = predicted_ratios * predicted_total
-
-        # 결과 반환
-        result = pd.Series(
-            data=np.append(predicted_spending, predicted_total),
-            index=list(model_input.index) + ['predicted_total']
-        )
-        result.name = (most_recent_period[0], most_recent_period[1] + 1)
-        return result
-
-    def main():
-        """
-        메인 함수: 데이터 처리, 예측, 출력 수행
-        """
-        print("SQL에서 전처리된 데이터를 가져옵니다...")
-        preprocessed_data = fetch_sql_processed_data()
-        print("Preprocessed Data Columns:", preprocessed_data.columns)
-
-        print("저장된 모델의 입력 형식을 확인합니다...")
-        model = load('rfm_Consumption_prediction.joblib')
-        model_features = list(model.feature_names_in_) if hasattr(model, 'feature_names_in_') else preprocessed_data.columns.drop('TotalSpending')
-
-        print("다음 달 예측 결과:")
-        next_month_prediction = predict_next_month(preprocessed_data, model_features)
-        print(f"연도: {next_month_prediction.name[0]}, 월: {next_month_prediction.name[1]}")
-        print(next_month_prediction)
-        return next_month_prediction
-
-
+    next_month_prediction = None
     if __name__ == "__main__":
-        prediction= main()
+        prediction= senter()
         # JSON 형식으로 변환
         next_month_prediction = json.dumps(prediction)
-
-
-
 
     context = {
         'user_name': user_name,
         'next_month_prediction' : next_month_prediction, # 다음 달 소비 예측 json.
-
     }
     return render(request, 'spending_mbti.html', context)
 
@@ -326,6 +320,16 @@ def report_ex(request):
     }
     return render(request, 'report_ex.html', context)
 
+
+def assign_cluster(stage_class, sex, age):
+    if stage_class == 0:
+        if sex == 'M' and age in [19, 20, 21]:
+            return [5, 2, 1, 4]
+        else:
+            return [0, 1, 4]
+    else:
+        return [1, 4]
+
 @login_required_session
 def summary_view(request):
     customer_id = request.session.get('user_id')  # 세션에서 CustomerID 가져오기
@@ -376,12 +380,12 @@ def summary_view(request):
         DProduct.objects.filter(dsid__in=recommended_dsid_list['dproduct']).values('dsname', 'bank', 'baser', 'maxir')
     ) + [
         {
-            'dsname': sp['ProductName'],
-            'bank': sp['BankName'],
-            'baser': sp['BaseRate'],
-            'maxir': sp['MaxPreferentialRate']
+            'dsname': sp['product_name'],
+            'bank': sp['bank_name'],
+            'baser': sp['base_rate'],
+            'maxir': sp['max_preferential_rate']
         }
-        for sp in SProduct.objects.filter(DSID__in=recommended_dsid_list['sproduct']).values('ProductName', 'BankName', 'BaseRate', 'MaxPreferentialRate')
+        for sp in SProduct.objects.filter(DSID__in=recommended_dsid_list['sproduct']).values('product_name', 'bank_name', 'base_rate', 'max_preferential_rate')
     ]
 
     # 랜덤 상품 추가
@@ -392,10 +396,10 @@ def summary_view(request):
 
         random_product_details = list(random_dproducts.values('dsname', 'bank', 'baser', 'maxir')) + [
             {
-                'dsname': sp.ProductName,
-                'bank': sp.BankName,
-                'baser': sp.BaseRate,
-                'maxir': sp.MaxPreferentialRate
+                'dsname': sp.product_name,
+                'bank': sp.bank_name,
+                'baser': sp.base_rate,
+                'maxir': sp.max_preferential_rate
             }
             for sp in random_sproducts
         ]
@@ -408,18 +412,19 @@ def summary_view(request):
     unique_product_details = {p['dsname']: p for p in product_details if p['dsname']}.values()
     product_details = list(unique_product_details)[:5]
 
-    # 적금 추천 상품 처리
-    cluster_savings = pd.read_csv('./blog/cluster_savings_updated.csv')
+
+    ## 적금 추천 상품 top 3
+    # Django ORM을 사용하여 데이터 가져오기
+    cluster_savings = SProduct.objects.all()
+
+    # 필요한 데이터를 Pandas DataFrame으로 변환
+    
+
+    data = list(cluster_savings.values())  # ORM QuerySet을 리스트로 변환
+    cluster_savings = pd.DataFrame(data)
+    # 결과를 저장할 빈 데이터프레임 생성 (모든 열 포함)
     final_result = pd.DataFrame(columns=cluster_savings.columns)
 
-    def assign_cluster(stage_class, sex, age):
-        if stage_class == 0:
-            if sex == 'M' and age in [19, 20, 21]:
-                return [5, 2, 1, 4]
-            else:
-                return [0, 1, 4]
-        else:
-            return [1, 4]
 
     birth_year = user.Birth.year  # 주민번호 앞자리로 연도 추출
     current_year = datetime.datetime.now().year
@@ -429,13 +434,14 @@ def summary_view(request):
     for i in cluster:
         filtered_df = cluster_savings[cluster_savings['cluster1'] == i]
         if not filtered_df.empty:
-            sorted_df = filtered_df.sort_values(by=['최고우대금리', '기본금리'], ascending=[False, False])
+            sorted_df = filtered_df.sort_values(by=['max_preferential_rate', 'base_rate'], ascending=[False, False])
             if not sorted_df.empty:
                 top_result = sorted_df.head(2)
                 final_result = pd.concat([final_result, top_result], ignore_index=True)
 
     # 적금 최종 추천 3개로 제한
-    final_recommend_json = final_result.head(3)[["상품명", "은행명", "최고우대금리", "기본금리", "가입방법"]].to_dict(orient='records')
+    final_recommend_json = final_result.head(3)[["product_name", "bank_name", "max_preferential_rate", "base_rate", "signup_method"]].to_dict(orient='records')
+    
 
     # 예금 추천 처리
     cluster_scores = {i: 0 for i in range(7)}
@@ -457,13 +463,16 @@ def summary_view(request):
     filtered_results = []
 
     for cluster in top_clusters:
-        filtered_deposits_query = DProduct.objects.filter(cluster=cluster).values('dsid', 'name', 'bank', 'baser', 'maxir')
+        filtered_deposits_query = DProduct.objects.filter(cluster=cluster).values('dsid', 'name', 'bank', 'baser', 'maxir','method')
         filtered_results.append(pd.DataFrame(filtered_deposits_query))
 
     final_recommendations = pd.concat(filtered_results, ignore_index=True)
     top2 = final_recommendations.sort_values(by='maxir', ascending=False).head(2)
     deposit_recommend_json = top2.to_dict(orient='records')
-
+    request.session['final_recommend'] = final_recommend_json
+    request.session['deposit_recommend'] = deposit_recommend_json
+    print("Session Final Recommend:", request.session.get('final_recommend'))
+    print("Session Deposit Recommend:", request.session.get('deposit_recommend'))
     # 최종 데이터 전달
     context = {
         'product_details': product_details,
@@ -536,10 +545,15 @@ def top5(request):
             top5_products = favorites[:5]  # 필요한 로직에 따라 상위 5개만 선택
         except UserProfile.DoesNotExist:
             pass  # 사용자가 없을 경우 기본값 유지
-
+    final_recommend = request.session.get('final_recommend')
+    deposit_recommend = request.session.get('deposit_recommend')
+    print("Final Recommend:", final_recommend)
+    print("Deposit Recommend:", deposit_recommend)
     context = {
         'user_name': user_name,
         'top5_products': top5_products,
+        'final_recommend': final_recommend,  # 적금 Top 3
+        'deposit_recommend': deposit_recommend  # 예금 Top 2
     }
 
     return render(request, 'recommend_savings_top5.html', context)

@@ -17,7 +17,8 @@ import ssl
 from elasticsearch_dsl import connections
 import tensorflow as tf
 import logging
-
+import warnings
+warnings.filterwarnings("ignore", category=FutureWarning)
 # TensorFlow 로그 레벨 설정
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
