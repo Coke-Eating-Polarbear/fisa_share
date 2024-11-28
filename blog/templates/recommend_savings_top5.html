@@ -133,13 +133,16 @@
 
         <!-- 예금 추천 콘텐츠 -->
         <div class="tab-content active">
-            <!-- <div class="recommendation-title">{{ user_name }}님의 추천 예금 상품 TOP 5</div> -->
             <div class="recommendations">
+                {% for product in deposit_recommend %}
                 <div class="card">
                     <img src="https://via.placeholder.com/50x70" alt="상품 이미지">
                     <div class="card-content">
-                        <span class="card-title">예금 상품 1</span><br>
-                        은행명<br>기본 금리: 2.0%<br>우대 금리
+                        <span class="card-title">{{ product.name }}</span><br>
+                        <p><strong>은행:</strong> {{ product.bank }}</p>
+                        <p><strong>기준 금리:</strong> {{ product.baser }}</p>
+                        <p><strong>최대 금리:</strong> {{ product.maxir }}</p>
+                        <p><strong>가입 방법:</strong> {{ product.method }}</p>
                     </div>
                     <span class="heart-icon">♡</span>
                     <button class="card-button">자세히보기</button>
@@ -149,75 +152,26 @@
                         <p>상품 설명...</p>
                     </div>
                 </div>
-                <div class="card">
-                    <img src="https://via.placeholder.com/50x70" alt="상품 이미지">
-                    <div class="card-content">
-                        <span class="card-title">예금 상품 2</span><br>
-                        은행명<br>기본 금리: 2.5%<br>우대 금리
-                    </div>
-                    <span class="heart-icon">♡</span>
-                    <button class="card-button">자세히보기</button>
-                    <div class="details-box">
-                        <button class="close-button">✕</button>
-                        <p>이율 정보 및 상세 내용</p>
-                        <p>상품 설명...</p>
-                    </div>
-                </div>
-                <div class="card">
-                    <img src="https://via.placeholder.com/50x70" alt="상품 이미지">
-                    <div class="card-content">
-                        <span class="card-title">예금 상품 3</span><br>
-                        은행명<br>기본 금리: 2.5%<br>우대 금리
-                    </div>
-                    <span class="heart-icon">♡</span>
-                    <button class="card-button">자세히보기</button>
-                    <div class="details-box">
-                        <button class="close-button">✕</button>
-                        <p>이율 정보 및 상세 내용</p>
-                        <p>상품 설명...</p>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <img src="https://via.placeholder.com/50x70" alt="상품 이미지">
-                    <div class="card-content">
-                        <span class="card-title">예금 상품 4</span><br>
-                        은행명<br>기본 금리: 2.5%<br>우대 금리
-                    </div>
-                    <span class="heart-icon">♡</span>
-                    <button class="card-button">자세히보기</button>
-                    <div class="details-box">
-                        <button class="close-button">✕</button>
-                        <p>이율 정보 및 상세 내용</p>
-                        <p>상품 설명...</p>
-                    </div>
-                </div>
-                <div class="card">
-                    <img src="https://via.placeholder.com/50x70" alt="상품 이미지">
-                    <div class="card-content">
-                        <span class="card-title">예금 상품 5</span><br>
-                        은행명<br>기본 금리: 2.5%<br>우대 금리
-                    </div>
-                    <span class="heart-icon">♡</span>
-                    <button class="card-button">자세히보기</button>
-                    <div class="details-box">
-                        <button class="close-button">✕</button>
-                        <p>이율 정보 및 상세 내용</p>
-                        <p>상품 설명...</p>
-                    </div>
-                </div>
+                {% endfor %}
+                <a href="{% url 'info' %}" class="new-action-button">자세히 설정하기</a>
             </div>
         </div>
 
         <!-- 적금 추천 콘텐츠 -->
+        
         <div class="tab-content">
-            <!-- <div class="recommendation-title">{{ user_name }}님의 추천 적금 상품 TOP 5</div> -->
+            <!-- 적금 추천 콘텐츠 -->
             <div class="recommendations">
+                {% for product in final_recommend %}
                 <div class="card">
                     <img src="https://via.placeholder.com/50x70" alt="상품 이미지">
                     <div class="card-content">
-                        <span class="card-title">적금 상품 1</span><br>
-                        은행명<br>기본 금리: 3.0%<br>우대 금리
+                        <span class="card-title"></span>
+                        <p><strong>상품명:</strong> {{ product.product_name }}</p>
+                        <p><strong>은행:</strong> {{ product.bank_name }}</p>
+                        <p><strong>기준 금리:</strong> {{ product.base_rate }}</p>
+                        <p><strong>최대 금리:</strong> {{ product.max_preferential_rate }}</p>
+                        <p><strong>가입 방법:</strong> {{ product.signup_method }}</p>
                     </div>
                     <span class="heart-icon">♡</span>
                     <button class="card-button">자세히보기</button>
@@ -227,66 +181,11 @@
                         <p>상품 설명...</p>
                     </div>
                 </div>
-                <div class="card">
-                    <img src="https://via.placeholder.com/50x70" alt="상품 이미지">
-                    <div class="card-content">
-                        <span class="card-title">적금 상품 2</span><br>
-                        은행명<br>기본 금리: 3.5%<br>우대 금리
-                    </div>
-                    <span class="heart-icon">♡</span>
-                    <button class="card-button">자세히보기</button>
-                    <div class="details-box">
-                        <button class="close-button">✕</button>
-                        <p>이율 정보 및 상세 내용</p>
-                        <p>상품 설명...</p>
-                    </div>
-                </div>
-                <div class="card">
-                    <img src="https://via.placeholder.com/50x70" alt="상품 이미지">
-                    <div class="card-content">
-                        <span class="card-title">적금 상품 3</span><br>
-                        은행명<br>기본 금리: 3.5%<br>우대 금리
-                    </div>
-                    <span class="heart-icon">♡</span>
-                    <button class="card-button">자세히보기</button>
-                    <div class="details-box">
-                        <button class="close-button">✕</button>
-                        <p>이율 정보 및 상세 내용</p>
-                        <p>상품 설명...</p>
-                    </div>
-                </div>
-                <div class="card">
-                    <img src="https://via.placeholder.com/50x70" alt="상품 이미지">
-                    <div class="card-content">
-                        <span class="card-title">적금 상품 4</span><br>
-                        은행명<br>기본 금리: 3.5%<br>우대 금리
-                    </div>
-                    <span class="heart-icon">♡</span>
-                    <button class="card-button">자세히보기</button>
-                    <div class="details-box">
-                        <button class="close-button">✕</button>
-                        <p>이율 정보 및 상세 내용</p>
-                        <p>상품 설명...</p>
-                    </div>
-                </div>
-                <div class="card">
-                    <img src="https://via.placeholder.com/50x70" alt="상품 이미지">
-                    <div class="card-content">
-                        <span class="card-title">적금 상품 5</span><br>
-                        은행명<br>기본 금리: 3.5%<br>우대 금리
-                    </div>
-                    <span class="heart-icon">♡</span>
-                    <button class="card-button">자세히보기</button>
-                    <div class="details-box">
-                        <button class="close-button">✕</button>
-                        <p>이율 정보 및 상세 내용</p>
-                        <p>상품 설명...</p>
-                    </div>
-
-                </div>
-                <a href="{% url 'info' %}" class="new-action-button">자세히 설정하기</a>
-                
+                {% endfor %}
             </div>
+            <a href="{% url 'info' %}" class="new-action-button">자세히 설정하기</a>
+        </div>
+        
         </div>
     </div>
 
