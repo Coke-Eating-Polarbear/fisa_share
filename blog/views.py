@@ -8,7 +8,7 @@ import io
 from matplotlib import font_manager, rc # type: ignore
 from django.contrib import messages # type: ignore
 from .forms import UserProfileForm
-from blog.models import UserProfile,Recommend, DsProduct, Wc, News, Favorite, Average,card, MyDataAsset, MyDataDS, MyDataPay,SpendAmount, DProduct  # UserProfile 모델도 가져옵니다
+from blog.models import UserProfile,Recommend, DsProduct, Wc, News, Favorite, Average,card, MyDataAsset, MyDataDS, MyDataPay,SpendAmount, DProduct, SProduct  # UserProfile 모델도 가져옵니다
 from django.contrib.auth.hashers import check_password# type: ignore
 from django.views.decorators.http import require_POST# type: ignore
 from django.http import HttpResponse,JsonResponse# type: ignore
@@ -393,7 +393,14 @@ def summary_view(request):
 
 
     ## 적금 추천 상품 top 3
-    cluster_savings = pd.read_csv('C:/ITStudy/15/fisa_share/blog/cluster_savings_updated.csv')
+    # Django ORM을 사용하여 데이터 가져오기
+    cluster_savings = SProduct.objects.all()
+
+    # 필요한 데이터를 Pandas DataFrame으로 변환
+    import pandas as pd
+
+    data = list(cluster_savings.values())  # ORM QuerySet을 리스트로 변환
+    cluster_savings = pd.DataFrame(data)
     # 결과를 저장할 빈 데이터프레임 생성 (모든 열 포함)
     final_result = pd.DataFrame(columns=cluster_savings.columns)
 
