@@ -439,6 +439,7 @@ def summary_view(request):
 
     # 적금 최종 추천 3개로 제한
     final_recommend_json = final_result.head(3)[["product_name", "bank_name", "max_preferential_rate", "base_rate", "signup_method"]].to_dict(orient='records')
+    
 
     # 예금 추천 처리
     cluster_scores = {i: 0 for i in range(7)}
@@ -460,7 +461,7 @@ def summary_view(request):
     filtered_results = []
 
     for cluster in top_clusters:
-        filtered_deposits_query = DProduct.objects.filter(cluster=cluster).values('dsid', 'name', 'bank', 'baser', 'maxir')
+        filtered_deposits_query = DProduct.objects.filter(cluster=cluster).values('dsid', 'name', 'bank', 'baser', 'maxir','method')
         filtered_results.append(pd.DataFrame(filtered_deposits_query))
 
     final_recommendations = pd.concat(filtered_results, ignore_index=True)
