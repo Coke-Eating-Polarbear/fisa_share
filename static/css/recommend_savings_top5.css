@@ -1,69 +1,233 @@
 body {
-    background-color: #f8f9fa;
     font-family: Arial, sans-serif;
-}
-.header, .footer {
-    display: flex;
-    justify-content: space-between;
-    padding: 10px 20px;
-    background-color: #e9ecef;
-    border-bottom: 1px solid #dee2e6;
-}
-.header nav a, .footer a {
-    margin: 0 10px;
-    color: #333;
-    text-decoration: none;
-}
-.container {
-    max-width: 900px;
-    margin: 20px auto;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
     background-color: #ffffff;
-    padding: 20px;
-    border: 1px solid #dee2e6;
-    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; /* 화면 전체 높이를 차지하도록 설정 */
 }
-.recommendation-title {
-    font-size: 18px;
-    font-weight: bold;
+header, footer {
+        /* background-color: #ffffff; */
+        text-align: center;
+        width: 100vw;
+        }
+        header {
+            background-color: #ffffff;
+            position: fixed;
+            top: 0;
+            z-index: 2;
+            height: 80px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+        }
+        
+        footer {
+            background-color: #F5F6F7;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 10px;
+            box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+        }
+        footer p {
+            margin: 5px;
+            line-height: 1.2;
+            text-decoration: none;
+            color: #000000;
+            font-size: 0.9rem;
+        }
+        
+        footer a {
+            color: #007bff; /* 링크 색상 */
+            text-decoration: none; /* 링크 밑줄 제거 */
+            font-weight: bold; /* 링크 글씨 굵게 */
+        }
+        
+        footer a:hover {
+            text-decoration: underline; /* 호버 시 밑줄 추가 */
+            color: #0056b3; /* 호버 시 약간 더 진한 파란색 */
+        }
+        
+    
+            /* 드롭다운 메뉴 스타일 */
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        .navbar {
+            display: flex;
+            justify-content: space-between; /* 좌측 로고와 우측 버튼 배치 */
+            /* justify-content: flex-end; 오른쪽 정렬 */
+            align-items: center;
+            padding: 10px 20px;
+            font-size: 0.3rem;
+            background-color: #ffffff;
+        }
+        .nav-links {
+            margin-right: 10px; /* 회원 정보와의 구분 */
+            display: flex; 
+            justify-content: flex-end; 
+            align-items: center; 
+            flex-grow: 1; 
+            text-align: center;
+        }
+        .navbar a {
+            /* margin: 0 20px; 링크 간격 */
+            font-size: 1.1rem; /* 글씨 크기 */
+            font-weight: bold; /* 글씨 진하게 */
+            margin-left: 15px; /* 각 링크 사이의 간격 */
+            text-decoration: none;
+            color: #333;
+        }
+    
+        .dropdown-content {
+            display: none;
+            position: absolute; /*부모요소 바로 아래에 위치*/
+            top: 100%;
+            left: 0;
+            background-color: #fff;
+            /* box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); */
+            padding: 0% ;
+            width: 150px; /*드롭다운이 전체 넓이를 차지*/
+            z-index: 1000;
+            border-top: 1px solid #ddd;
+            border-bottom: 1px solid #ddd;
+            /* border: 1px solid #ddd; */
+        }
+    
+        .dropdown-content a {
+            padding: 10px 20px;
+            display: block;
+            text-align: left;
+            color: #333;
+            text-decoration: none;
+            /* white-space: nowrap; */
+        }
+    
+        .dropdown-content a:hover {
+            background-color: #f1f1f1;
+        }
+    
+        /* 마우스를 올렸을 때 드롭다운 표시 */
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+    
+        /* 링크 스타일 */
+        .nav-box nav a {
+            color: #333;
+            margin: 0 10px;
+            text-decoration: none;
+        }
+    
+        .nav-box nav a:hover {
+            font-weight: bold;
+        }
+
+        .container {
+            margin-top: 20px; /* 상단 여백 줄이기 */
+            flex: 1;
+            width: 70%;
+            max-width: none;
+            background-color: #ffffff;
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #dee2e6;
+            border-radius: 10px;
+            box-sizing: border-box;
+        }
+        
+
+/* 탭 스타일 */
+.tabs {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 20px;
+    background-color: #ffffff;
+    border-radius: 5px;
+    padding: 10px 0;
+}
+
+.tab {
+    flex: 1;
+    text-align: center;
+    cursor: pointer;
+    padding: 15px;
+    margin: 0 5px;
+    border: 1px solid transparent;
+    border-radius: 5px;
+    background-color: #ffffff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.tab:hover {
+    background-color: #f1f1f1; /* 마우스 올릴 때 배경색 */
+    border: 1px solid #dee2e6; /* 테두리 추가 */
+}
+
+.tab.active {
+    background-color: #007bff; /* 활성화된 탭 색상 */
+    color: #ffffff; /* 글자색 */
+    border: 1px solid #007bff; /* 활성화된 테두리 */
+    box-shadow: none; /* 활성화된 탭의 그림자 제거 */
+    font-weight: bold; /* 활성화된 탭의 글자 굵게 */
+}
+
+.tab-content {
+    display: none; /* 기본적으로 숨김 */
+    border: 1px solid #dee2e6; /* 테두리 */
+    padding: 20px; /* 안쪽 여백 */
+    border-radius: 5px; /* 모서리 둥글게 */
+    background-color: #ffffff; /* 배경색 */
+    margin-top: 10px; /* 탭 아래 여백 */
+}
+
+.tab-content.active {
+    display: block; /* 활성화된 탭 내용 표시 */
+}
+
+
+.card {
+    position: relative; /* details-box의 기준 컨테이너로 설정 */
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    border: 1px solid #dee2e6;
+    text-align: left;
+    padding: 15px;
     margin-bottom: 10px;
 }
-.carousel-wrapper {
-    overflow: hidden;
-    width: 100%;
-}
-.recommendations {
-    display: flex;
-    transition: transform 0.3s ease;
-}
-.card {
-    width: 25%;
-    min-width: 200px;
-    margin-right: 10px;
-    background-color: #f8f9fa;
-    border-radius: 10px;
-    border: 1px solid #dee2e6;
-    text-align: center;
-    padding: 15px;
-    flex-shrink: 0;
-    position: relative;
-}
+
 .card img {
-    display: block;
-    margin: 0 auto;
-    width: 50px;
-    height: 70px;
+    width: 200px;
+    height: 90px;
+    float: left;
+    display: block; /* 이미지를 블록 요소로 변경 */
+    margin-right: 15px;
 }
-.card-title {
-    font-weight: bold;
-    text-align: left;
-    margin-top: 10px;
-}
+
 .card-content {
+    overflow: hidden;
     font-size: 14px;
     color: #555;
-    margin: 10px 0;
+    margin-top: 10px; /* 이미지와 텍스트 사이 여백 추가 */
 }
+
+.card-title {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
 .card-button {
+    position: absolute; /* .card를 기준으로 위치를 설정 */
+    bottom: 10px; /* 컨테이너의 아래쪽에서 10px 위로 */
+    right: 10px; /* 컨테이너의 오른쪽에서 10px 왼쪽으로 */
     display: inline-block;
     padding: 5px 10px;
     font-size: 12px;
@@ -74,15 +238,36 @@ body {
     text-decoration: none;
     cursor: pointer;
 }
-/* 자세히보기 박스 스타일 */
+
+.heart-icon {
+    font-size: 25px;
+    cursor: pointer;
+    color: #ddd;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    transition: color 0.3s;
+}
+
+.heart-icon.liked {
+    color: red; /* 클릭 시 붉은 하트 색상 */
+    font-size: 25px; /* 클릭 시 크기 유지 */
+    transform: scale(1.1); /* 살짝 커지도록 애니메이션 */
+    transition: all 0.3s ease;
+}
+
 .details-box {
     display: none;
-    margin-top: 10px;
-    padding: 20px;
+    position: absolute; /* 카드 컨테이너를 기준으로 위치를 설정 */
+    bottom: 10px; /* 카드 컨테이너의 아래쪽에서 10px 위로 */
+    left: 10px; /* 카드 컨테이너의 왼쪽에서 10px 오른쪽으로 */
+    width: calc(100% - 20px); /* 카드 내부 공간을 고려한 너비 설정 */
+    padding: 15px;
     border: 1px solid #ddd;
     border-radius: 5px;
     background-color: #f9f9f9;
-    position: relative;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* 그림자 효과 */
+    z-index: 1; /* 다른 요소 위에 표시되도록 설정 */
 }
 
 .close-button {
@@ -92,90 +277,30 @@ body {
     cursor: pointer;
     font-size: 16px;
     color: #888;
+    background: none;
+    border: none;
 }
 
-.join-button {
-    padding: 5px 10px;
-    border: 1px solid #007bff;
-    background-color: #fff;
-    cursor: pointer;
-    border-radius: 3px;
-    font-size: 14px;
-    margin-top: 20px;
-}
-.heart-icon {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    font-size: 20px;
-    cursor: pointer;
-    color: #ddd;
-    transition: color 0.3s;
-}
-.heart-icon.liked {
-    color: red;
-}
-.navigation {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 5px;
-    margin-top: 20px;
-}
-.nav-arrow {
-    cursor: pointer;
-    font-size: 24px;
-    color: #888;
-    transition: color 0.3s;
-}
-.nav-arrow:hover {
-    color: #007bff;
-}
-.nav-dot {
-    width: 10px;
-    height: 10px;
-    background-color: #ccc;
-    border-radius: 50%;
-    display: inline-block;
-    transition: background-color 0.3s;
-}
-.nav-dot.active {
-    width: 20px;
-    background-color: #666;
-    border-radius: 10px;
+.main-title-box {
+    text-align: center; /* 중앙 정렬 */
+    margin: 10px 0; /* 위아래 여백 줄이기 */
+    padding: 10px 0; /* 내부 여백 */
+    background-color: #ffffff; /* 배경색 */
 }
 
-.card .new-action-button {
-    display: block;
-    margin: 10px auto;
-    padding: 10px 20px;
-    background-color: #44cfe8 !important;
-    color: white !important;
-    border: none !important;
-    border-radius: 5px !important;
-    cursor: pointer !important;
-    text-align: center;
+.main-title {
+    font-size: 1.5rem; /* 글씨 크기 */
+    font-weight: bold; /* 글씨 굵게 */
+    color: #333; /* 글씨 색상 */
+    display: inline-block; /* 글자 크기에 맞는 박스 크기 */
+    padding: 10px 20px; /* 내부 여백 */
+    border: 2px solid #555; /* 테두리 */
+    border-radius: 8px; /* 테두리를 둥글게 */
+    background-color: #f8f9fa; /* 박스 배경색 */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* 약간의 그림자 */
 }
 
-.card .new-action-button:hover {
-    background-color: #34a8c5 !important;
+.main-content {
+    margin-top: 100px; /* 헤더의 높이와 동일하게 설정 */
 }
 
-.product-card {
-    background-color: #ffffff;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    padding: 15px;
-    width: calc(20% - 10px); /* 5개의 카드가 한 줄에 채워지도록 설정 */
-    min-width: 150px; /* 최소 너비 설정 */
-    color: #333;
-    box-sizing: border-box;
-    }
-
-    .product-list {
-        display: flex;
-        justify-content: space-around;
-        gap: 10px;
-        padding-bottom: 80px;
-        position: relative;
-    }

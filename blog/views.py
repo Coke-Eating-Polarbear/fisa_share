@@ -412,6 +412,7 @@ def summary_view(request):
     unique_product_details = {p['dsname']: p for p in product_details if p['dsname']}.values()
     product_details = list(unique_product_details)[:5]
 
+
     ## 적금 추천 상품 top 3
     # Django ORM을 사용하여 데이터 가져오기
     cluster_savings = SProduct.objects.all()
@@ -422,7 +423,6 @@ def summary_view(request):
     data = list(cluster_savings.values())  # ORM QuerySet을 리스트로 변환
     cluster_savings = pd.DataFrame(data)
     # 결과를 저장할 빈 데이터프레임 생성 (모든 열 포함)
-
     final_result = pd.DataFrame(columns=cluster_savings.columns)
 
 
