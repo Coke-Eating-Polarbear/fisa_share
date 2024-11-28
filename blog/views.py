@@ -8,7 +8,7 @@ import io
 from matplotlib import font_manager, rc # type: ignore
 from django.contrib import messages # type: ignore
 from .forms import UserProfileForm
-from blog.models import UserProfile,Recommend, DsProduct, Wc, News, Favorite, Average,card, MyDataAsset, MyDataDS, MyDataPay,SpendAmount, DProduct  # UserProfile 모델도 가져옵니다
+from blog.models import UserProfile,Recommend, Wc, News, Favorite, Average,card, MyDataAsset, MyDataDS, MyDataPay,SpendAmount, DProduct, SProduct  # UserProfile 모델도 가져옵니다
 from django.contrib.auth.hashers import check_password# type: ignore
 from django.views.decorators.http import require_POST# type: ignore
 from django.http import HttpResponse,JsonResponse# type: ignore
@@ -209,20 +209,15 @@ def report_ex(request):
 def summary_view(request):
     customer_id = request.session.get('user_id')  # 세션에서 CustomerID 가져오기
     today = timezone.now().date()
-    yesterday = today - timedelta(days=1)
-    # 오늘 날짜의 이미지 데이터 가져오기
-        # 어제 날짜의 이미지 데이터 가져오기
+    yesterday = today - timezone.timedelta(days=1)
+
+    # 워드클라우드 이미지 가져오기
     wc_entry = Wc.objects.filter(date=yesterday).first()
     image_base64 = base64.b64encode(wc_entry.image).decode('utf-8') if wc_entry else None
 
     # 어제 날짜의 뉴스 데이터 가져오기
-    news_entries_queryset = News.objects.filter(
-        ndate=yesterday, 
-        summary__isnull=False
-    )
-
-    # 중복 제거 로직
-    seen_titles = set()  # 이미 본 제목을 저장
+    news_entries_queryset = News.objects.filter(ndate=yesterday, summary__isnull=False)
+    seen_titles = set()
     news_entries = []
     for news in news_entries_queryset:
         if news.title not in seen_titles:
@@ -230,210 +225,134 @@ def summary_view(request):
             news_entries.append({
                 'title': news.title,
                 'summary': news.summary,
-                'url': news.url  # URL 추가
+                'url': news.url
             })
-    user_name = "사용자"  # 기본값 설정
 
+    # 사용자 정보 가져오기
+    user_name = "사용자"  # 기본값 설정
     if customer_id:
         try:
-            # CustomerID로 UserProfile 조회
             user = UserProfile.objects.get(CustomerID=customer_id)
-            user_name = user.username  # 사용자 이름 설정
+            user_name = user.username
         except UserProfile.DoesNotExist:
-            pass  # 사용자가 없을 경우 기본값 유지
+            pass
 
-    # CustomerID가 세션에 없으면 로그인 페이지로 리디렉션
-    if not customer_id:
-        return redirect('login')  # 로그인 페이지 URL로 수정 필요
+    if not customer_id:  # 로그인되지 않은 사용자는 로그인 페이지로 리디렉션
+        return redirect('login')
 
-    # 추천 테이블에서 CustomerID에 해당하는 추천 상품 가져오기
-    recommended_products = Recommend.objects.filter(CustomerID=customer_id).values('DSID')
+    # 추천 상품 처리
+    recommended_products = Recommend.objects.filter(CustomerID=customer_id)
     recommended_count = recommended_products.count()
-    recommended_dsid_list = []
+    recommended_dsid_list = {'dproduct': [], 'sproduct': []}
 
-    # 추천된 상품이 있을 경우 해당 dsid로 ds_product에서 정보 가져오기
-    recommended_product_details = []
     if recommended_count > 0:
-        recommended_dsid_list = [rec['DSID'] for rec in recommended_products]
-        recommended_product_details = list(
-            DsProduct.objects.filter(dsid__in=recommended_dsid_list)
-            .values('dsname', 'bank', 'baser', 'maxir')
-        )
+        # DProduct와 SProduct 각각 추천 가져오기
+        recommended_dsid_list['dproduct'] = list(recommended_products.filter(dproduct__isnull=False).values_list('dproduct', flat=True))
+        recommended_dsid_list['sproduct'] = list(recommended_products.filter(sproduct__isnull=False).values_list('sproduct', flat=True))
 
-    # 추천 상품이 5개 미만인 경우, 부족한 개수만큼 중복되지 않게 ds_product에서 랜덤한 상품 가져오기
+    # 추천 상품 세부 정보 가져오기
+    recommended_product_details = list(
+        DProduct.objects.filter(dsid__in=recommended_dsid_list['dproduct']).values('dsname', 'bank', 'baser', 'maxir')
+    ) + [
+        {
+            'dsname': sp['ProductName'],
+            'bank': sp['BankName'],
+            'baser': sp['BaseRate'],
+            'maxir': sp['MaxPreferentialRate']
+        }
+        for sp in SProduct.objects.filter(DSID__in=recommended_dsid_list['sproduct']).values('ProductName', 'BankName', 'BaseRate', 'MaxPreferentialRate')
+    ]
+
+    # 랜덤 상품 추가
     if recommended_count < 5:
         remaining_count = 5 - recommended_count
-        random_products = DsProduct.objects.exclude(dsid__in=recommended_dsid_list).order_by('?')[:remaining_count]
-        random_product_details = random_products.values('dsname', 'bank', 'baser', 'maxir')
+        random_dproducts = DProduct.objects.exclude(dsid__in=recommended_dsid_list['dproduct']).order_by('?')[:remaining_count]
+        random_sproducts = SProduct.objects.exclude(DSID__in=recommended_dsid_list['sproduct']).order_by('?')[:remaining_count]
 
-        # 추천 상품 + 랜덤 상품을 결합하여 총 5개의 상품을 보여줍니다.
-        product_details = recommended_product_details + list(random_product_details)
+        random_product_details = list(random_dproducts.values('dsname', 'bank', 'baser', 'maxir')) + [
+            {
+                'dsname': sp.ProductName,
+                'bank': sp.BankName,
+                'baser': sp.BaseRate,
+                'maxir': sp.MaxPreferentialRate
+            }
+            for sp in random_sproducts
+        ]
+
+        product_details = recommended_product_details + random_product_details
     else:
         product_details = recommended_product_details
 
-    # 로그에 product_details 출력
-    logger.info("Product details: %s", product_details)
+    # 중복 제거 및 최대 5개 제한
+    unique_product_details = {p['dsname']: p for p in product_details if p['dsname']}.values()
+    product_details = list(unique_product_details)[:5]
 
-    
-
-
-    ## 적금 추천 상품 top 3
-    cluster_savings = pd.read_csv('C:/ITStudy/15/fisa_share/blog/cluster_savings_updated.csv')
-    # 결과를 저장할 빈 데이터프레임 생성 (모든 열 포함)
+    # 적금 추천 상품 처리
+    cluster_savings = pd.read_csv('C:/Users/audwn/ITstudy/final_project/final/blog/cluster_savings_updated.csv')
     final_result = pd.DataFrame(columns=cluster_savings.columns)
 
-    # 고객
-    def assign_cluster(StageClass,Sex,age):
-        if StageClass == 0:
-            if Sex == 'M' and age in [19, 20, 21]:
+    def assign_cluster(stage_class, sex, age):
+        if stage_class == 0:
+            if sex == 'M' and age in [19, 20, 21]:
                 return [5, 2, 1, 4]
             else:
                 return [0, 1, 4]
         else:
             return [1, 4]
-    
-    # 나이 계산 (생년월일 기반)
-    birth_year = (user.Birth.year) # 주민번호 앞자리에서 연도 추출
+
+    birth_year = user.Birth.year  # 주민번호 앞자리로 연도 추출
     current_year = datetime.datetime.now().year
     age = current_year - birth_year
-    StageClass = user.Stageclass
-    sex = user.sex
-    cluster = assign_cluster(StageClass,age,sex)
+    cluster = assign_cluster(user.Stageclass, user.sex, age)
 
-
-
-    # 고객 클러스터에 따라 필터링하고 정렬된 결과 출력
     for i in cluster:
-        # print(f"현재 처리 중인 클러스터: {i}")
-        filtered_df = cluster_savings[cluster_savings['cluster1'] == i]  # 해당 클러스터의 데이터 필터링
-        # 해당 클러스터 최고우대금리, 기본금리 순서로 최대값으로 정렬
+        filtered_df = cluster_savings[cluster_savings['cluster1'] == i]
+        if not filtered_df.empty:
+            sorted_df = filtered_df.sort_values(by=['최고우대금리', '기본금리'], ascending=[False, False])
+            if not sorted_df.empty:
+                top_result = sorted_df.head(2)
+                final_result = pd.concat([final_result, top_result], ignore_index=True)
 
-        if not filtered_df.empty:  # 필터링된 데이터프레임이 비어있지 않은 경우
-            # 최고우대금리, 기본금리 순서로 내림차순 정렬
-            sorted_df = filtered_df.sort_values(
-                by=['최고우대금리', '기본금리'],
-                ascending=[False, False]  # 둘 다 내림차순 정렬
-            )
+    # 적금 최종 추천 3개로 제한
+    final_recommend_json = final_result.head(3)[["상품명", "은행명", "최고우대금리", "기본금리", "가입방법"]].to_dict(orient='records')
 
-        if not sorted_df.empty:  # 필터링된 데이터프레임이 비어있지 않은 경우
-            # 최고우대금리가 최대값인 행만 추출
-            max_rate = sorted_df['최고우대금리'].max()
-            max_rate_df = sorted_df[sorted_df['최고우대금리'] == max_rate]
-
-            # 최종 결과에서 '우리은행'이 있는 경우 가장 먼저 선택
-            if '우리은행' in sorted_df['은행명'].values:
-                top_result = sorted_df[sorted_df['은행명'] == '우리은행'].head(1)
-            else:
-                # '우리은행'이 없으면 가나다 순으로 첫 번째 선택
-                top_result = sorted_df.head(1)
-
-            # 결과를 최종 데이터프레임에 추가
-            final_result = pd.concat([final_result, top_result], ignore_index=True)
-        else:
-            print(f"클러스터 {i}에 해당하는 데이터가 없습니다.")
-
-    # 최종 결과 출력
-    # print(final_result[["상품명","은행명","최고우대금리","기본금리","cluster1"]])
-    final_cluster= final_result["cluster1"][0:2].tolist()
-
-    final_recommend = pd.DataFrame(columns=cluster_savings.columns)
-
-    for i in final_cluster:
-        filtered_df = cluster_savings[cluster_savings['cluster1'] == i]  # 해당 클러스터의 데이터 필터링
-        if not filtered_df.empty:  # 필터링된 데이터프레임이 비어있지 않은 경우
-            # 최고우대금리, 기본금리 순서로 내림차순 정렬
-            sorted_df = filtered_df.sort_values(
-                by=['최고우대금리', '기본금리'],
-                ascending=[False, False]  # 둘 다 내림차순 정렬
-            )
-
-        if not sorted_df.empty:  # 필터링된 데이터프레임이 비어있지 않은 경우
-            # 최고우대금리가 최대값인 행 및 두 번째로 큰 값을 추출
-            sorted_rate_df = filtered_df.sort_values(by='최고우대금리', ascending=False)  # 내림차순 정렬
-            top_two_rates = sorted_rate_df.head(2)  # 상위 2개의 행 선택
-
-            final_recommend = pd.concat([final_recommend, top_two_rates], ignore_index=True)
-        else:
-            print(f"클러스터 {i}에 해당하는 데이터가 없습니다.")
-
-    
-    # 마지막 행 제거
-    final_recommend = final_recommend.drop(final_recommend.index[-1])
-
-    # 결과 확인
-    print(final_recommend[["상품명","은행명","최고우대금리","기본금리","가입방법"]])
-    # 데이터프레임을 JSON으로 변환
-    final_recommend_json = final_recommend[["상품명", "은행명", "최고우대금리", "기본금리", "가입방법"]].to_dict(orient='records')
-    
-    ## 예금 top 3
-    customer_class_pred = user.Stageclass
-    income_group_pred = user.Inlevel
-    recommended_clusters = []
-    customer_class = customer_class_pred
-    income_group = income_group_pred
-    # 초기 점수 설정
-    cluster_scores = {i: 0 for i in range(7)}  # 클러스터 0~6
-
-    # 고객분류에 따른 가중치 추가
-    if customer_class in [0, 1, 2, 3]:
+    # 예금 추천 처리
+    cluster_scores = {i: 0 for i in range(7)}
+    if user.Stageclass in [0, 1, 2, 3]:
         for cluster in [2, 4, 5, 6]:
             cluster_scores[cluster] += 1
-    elif customer_class in [4, 5, 6, 7]:
+    elif user.Stageclass in [4, 5, 6, 7]:
         for cluster in [0, 1, 2, 3, 4, 5, 6]:
             cluster_scores[cluster] += 1
-
-    # 소득분위에 따른 가중치 추가
-    if income_group in [0, 1]:
+    if user.Inlevel in [0, 1]:
         for cluster in [0, 1, 2, 6]:
             cluster_scores[cluster] += 1
-    elif income_group in [2, 3, 4]:
+    elif user.Inlevel in [2, 3, 4]:
         for cluster in [3, 4, 5]:
             cluster_scores[cluster] += 1
 
-    # 클러스터 점수를 기반으로 상위 2개 클러스터 추천
-    sorted_clusters = sorted(cluster_scores.items(), key=lambda x: x[1], reverse=True)
-    top_clusters = [cluster[0] for cluster in sorted_clusters[:2]]
-    recommended_clusters.append(top_clusters)
-
-    print("recommended_clusters",recommended_clusters)   
-
-    # selected_columns = ['Name', 'Bank', 'MaxIR', 'BaseR', 'Method']
+    sorted_clusters = sorted(cluster_scores.items(), key=lambda x: x[1], reverse=True)[:2]
+    top_clusters = [cluster[0] for cluster in sorted_clusters]
     filtered_results = []
-    for clusters in recommended_clusters:
-        
-        filtered_deposits_query = DProduct.objects.filter(cluster__in=clusters).values(
-        'dsid', 'name', 'bank', 'baser', 'maxir', 'cluster'  # 필요한 필드만 선택
-        )
 
-        # QuerySet을 Pandas DataFrame으로 변환
-        filtered_deposits = pd.DataFrame(filtered_deposits_query)
+    for cluster in top_clusters:
+        filtered_deposits_query = DProduct.objects.filter(cluster=cluster).values('dsid', 'name', 'bank', 'baser', 'maxir')
+        filtered_results.append(pd.DataFrame(filtered_deposits_query))
 
-        # 고객 정보 추가
-        filtered_deposits["custom_num"] = customer_class
-        filtered_deposits["amount_num"] = income_group
-        filtered_results.append(filtered_deposits)
-
-    # 최종 결과 데이터프레임 생성
     final_recommendations = pd.concat(filtered_results, ignore_index=True)
-
-    # maxir 기준으로 내림차순 정렬 후 상위 2개 추출
-    top2 = final_recommendations.sort_values(by='maxir', ascending=False).iloc[1:3]
-
-    print("예금 : final_recommendations",top2)
+    top2 = final_recommendations.sort_values(by='maxir', ascending=False).head(2)
     deposit_recommend_json = top2.to_dict(orient='records')
-    
-    # 모든 데이터를 하나의 context 딕셔너리로 전달
+
+    # 최종 데이터 전달
     context = {
         'product_details': product_details,
         'image_base64': image_base64,
         'news_entries': news_entries,
         'user_name': user_name,
-        'final_recommend': final_recommend_json,  # 적금 top 3
-        'deposit_recommend': deposit_recommend_json , # 예금 top2 
+        'final_recommend': final_recommend_json,  # 적금 Top 3
+        'deposit_recommend': deposit_recommend_json  # 예금 Top 2
     }
 
-        
-        
     return render(request, 'loginmain.html', context)
 
 @login_required_session
@@ -490,7 +409,7 @@ def top5(request):
             user_name = user.username  # 사용자 이름 설정
 
             # Favorite 테이블에서 사용자와 관련된 DSID 가져오기
-            favorites = Favorite.objects.filter(CustomerID=user).select_related('DSID')
+            favorites = Favorite.objects.filter(CustomerID=user).select_related('content_type')
 
             # Favorite에 등록된 상품 중 상위 5개 가져오기
             top5_products = favorites[:5]  # 필요한 로직에 따라 상위 5개만 선택
@@ -565,15 +484,22 @@ def add_favorite(request):
     if request.method == "POST":
         try:
             data = json.loads(request.body)
-            product_id = data.get("product_id")  # DSID
+            product_id = data.get("product_id")  # 제품 ID
+            product_type = data.get("product_type")  # 제품 타입 (dproduct or sproduct)
             customer_id = request.session.get('user_id')  # 세션에서 사용자 ID 가져오기
 
-            if customer_id and product_id:
+            if customer_id and product_id and product_type:
                 user = UserProfile.objects.get(CustomerID=customer_id)
-                ds_product = DsProduct.objects.get(dsid=product_id)
 
-                # Favorite에 추가
-                Favorite.objects.get_or_create(CustomerID=user, DSID=ds_product)
+                if product_type == "dproduct":  # 예금인 경우
+                    dproduct = DProduct.objects.get(dsid=product_id)
+                    Favorite.objects.get_or_create(CustomerID=user, dproduct=dproduct)
+                elif product_type == "sproduct":  # 적금인 경우
+                    sproduct = SProduct.objects.get(DSID=product_id)
+                    Favorite.objects.get_or_create(CustomerID=user, sproduct=sproduct)
+                else:
+                    return JsonResponse({"status": "error", "message": "Invalid product type"}, status=400)
+
                 return JsonResponse({"status": "success"})
 
         except Exception as e:
@@ -586,15 +512,22 @@ def remove_favorite(request):
     if request.method == "POST":
         try:
             data = json.loads(request.body)
-            product_id = data.get("product_id")  # DSID
+            product_id = data.get("product_id")  # 제품 ID
+            product_type = data.get("product_type")  # 제품 타입 (dproduct or sproduct)
             customer_id = request.session.get('user_id')  # 세션에서 사용자 ID 가져오기
 
-            if customer_id and product_id:
+            if customer_id and product_id and product_type:
                 user = UserProfile.objects.get(CustomerID=customer_id)
-                ds_product = DsProduct.objects.get(dsid=product_id)
 
-                # Favorite에서 삭제
-                Favorite.objects.filter(CustomerID=user, DSID=ds_product).delete()
+                if product_type == "dproduct":  # 예금인 경우
+                    dproduct = DProduct.objects.get(dsid=product_id)
+                    Favorite.objects.filter(CustomerID=user, dproduct=dproduct).delete()
+                elif product_type == "sproduct":  # 적금인 경우
+                    sproduct = SProduct.objects.get(DSID=product_id)
+                    Favorite.objects.filter(CustomerID=user, sproduct=sproduct).delete()
+                else:
+                    return JsonResponse({"status": "error", "message": "Invalid product type"}, status=400)
+
                 return JsonResponse({"status": "success"})
 
         except Exception as e:
