@@ -257,7 +257,7 @@ class DProduct(models.Model):
 
 
 class SProduct(models.Model):
-    dsid = models.IntegerField(primary_key=True)  # DSID를 Primary Key로 설정
+    DSID = models.IntegerField(primary_key=True)  # DSID를 Primary Key로 설정
     product_name = models.CharField(max_length=255)  # 상품명
     bank_name = models.CharField(max_length=255)  # 은행명
     base_rate = models.FloatField()  # 기본금리

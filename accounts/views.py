@@ -143,8 +143,6 @@ def signup(request):
             else:
                 print("No data found in mydata_asset table.")
 
-
-
             # 매핑
             customer_class_pred, income_group_pred = map_person(
                 age=age,

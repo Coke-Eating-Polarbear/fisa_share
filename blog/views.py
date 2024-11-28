@@ -26,7 +26,6 @@ from accounts.views import map_person
 from .utils import income_model
 import pandas as pd
 import datetime
-import pandas as pd
 from sqlalchemy import create_engine
 from joblib import load
 import numpy as np
@@ -371,12 +370,12 @@ def summary_view(request):
         DProduct.objects.filter(dsid__in=recommended_dsid_list['dproduct']).values('dsname', 'bank', 'baser', 'maxir')
     ) + [
         {
-            'dsname': sp['ProductName'],
-            'bank': sp['BankName'],
-            'baser': sp['BaseRate'],
-            'maxir': sp['MaxPreferentialRate']
+            'dsname': sp['product_name'],
+            'bank': sp['bank_name'],
+            'baser': sp['base_rate'],
+            'maxir': sp['max_preferential_rate']
         }
-        for sp in SProduct.objects.filter(DSID__in=recommended_dsid_list['sproduct']).values('ProductName', 'BankName', 'BaseRate', 'MaxPreferentialRate')
+        for sp in SProduct.objects.filter(DSID__in=recommended_dsid_list['sproduct']).values('product_name', 'bank_name', 'base_rate', 'max_preferential_rate')
     ]
 
     # 랜덤 상품 추가
@@ -387,10 +386,10 @@ def summary_view(request):
 
         random_product_details = list(random_dproducts.values('dsname', 'bank', 'baser', 'maxir')) + [
             {
-                'dsname': sp.ProductName,
-                'bank': sp.BankName,
-                'baser': sp.BaseRate,
-                'maxir': sp.MaxPreferentialRate
+                'dsname': sp.product_name,
+                'bank': sp.bank_name,
+                'baser': sp.base_rate,
+                'maxir': sp.max_preferential_rate
             }
             for sp in random_sproducts
         ]
@@ -403,15 +402,12 @@ def summary_view(request):
     unique_product_details = {p['dsname']: p for p in product_details if p['dsname']}.values()
     product_details = list(unique_product_details)[:5]
 
-    # 적금 추천 상품 처리
-    csv_path = os.path.join(settings.BASE_DIR, 'static', 'cluster_savings_updated.csv')
-
     ## 적금 추천 상품 top 3
     # Django ORM을 사용하여 데이터 가져오기
     cluster_savings = SProduct.objects.all()
 
     # 필요한 데이터를 Pandas DataFrame으로 변환
-    import pandas as pd
+    
 
     data = list(cluster_savings.values())  # ORM QuerySet을 리스트로 변환
     cluster_savings = pd.DataFrame(data)
@@ -436,13 +432,13 @@ def summary_view(request):
     for i in cluster:
         filtered_df = cluster_savings[cluster_savings['cluster1'] == i]
         if not filtered_df.empty:
-            sorted_df = filtered_df.sort_values(by=['최고우대금리', '기본금리'], ascending=[False, False])
+            sorted_df = filtered_df.sort_values(by=['max_preferential_rate', 'base_rate'], ascending=[False, False])
             if not sorted_df.empty:
                 top_result = sorted_df.head(2)
                 final_result = pd.concat([final_result, top_result], ignore_index=True)
 
     # 적금 최종 추천 3개로 제한
-    final_recommend_json = final_result.head(3)[["상품명", "은행명", "최고우대금리", "기본금리", "가입방법"]].to_dict(orient='records')
+    final_recommend_json = final_result.head(3)[["product_name", "bank_name", "max_preferential_rate", "base_rate", "signup_method"]].to_dict(orient='records')
 
     # 예금 추천 처리
     cluster_scores = {i: 0 for i in range(7)}
