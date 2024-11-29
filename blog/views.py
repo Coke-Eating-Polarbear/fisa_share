@@ -438,11 +438,11 @@ def summary_view(request):
         if not filtered_df.empty:
             sorted_df = filtered_df.sort_values(by=['max_preferential_rate', 'base_rate'], ascending=[False, False])
             if not sorted_df.empty:
-                top_result = sorted_df.head(3)
+                top_result = sorted_df.head(5)
                 final_result = pd.concat([final_result, top_result], ignore_index=True)
 
     # 적금 최종 추천 3개로 제한
-    final_recommend_json = final_result.head(2)[["product_name", "bank_name", "max_preferential_rate", "base_rate", "signup_method"]].to_dict(orient='records')
+    final_recommend_json = final_result.head(5)[["product_name", "bank_name", "max_preferential_rate", "base_rate", "signup_method"]].to_dict(orient='records')
     
 
     # 예금 추천 처리
@@ -469,20 +469,20 @@ def summary_view(request):
         filtered_results.append(pd.DataFrame(filtered_deposits_query))
     request.session['clusters'] = top_clusters
     final_recommendations = pd.concat(filtered_results, ignore_index=True)
-    top2 = final_recommendations.sort_values(by='maxir', ascending=False).head(3)
+    top2 = final_recommendations.sort_values(by='maxir', ascending=False).head(5)
     deposit_recommend_json = top2.to_dict(orient='records')
-    request.session['final_recommend'] = final_recommend_json
-    request.session['deposit_recommend'] = deposit_recommend_json
-    print("Session Final Recommend:", request.session.get('final_recommend'))
-    print("Session Deposit Recommend:", request.session.get('deposit_recommend'))
+    request.session['final_recommend'] = final_recommend_json[:5]  # 적금 Top 5
+    request.session['deposit_recommend'] = deposit_recommend_json[:5]  # 예금 Top 5
+    final_recommend_display = final_recommend_json[:2]  # 적금 2개
+    deposit_recommend_display = deposit_recommend_json[:3]  # 예금 3개
     # 최종 데이터 전달
     context = {
         'product_details': product_details,
         'image_base64': image_base64,
         'news_entries': news_entries,
         'user_name': user_name,
-        'final_recommend': final_recommend_json,  # 적금 Top 3
-        'deposit_recommend': deposit_recommend_json  # 예금 Top 2
+        'final_recommend': final_recommend_display,  # 적금 Top 3
+        'deposit_recommend': deposit_recommend_display  # 예금 Top 2
     }
 
     return render(request, 'loginmain.html', context)
