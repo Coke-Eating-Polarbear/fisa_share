@@ -134,6 +134,19 @@
         <!-- 예금 추천 콘텐츠 -->
         <div class="tab-content active">
             <div class="recommendations">
+                <!-- 기존 상품 박스 -->
+                <div class="existing-product-container">
+                <div class="card">
+                   <img src="https://via.placeholder.com/50x70" alt="상품 이미지">
+                   <div class="card-content">
+                       <span class="card-title">기존 상품</span><br>
+                       <p><strong>은행:</strong> Sample Bank</p>
+                       <p><strong>기준 금리:</strong> %</p>
+                       <p><strong>최대 금리:</strong> %</p>
+                       <p><strong>가입 방법:</strong> 아무거나</p>
+                    </div>
+                </div>
+            </div>
                 {% for product in deposit_recommend %}
                 <div class="card">
                     <img src="https://via.placeholder.com/50x70" alt="상품 이미지">
@@ -158,10 +171,21 @@
         </div>
 
         <!-- 적금 추천 콘텐츠 -->
-        
         <div class="tab-content">
-            <!-- 적금 추천 콘텐츠 -->
             <div class="recommendations">
+                <!-- 기존 상품 박스 -->
+                <div class="existing-product-container">
+                    <div class="card">
+                       <img src="https://via.placeholder.com/50x70" alt="상품 이미지">
+                       <div class="card-content">
+                           <span class="card-title">기존 상품</span><br>
+                           <p><strong>은행:</strong> Sample Bank</p>
+                           <p><strong>기준 금리:</strong> %</p>
+                           <p><strong>최대 금리:</strong> %</p>
+                           <p><strong>가입 방법:</strong> 아무거나</p>
+                        </div>
+                    </div>
+                </div>
                 {% for product in final_recommend %}
                 <div class="card">
                     <img src="https://via.placeholder.com/50x70" alt="상품 이미지">
