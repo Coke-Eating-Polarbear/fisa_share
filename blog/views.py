@@ -41,6 +41,7 @@ client = OpenAI()
 
 rc('font', family='Malgun Gothic')
 logger = logging.getLogger(__name__)
+
 def login_required_session(view_func):
     """
     세션에 'user_id'가 없을 경우 로그인 페이지로 리디렉션하는 데코레이터.
@@ -326,7 +327,6 @@ def report_ex(request):
     }
     return render(request, 'report_ex.html', context)
 
-
 def assign_cluster(stage_class, sex, age):
     if stage_class == 0:
         if sex == 'M' and age in [19, 20, 21]:
@@ -442,11 +442,11 @@ def summary_view(request):
         if not filtered_df.empty:
             sorted_df = filtered_df.sort_values(by=['max_preferential_rate', 'base_rate'], ascending=[False, False])
             if not sorted_df.empty:
-                top_result = sorted_df.head(2)
+                top_result = sorted_df.head(5)
                 final_result = pd.concat([final_result, top_result], ignore_index=True)
 
     # 적금 최종 추천 3개로 제한
-    final_recommend_json = final_result.head(3)[["product_name", "bank_name", "max_preferential_rate", "base_rate", "signup_method"]].to_dict(orient='records')
+    final_recommend_json = final_result.head(5)[["product_name", "bank_name", "max_preferential_rate", "base_rate", "signup_method"]].to_dict(orient='records')
     
 
     # 예금 추천 처리
@@ -471,63 +471,88 @@ def summary_view(request):
     for cluster in top_clusters:
         filtered_deposits_query = DProduct.objects.filter(cluster=cluster).values('dsid', 'name', 'bank', 'baser', 'maxir','method')
         filtered_results.append(pd.DataFrame(filtered_deposits_query))
-
+    request.session['clusters'] = top_clusters
     final_recommendations = pd.concat(filtered_results, ignore_index=True)
-    top2 = final_recommendations.sort_values(by='maxir', ascending=False).head(2)
+    top2 = final_recommendations.sort_values(by='maxir', ascending=False).head(5)
     deposit_recommend_json = top2.to_dict(orient='records')
-    request.session['final_recommend'] = final_recommend_json
-    request.session['deposit_recommend'] = deposit_recommend_json
-    print("Session Final Recommend:", request.session.get('final_recommend'))
-    print("Session Deposit Recommend:", request.session.get('deposit_recommend'))
+    request.session['final_recommend'] = final_recommend_json[:5]  # 적금 Top 5
+    request.session['deposit_recommend'] = deposit_recommend_json[:5]  # 예금 Top 5
+    final_recommend_display = final_recommend_json[:2]  # 적금 2개
+    deposit_recommend_display = deposit_recommend_json[:3]  # 예금 3개
     # 최종 데이터 전달
     context = {
         'product_details': product_details,
         'image_base64': image_base64,
         'news_entries': news_entries,
         'user_name': user_name,
-        'final_recommend': final_recommend_json,  # 적금 Top 3
-        'deposit_recommend': deposit_recommend_json  # 예금 Top 2
+        'final_recommend': final_recommend_display,  # 적금 Top 3
+        'deposit_recommend': deposit_recommend_display  # 예금 Top 2
     }
 
     return render(request, 'loginmain.html', context)
 
 @login_required_session
 def info(request):
-    # 세션에서 CustomerID 가져오기
     customer_id = request.session.get('user_id')  
-    user_name = "사용자"  # 기본값 설정
+    user_name = "사용자"
 
     if customer_id:
         try:
-            # CustomerID로 UserProfile 조회
             user = UserProfile.objects.get(CustomerID=customer_id)
-            user_name = user.username  # 사용자 이름 설정
+            user_name = user.username
         except UserProfile.DoesNotExist:
-            pass  # 사용자가 없을 경우 기본값 유지
+            pass
 
-    context = {
-        'user_name': user_name,
-    }
-    
-    # POST 요청일 경우 info1의 goal과 saving_method를 세션에 저장 후 리디렉션
+    context = {'user_name': user_name}
+
     if request.method == 'POST':
-        biggoal = request.POST.get('biggoal')
-        goal = request.POST.get('goal')
-        saving_method = request.POST.get('saving_method')
-        period = request.POST.get('period')
-        amount = request.POST.get('amount')
-        bank_option = request.POST.get('bank_option')
-        selected_preferences = request.POST.getlist('preferences')
+        saving_method = request.POST.get('saving_method')  
+        bank_option = request.POST.get('bank_option')  
+        selected_preferences = request.POST.getlist('preferences')  
+        cluster_list = request.session.get('clusters', [])
         
-        request.session['biggoal'] = biggoal
-        request.session['selected_preferences'] = selected_preferences
-        request.session['bank_option'] = bank_option
-        request.session['period'] = period
-        request.session['amount'] = amount
-        request.session['goal'] = goal
-        request.session['saving_method'] = saving_method
-        print(biggoal,selected_preferences,bank_option,period,amount,goal,saving_method)
-        return redirect('top5')
+        if not cluster_list:
+            return render(request, 'error.html', {'message': 'Cluster 값이 없습니다.'})
+
+        # 은행 유형 필터링
+        if bank_option == "일반은행":
+            s_bank_query = Q(bank_name__icontains="1금융권")
+        elif bank_option == "저축은행":
+            s_bank_query = Q(bank_name__icontains="저축은행")
+        else:
+            return render(request, 'error.html', {'message': '유효하지 않은 은행 옵션입니다.'})
+
+        # 클러스터 필터링
+        d_cluster_query = Q()
+        s_cluster_query = Q()
+        for cluster in cluster_list:
+            d_cluster_query |= Q(cluster=cluster)
+            s_cluster_query |= Q(cluster1=cluster)
+
+        # 우대조건 필터링
+        d_preference_query = Q()
+        s_preference_query = Q()
+        for preference in selected_preferences:
+            d_preference_query &= Q(condit__icontains=preference)
+            s_preference_query &= Q(preferential_conditions__icontains=preference)
+        # 적립 방법에 따라 분리된 로직
+        deposit_recommend = []
+        final_recommend = []
+        if saving_method == "목돈 모으기":
+            deposit_recommend = DProduct.objects.filter(d_cluster_query).order_by('-maxir', '-name').values()[:5]  # 상위 5개만 가져오기
+        elif saving_method == "목돈 굴리기":
+            final_recommend = SProduct.objects.filter(s_bank_query & s_cluster_query).order_by('-max_preferential_rate', '-bank_name').values()[:5]  # 상위 5개만 가져오기
+        elif saving_method == "목돈 모으기 + 목돈 굴리기":
+            deposit_recommend = DProduct.objects.filter(d_cluster_query).order_by('-maxir', '-name').values()[:5]  # 상위 5개만 가져오기
+            final_recommend = SProduct.objects.filter(s_bank_query & s_cluster_query).order_by('-max_preferential_rate', '-bank_name').values()[:5]  # 상위 5개만 가져오기
+        # 추천 결과를 세션에 JSON 형식으로 저장
+        request.session['deposit_recommend'] = json.dumps(list(deposit_recommend), cls=DjangoJSONEncoder)
+        request.session['final_recommend'] = json.dumps(list(final_recommend), cls=DjangoJSONEncoder)
+        
+        return render(request, 'recommend_savings_top5.html', {
+            'deposit_recommend': deposit_recommend,
+            'final_recommend': final_recommend
+        })
     
     # GET 요청일 경우 템플릿 렌더링
     return render(request, 'savings_info.html', context)
