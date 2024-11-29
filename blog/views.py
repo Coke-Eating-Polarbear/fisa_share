@@ -31,7 +31,8 @@ from joblib import load
 import numpy as np
 from django.conf import settings
 from openai import OpenAI
-
+from django.db.models import Q
+from django.core.serializers.json import DjangoJSONEncoder
 
 es = Elasticsearch([os.getenv('ES')])  # Elasticsearch 설정
 load_dotenv() 
