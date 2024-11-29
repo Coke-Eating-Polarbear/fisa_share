@@ -304,3 +304,11 @@ header, footer {
     margin-top: 100px; /* 헤더의 높이와 동일하게 설정 */
 }
 
+.existing-product-container {
+    margin-bottom: 20px; /* 추천 상품과의 간격 */
+    padding: 10px; /* 선택적: 여백 추가 */
+    background-color: #f9f9f9; /* 선택적: 배경색 */
+    border-radius: 8px; /* 선택적: 모서리 둥글게 */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 선택적: 그림자 */
+}
+
