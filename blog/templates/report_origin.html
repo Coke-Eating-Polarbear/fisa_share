@@ -7,6 +7,8 @@
     <title>금융분석리포트</title>
     <link rel="stylesheet" href="{% static 'css/report_origin.css' %}">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Marked.js 라이브러리 -->
+    <script src="https://cdn.jsdelivr.net/npm/marked@2.1.3/marked.min.js"></script>
     <style>
     </style>
 </head>
@@ -99,15 +101,23 @@
             </div>
             
         <div class="box report-summary">
-            <h3>금융 리포트 종합 요약</h3>
-            <p id="full-report">
-                생성형 AI로 분석한 전체 자산 요약 내용이 들어갑니다. 회원의 자산 상태를 설명하는 구체적인 분석 내용이 표시됩니다.
-            </p>
+            <h3>만덕이가 분석한 금융 리포트</h3>
+            <!--<p id="full-report"> {{ report }} </p>-->
+            <div id="report-container">{{ report }}</div>
         </div>
     </div>
 
 
     <script>
+        // DOMContentLoaded 이벤트로 스크립트 실행
+        document.addEventListener("DOMContentLoaded", function () {
+            // Django에서 전달된 데이터를 JavaScript로 로드
+            const markdownReport = `{{ report|safe }}`;
+
+            // 마크다운을 HTML로 변환
+            document.getElementById('report-container').innerHTML = marked(markdownReport);
+        });
+
         // Django에서 전달된 데이터를 JavaScript로 로드
         const barData = JSON.parse('{{ bar_data|safe }}');
         const averageData = JSON.parse('{{ average_data|safe }}');

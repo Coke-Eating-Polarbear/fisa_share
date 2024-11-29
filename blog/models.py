@@ -154,10 +154,13 @@ class MyDataAsset(models.Model):
     estate = models.BigIntegerField()  # Estate
     financial = models.BigIntegerField()  # Financial
     ect = models.BigIntegerField()  # Ect
-    monthly_income = models.FloatField()
-    financial = models.FloatField()
-    debt = models.FloatField()
-    total_income = models.FloatField()
+    monthly_income = models.BigIntegerField()
+    debt = models.BigIntegerField()
+    total_income = models.BigIntegerField()
+    expenses = models.BigIntegerField()
+    repayment = models.BigIntegerField()
+    saving = models.BigIntegerField()
+    rent = models.BigIntegerField()
 
     def __str__(self):
         return self.CustomerID
