@@ -231,7 +231,7 @@ class DProduct(models.Model):
     bank = models.CharField(max_length=255, null=True, blank=True)
     baser = models.FloatField(null=True, blank=True)
     maxir = models.FloatField(null=True, blank=True)
-    dtype = models.CharField(max_length=255, null=True, blank=True)
+    dstype = models.CharField(max_length=255, null=True, blank=True)
     period = models.CharField(max_length=255, null=True, blank=True)
     amount = models.CharField(max_length=255, null=True, blank=True)
     method = models.TextField(null=True, blank=True)
