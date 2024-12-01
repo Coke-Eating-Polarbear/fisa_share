@@ -63,23 +63,25 @@
             <!-- 차트 1 -->
             <div class="chart-container">
                 <div class="chart-header">
-                    <div class="chart-title">지출 빈도별 소비</div>
                     <div class="date-range-buttons">
-                        <button onclick="filterData(7)">최근 7일</button>
-                        <button onclick="filterData(14)">최근 14일</button>
-                        <button onclick="filterData(30)">최근 30일</button>
+                        <button onclick="filterData('1m')">직전 1달</button>
+                        <button onclick="filterData('6m')">최근 6달</button>
+                        <button onclick="filterData('1y')">최근 1년</button>
                     </div>
+                    <div class="chart-title">지출 빈도별 소비</div>
+                    
                 </div>
                 <!-- 정렬 및 날짜 선택 -->
-                <div class="filter-section">
+                <!-- <div class="filter-section">
                     <div class="sort-container">
                     </div>
                     <div class="date-container">
                         <label for="dateFrequency">날짜:</label>
                         <input type="date" id="dateFrequency" />
                     </div>
-                </div>
+                </div> -->
                 <canvas id="frequencyChart" class="chart"></canvas>
+                
             </div>
     
             <!-- 차트 2 -->
@@ -87,28 +89,28 @@
                 <div class="chart-header">
                     <div class="chart-title">지출 금액별 소비</div>
                     <div class="date-range-buttons">
-                        <button onclick="filterData(7)">최근 7일</button>
-                        <button onclick="filterData(14)">최근 14일</button>
-                        <button onclick="filterData(30)">최근 30일</button>
+                        <!-- <button onclick="filterData('1m')">직전 1달</button>
+                        <button onclick="filterData('6m')">최근 6달</button>
+                        <button onclick="filterData('1y')">최근 1년</button> -->
                     </div>
                 </div>
                 <!-- 정렬 및 날짜 선택 -->
-                <div class="filter-section">
+                <!-- <div class="filter-section">
                     <div class="sort-container">
                     </div>
                     <div class="date-container">
                         <label for="dateAmount">날짜:</label>
                         <input type="date" id="dateAmount" />
                     </div>
-                </div>
+                </div> -->
                 <canvas id="amountChart" class="chart"></canvas>
             </div>
         </div>
 
         <!-- 설명 섹션 -->
         <div class="description">
-            <p>다음 달 예상 소비 금액은 <span class="highlight">##원</span>입니다.</p>
-            <p><span class="highlight">식비</span>와 <span class="highlight">쇼핑</span> 항목에서 가장 큰 소비가 예상됩니다.</p>
+            <p>다음 달 예상 소비 금액은 <span id="predicted-total" class="highlight"></span>원 입니다.</p>
+            <p><span id="amount-top" class="highlight"></span>와 <span id="amount-top2" class="highlight"></span> 항목에서 가장 큰 소비가 예상됩니다.</p>
             <p>이 분야에서 소비를 줄이려면, 혜택이 큰 카드를 사용해보세요!</p>
             <p>예상 절감 금액: <span class="highlight">##원</span></p>
         </div>
@@ -126,12 +128,18 @@
                     <div class="filter-section">
                         <label for="categorySelect">항목 선택:</label>
                         <select id="categorySelect" onchange="updatePredictionChart()">
-                            <option value="total">총합</option>
-                            <option value="식비">식비</option>
-                            <option value="쇼핑">쇼핑</option>
-                            <option value="교통">교통</option>
-                            <option value="취미">취미</option>
-                            <option value="카페">카페</option>
+                            <option value="predicted_total">총합</option>
+                            <option value="eat">식비</option>
+                            <option value="transfer">교통비</option>
+                            <option value="utility_amount">공과금</option>
+                            <option value="phone">통신비</option>
+                            <option value="home">주거비</option>
+                            <option value="hobby">취미</option>
+                            <option value="fashion">패션</option>
+                            <option value="party">모임비</option>
+                            <option value="allowance">용돈</option>
+                            <option value="study">교육비</option>
+                            <option value="medical">의료비</option>
                         </select>
                     </div>
                 </div>
@@ -196,22 +204,67 @@
                 </div>
             </div>
     <script>
+
+        // Django에서 전달된 JSON 데이터를 JavaScript 객체로 변환
+        const nextMonthPrediction = JSON.parse('{{ next_month_prediction_json|safe }}');
+
+        // predicted_total 값을 HTML에 삽입
+        const predictedTotal = nextMonthPrediction.predicted_total;
+
+        // 숫자를 3자리마다 쉼표로 포맷
+        const formattedPredictedTotal = predictedTotal.toLocaleString('ko-KR');
+        // HTML 업데이트
+        document.getElementById('predicted-total').textContent = formattedPredictedTotal;
+
         // 데이터는 예시입니다. 필요에 따라 실제 데이터를 사용하세요.
+        // 데이터 받아와야함.
+        const FreqsortedCategories = JSON.parse('{{ Freq_sorted_categories_json|escapejs }}');
+        const freqTotal = JSON.parse('{{ Freq_total_json|escapejs }}');
+
+        // 프론트 친구들에게 부탁 : label별 컬러 설정해줄수 있는지?
+        const colors = [
+            '#ff6384', '#36a2eb', '#ffce56', '#4bc0c0', '#9966ff',  // 기존 5개 색상
+            '#ff9f40', '#c9cbcf', '#f66f0d', '#5c67f2', '#f2828b', '#63c5c1' // 추가한 6개 색상
+        ];
+        // console.log(FresortedCategories);  // 확인용
+        // console.log(freqTotal);  // 확인용
+        const freq_labels = Object.keys(FreqsortedCategories); // 키를 라벨로 사용
+        const freq_data = Object.values(FreqsortedCategories); // 값을 데이터로 사용
+
+        
         const frequencyData = {
-            labels: ['식비', '쇼핑', '교통', '취미', '카페'],
+            labels: freq_labels,
             datasets: [{
-                data: [30, 20, 15, 25, 10],
-                backgroundColor: ['#ff6384', '#36a2eb', '#ffce56', '#4bc0c0', '#9966ff']
+                data: freq_data,
+                backgroundColor: colors
             }]
         };
 
+        // sorted_categories 딕셔너리에서 labels와 data 추출
+        // Django에서 dict 형태를 JSON 형식으로 변환하여 JavaScript 객체로 전달
+        // Django에서 전달된 JSON 형식을 JavaScript 객체로 변환
+        
+        const sortedCategories = JSON.parse('{{ sorted_categories_json|escapejs }}');
+        const amountTotal = JSON.parse('{{ amount_total_json|escapejs }}'); 
+
+        
+        const amount_labels = Object.keys(sortedCategories); // 키를 라벨로 사용
+        const amount_data = Object.values(sortedCategories); // 값을 데이터로 사용
+        const amount_top = amount_labels[0]
+        const amount_top2 = amount_labels[1]
+        document.getElementById('amount-top').textContent = amount_top;
+        document.getElementById('amount-top2').textContent = amount_top2;
+        
+
         const amountData = {
-            labels: ['식비', '쇼핑', '교통', '취미', '카페'],
+            labels: amount_labels,
             datasets: [{
-                data: [35, 25, 10, 20, 10],
-                backgroundColor: ['#ff6384', '#36a2eb', '#ffce56', '#4bc0c0', '#9966ff']
+                data: amount_data,
+                backgroundColor: colors
             }]
         };
+        console.log(amountData);
+        
 
         // 차트 생성
         new Chart(document.getElementById('frequencyChart'), {
@@ -258,23 +311,45 @@
             ],
         };
 
-        function filterData(days) {
-            console.log(`최근 ${days}일 데이터를 불러옵니다.`);
-            // 여기서 days 값을 이용해 데이터를 필터링하고 차트를 업데이트하는 로직 추가
-            // 예: AJAX 요청 또는 데이터 업데이트
+        function filterData(period) {
+            let startDate;
+
+            // 현재 날짜를 기준으로 기간 계산
+            const today = new Date();
+            
+            if (period === '1m') {
+                // 직전 1달
+                startDate = new Date(today.setMonth(today.getMonth() - 1));
+            } else if (period === '6m') {
+                // 최근 6달
+                startDate = new Date(today.setMonth(today.getMonth() - 6));
+            } else if (period === '1y') {
+                // 최근 1년
+                startDate = new Date(today.setFullYear(today.getFullYear() - 1));
+            }
+
+            // startDate를 기준으로 필터링된 데이터를 가져오거나 차트를 갱신하는 로직을 추가합니다.
+            console.log('Start Date:', startDate.toISOString().split('T')[0]); // 출력 형식: YYYY-MM-DD
+
+            
+            // 현재 URL에 period를 쿼리 파라미터로 추가
+            const url = new URL(window.location.href);
+            url.searchParams.set('period', period);  // 'period' 파라미터를 URL에 추가
+
+            // 페이지를 리로드하여 쿼리 파라미터가 서버로 전달되도록 함
+            window.location.href = url.toString();
+
+
+            // 여기에 차트 데이터 필터링 및 갱신하는 로직을 넣습니다.
         }
+
 
         //다음 달 예측 소비
         // 월별 소비 데이터
-        const consumptionData = {
-            total: [1200000, 1350000, 1280000, 1400000], // 총합
-            식비: [450000, 470000, 500000, 520000],      // 식비
-            쇼핑: [650000, 700000, 720000, 750000],      // 쇼핑
-            교통: [200000, 210000, 220000, 230000],      // 교통
-            취미: [300000, 310000, 320000, 330000],      // 취미
-            카페: [100000, 110000, 120000, 130000]       // 카페
-        };
-
+        const month1 = JSON.parse('{{ month1_json|escapejs }}');
+        const month2 = JSON.parse('{{ month2_json|escapejs }}');
+        const month3 = JSON.parse('{{ month3_json|escapejs }}');
+        
         // 차트 객체 저장 변수
         let predictionChart;
 
@@ -286,15 +361,16 @@
             if (predictionChart) {
                 predictionChart.destroy();
             }
-
+            const months = JSON.parse('{{ months_json|escapejs }}');  // Django 데이터 JS로 전달
+            console.log(months);  // JavaScript에서 데이터 출력
             // 새로운 차트 생성
             predictionChart = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: ['9월', '10월', '11월', '12월'], // X축 레이블
+                    labels: months, // X축 레이블
                     datasets: [
                         {
-                            label: `${category} 소비 금액 (원)`, // 데이터셋 이름
+                            label: `소비 금액 (원)`, // 데이터셋 이름
                             data: data, // 선택된 항목의 데이터
                             borderColor: '#36a2eb',
                             backgroundColor: 'rgba(54, 162, 235, 0.2)',
@@ -333,13 +409,20 @@
         // 드롭다운 선택값에 따라 차트 업데이트
         function updatePredictionChart() {
             const selectedCategory = document.getElementById('categorySelect').value;
-            const selectedData = consumptionData[selectedCategory];
+            console.log('Selected Category:', selectedCategory);
+            const selectedData1 = month1[selectedCategory]; // JSON에서 선택된 키의 값 가져오기
+            const selectedData2 = month2[selectedCategory]; // JSON에서 선택된 키의 값 가져오기
+            const selectedData3 = month3[selectedCategory]; // JSON에서 선택된 키의 값 가져오기
+            const selectedData4 = nextMonthPrediction[selectedCategory];
+            const selectedData = [selectedData1,selectedData2,selectedData3,selectedData4];
             renderPredictionChart(selectedData, selectedCategory);
+
+            
         }
 
         // 초기화: 페이지 로드 시 기본 데이터로 차트 렌더링
         window.onload = function () {
-            document.getElementById('categorySelect').value = 'total'; // 기본값 설정
+            document.getElementById('categorySelect').value = 'predicted_total'; // 기본값 설정
             updatePredictionChart(); // 차트 렌더링
         };
 

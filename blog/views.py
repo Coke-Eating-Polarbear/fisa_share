@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect,get_object_or_404 # type: ignore
 from django.contrib.auth import authenticate, login,logout # type: ignore
 from django.utils import timezone # type: ignore
 from datetime import timedelta
+from datetime import date
 import matplotlib.pyplot as plt # type: ignore
 import base64
 import io
@@ -33,6 +34,10 @@ from django.conf import settings
 from openai import OpenAI
 from django.db.models import Q
 from django.core.serializers.json import DjangoJSONEncoder
+from django.core import serializers
+from django.db.models import Sum
+import calendar
+from dateutil.relativedelta import relativedelta
 
 es = Elasticsearch([os.getenv('ES')])  # Elasticsearch 설정
 load_dotenv() 
@@ -155,40 +160,61 @@ def mypage(request):
     }
     return render(request, 'mypage.html', context)
 
-def fetch_sql_processed_data():
+def fetch_sql_processed_data(mydata_pay):
     """
-    SQL에서 전처리된 데이터를 가져오는 함수.
+    전처리된 데이터를 만드는 함수.
     Returns:
         DataFrame: SQL에서 처리된 데이터를 Pandas DataFrame으로 반환
     """
-    db_config = {
-        'host': '118.67.131.22:3306',
-        'user': 'fisaai',
-        'password': 'woorifisa3!W',
-        'database': 'manduck'
-    }
-    db_connection = f"mysql+pymysql://{db_config['user']}:{db_config['password']}@{db_config['host']}/{db_config['database']}"
-    engine = create_engine(db_connection)
+    # db_config = {
+    #     'host': '118.67.131.22:3306',
+    #     'user': 'fisaai',
+    #     'password': 'woorifisa3!W',
+    #     'database': 'manduck'
+    # }
+    # db_connection = f"mysql+pymysql://{db_config['user']}:{db_config['password']}@{db_config['host']}/{db_config['database']}"
+    # engine = create_engine(db_connection)
 
-    query = """
-    SELECT 
-        Pyear,
-        Pmonth,
-        Bizcode,
-        SUM(Price) AS TotalPrice,
-        SUM(SUM(Price)) OVER (PARTITION BY Pyear, Pmonth) AS TotalSpending,
-        SUM(Price) * 1.0 / SUM(SUM(Price)) OVER (PARTITION BY Pyear, Pmonth) AS Ratio
-    FROM mydata_pay
-    GROUP BY Pyear, Pmonth, Bizcode
-    ORDER BY Pyear, Pmonth, Bizcode;
-    """
-    df = pd.read_sql(query, engine)
+    # query = """
+    # SELECT 
+    #     Pyear,
+    #     Pmonth,
+    #     Bizcode,
+    #     SUM(Price) AS TotalPrice,
+    #     SUM(SUM(Price)) OVER (PARTITION BY Pyear, Pmonth) AS TotalSpending,
+    #     SUM(Price) * 1.0 / SUM(SUM(Price)) OVER (PARTITION BY Pyear, Pmonth) AS Ratio
+    # FROM mydata_pay
+    # GROUP BY Pyear, Pmonth, Bizcode
+    # ORDER BY Pyear, Pmonth, Bizcode;
+    # """
+    # QuerySet을 Pandas DataFrame으로 변환
+    df = pd.DataFrame(list(mydata_pay))
+    print('mydata_pay_df',df)
+    # df = pd.read_sql(query, engine)
+    # 1. TotalPrice 계산: Pyear, Pmonth, Bizcode별로 Price 합산
+    df_grouped = df.groupby(['pyear', 'pmonth', 'bizcode'], as_index=False)['price'].sum()
+    df_grouped.rename(columns={'price': 'TotalPrice'}, inplace=True)
+
+    # 2. TotalSpending 계산: Pyear, Pmonth별 Price 합산
+    df_grouped['TotalSpending'] = df_grouped.groupby(['pyear', 'pmonth'])['TotalPrice'].transform('sum')
+
+    # 3. Ratio 계산: TotalPrice / TotalSpending
+    df_grouped['Ratio'] = df_grouped['TotalPrice'] / df_grouped['TotalSpending']
+
+    # 4. 정렬
+    df_grouped = df_grouped.sort_values(by=['pyear', 'pmonth', 'bizcode'])
+
+
+    # 결과 출력
+    print('df_grouped',df_grouped)
+    df=df_grouped
+    print('df',df)
 
     # Pivot 변환: Bizcode를 열로 만들고 각 Ratio 값을 채움
-    pivot_data = df.pivot(index=['Pyear', 'Pmonth'], columns='Bizcode', values='Ratio').fillna(0)
+    pivot_data = df.pivot(index=['pyear', 'pmonth'], columns='bizcode', values='Ratio').fillna(0)
 
     # TotalSpending 추가
-    pivot_data['TotalSpending'] = df.drop_duplicates(subset=['Pyear', 'Pmonth'])[['Pyear', 'Pmonth', 'TotalSpending']].set_index(['Pyear', 'Pmonth'])
+    pivot_data['TotalSpending'] = df.drop_duplicates(subset=['pyear', 'pmonth'])[['pyear', 'pmonth', 'TotalSpending']].set_index(['pyear', 'pmonth'])
 
     return pivot_data
 
@@ -215,7 +241,7 @@ def predict_next_month(preprocessed_data, model_features):
     print(f"모델 입력 데이터 (가장 최근 데이터):\n{model_input}")
 
     # 모델 로드 및 예측
-    model = load('rfm_Consumption_prediction.joblib')
+    model = load('./models/Consumption_Prediction_rfm.joblib')
     X_test = model_input.values.reshape(1, -1)
     predicted_total = model.predict(X_test)[0]
 
@@ -231,16 +257,16 @@ def predict_next_month(preprocessed_data, model_features):
     result.name = (most_recent_period[0], most_recent_period[1] + 1)
     return result
 
-def senter():
+def senter(mydata_pay):
     """
     메인 함수: 데이터 처리, 예측, 출력 수행
     """
     print("SQL에서 전처리된 데이터를 가져옵니다...")
-    preprocessed_data = fetch_sql_processed_data()
+    preprocessed_data = fetch_sql_processed_data(mydata_pay)
     print("Preprocessed Data Columns:", preprocessed_data.columns)
 
     print("저장된 모델의 입력 형식을 확인합니다...")
-    model = os.path.join(settings.BASE_DIR, 'models', 'rfm_Consumption_prediction.joblib')
+    model = os.path.join(settings.BASE_DIR, 'models', 'Consumption_prediction_rfm.joblib')
     model_features = list(model.feature_names_in_) if hasattr(model, 'feature_names_in_') else preprocessed_data.columns.drop('TotalSpending')
 
     print("다음 달 예측 결과:")
@@ -248,6 +274,11 @@ def senter():
     print(f"연도: {next_month_prediction.name[0]}, 월: {next_month_prediction.name[1]}")
     print(next_month_prediction)
     return next_month_prediction
+
+# 함수로 데이터 키 변환 정의
+def apply_mapping(data_dict, mapping):
+    return {mapping.get(k, k): v for k, v in data_dict.items()}
+
 
 @login_required_session
 def spending_mbti(request):
@@ -259,22 +290,304 @@ def spending_mbti(request):
             user = UserProfile.objects.get(CustomerID=customer_id)
             user_name = user.username  # 사용자 이름 설정
 
+            # 'period' 쿼리 파라미터 가져오기
+            period = request.GET.get('period', None)
+
+
+            # 현재 날짜 가져오기
+            today = date.today()
+            
+
+            # 기간에 따라 시작 날짜 계산
+            if period == '1m':
+                # 직전 1달
+                # 현재 월에서 한 달을 빼고 그 월의 첫째 날 계산
+                if today.month == 1:
+                    start_date = today.replace(year=today.year - 1, month=12)
+                else:
+                    start_date = today.replace(month=today.month - 1)
+
+            
+            elif period == '6m':
+                if today.month <= 6:
+                    # 1월부터 6월 사이인 경우, 지난 해로 넘어가야 함
+                    start_date = today.replace(year=today.year - 1, month=12 + (today.month - 6))
+                else:
+                    # 7월 이후의 경우
+                    start_date = today.replace(month=today.month - 6)
+            elif period == '1y':
+                # 최근 1년
+                start_date = today.replace(year=today.year - 1)
+            else:
+                # 직전 1달 디폴트
+                # 현재 월에서 한 달을 빼고 그 월의 첫째 날 계산
+                if today.month == 1:
+                    start_date = today.replace(year=today.year - 1, month=12)
+                else:
+                    start_date = today.replace(month=today.month - 1)
+
+            # start_date에서 지난달
+            start_date = start_date - relativedelta(months=1)
+            print('start_date',start_date)
+
+            # `SpendAmount`에서 기간에 맞는 데이터 필터링
+            spend_amounts = SpendAmount.objects.filter(
+                CustomerID=customer_id, 
+                SDate__gte=start_date  # 시작 날짜 이후의 데이터만 가져옴
+            )
+            
+             # 각 항목별로 총합을 구합니다.
+            category_totals = spend_amounts.aggregate(
+                total_eat_amount=Sum('eat_amount'),
+                total_transfer_amount=Sum('transfer_amount'),
+                total_utility_amount=Sum('utility_amount'),
+                total_phone_amount=Sum('phone_amount'),
+                total_home_amount=Sum('home_amount'),
+                total_hobby_amount=Sum('hobby_amount'),
+                total_fashion_amount=Sum('fashion_amount'),
+                total_party_amount=Sum('party_amount'),
+                total_allowance_amount=Sum('allowance_amount'),
+                total_study_amount=Sum('study_amount'),
+                total_medical_amount=Sum('medical_amount'),
+                total_total_amount=Sum('TotalAmount')  # 전체 합계
+            )
+
+            # 항목을 한국어로 맵핑한 딕셔너리로 저장
+            category_total_dict = {
+                '총합': category_totals['total_total_amount'],
+            }
+            # 항목을 한국어로 맵핑한 딕셔너리로 저장
+            category_dict = {
+                '식비': category_totals['total_eat_amount'] or 0,
+                '이체': category_totals['total_transfer_amount'] or 0,
+                '공과금': category_totals['total_utility_amount'] or 0,
+                '전화': category_totals['total_phone_amount'] or 0,
+                '집': category_totals['total_home_amount'] or 0,
+                '취미': category_totals['total_hobby_amount'] or 0,
+                '패션': category_totals['total_fashion_amount'] or 0,
+                '파티': category_totals['total_party_amount'] or 0,
+                '용돈': category_totals['total_allowance_amount'] or 0,
+                '학습': category_totals['total_study_amount'] or 0,
+                '의료': category_totals['total_medical_amount'] or 0,
+            }
+
+            # 항목을 값 기준으로 내림차순 정렬하여 상위 7개 항목을 추출
+            sorted_categories = sorted(category_dict.items(), key=lambda x: x[1] or 0, reverse=True)
+            # print(sorted_categories)
+
+            # 상위 4개 항목을 구합니다.
+            sorted_categories = dict(sorted_categories)
+            amount_total = dict(category_total_dict)
+
+            # sorted_categories와 amount_total을 JSON으로 변환
+            sorted_categories_json = json.dumps(sorted_categories)
+            amount_total_json = json.dumps(amount_total)
+
+            # # 나머지 항목을 "기타"로 묶어 총합을 계산 (total 제외)
+            # other_categories_total = sum([value for key, value in sorted_categories[7:]])
+
+            # # "기타" 항목 추가
+            # top4_categories['기타'] = other_categories_total
+
+            # print(top4_categories)    
+
+            # 여기서 부터는 spendfreq 시작
+            # # `SpendFreq`에서 기간에 맞는 데이터 필터링
+            spend_freq = SpendFreq.objects.filter(
+                CustomerID=customer_id, 
+                SDate__gte=start_date  # 시작 날짜 이후의 데이터만 가져옴
+            )     
+            print('spend_freq',spend_freq)
+
+            # 각 항목별로 총합을 구합니다.
+            Freq_category_totals = spend_freq.aggregate(
+                total_eat_Freq=Sum('eat_Freq'),
+                total_transfer_Freq=Sum('transfer_Freq'),
+                total_utility_Freq=Sum('utility_Freq'),
+                total_phone_Freq=Sum('phone_Freq'),
+                total_home_Freq=Sum('home_Freq'),
+                total_hobby_Freq=Sum('hobby_Freq'),
+                total_fashion_Freq=Sum('fashion_Freq'),
+                total_party_Freq=Sum('party_Freq'),
+                total_allowance_Freq=Sum('allowance_Freq'),
+                total_study_Freq=Sum('study_Freq'),
+                total_medical_Freq=Sum('medical_Freq'),
+                total_total_Freq=Sum('TotalFreq')  # 전체 합계
+            )
+            # 항목을 한국어로 맵핑한 딕셔너리로 저장
+            Freq_category_dict = {
+                '식비': Freq_category_totals['total_eat_Freq'] or 0,
+                '이체': Freq_category_totals['total_transfer_Freq'] or 0,
+                '공과금': Freq_category_totals['total_utility_Freq'] or 0,
+                '전화': Freq_category_totals['total_phone_Freq'] or 0,
+                '집': Freq_category_totals['total_home_Freq'] or 0,
+                '취미': Freq_category_totals['total_hobby_Freq'] or 0,
+                '패션': Freq_category_totals['total_fashion_Freq'] or 0,
+                '파티': Freq_category_totals['total_party_Freq'] or 0,
+                '용돈': Freq_category_totals['total_allowance_Freq'] or 0,
+                '학습': Freq_category_totals['total_study_Freq'] or 0,
+                '의료': Freq_category_totals['total_medical_Freq'] or 0,
+            }
+
+            # 항목을 한국어로 맵핑한 딕셔너리로 저장
+            Freq_category_total_dict = {
+                '총합': Freq_category_totals['total_total_Freq'],
+            }
+
+            # 항목을 값 기준으로 내림차순 정렬하여 상위 7개 항목을 추출
+            Freq_sorted_categories = sorted(Freq_category_dict.items(), key=lambda x: x[1] or 0, reverse=True)
+            # print(sorted_categories)
+
+            # 상위 4개 항목을 구합니다.
+            Freq_sorted_categories = dict(Freq_sorted_categories)
+            Freq_total = dict(Freq_category_total_dict)
+
+            # sorted_categories와 amount_total을 JSON으로 변환
+            Freq_sorted_categories_json = json.dumps(Freq_sorted_categories)
+            Freq_total_json = json.dumps(Freq_total)
+
+            # 소비 예측 모델 불러오기
+            mydata_pay = MyDataPay.objects.filter(
+                CustomerID=customer_id
+            ).values()     
+            print('mydata_pay',mydata_pay)
+            pd.options.display.float_format = '{:,.2f}'.format
+            
+            # series 타입을 직렬화
+            prediction= senter(mydata_pay)
+            # JSON 형식으로 변환
+            prediction_dict = prediction.to_dict()
+            next_month_prediction_json = json.dumps(prediction_dict)
+            print('next_month_prediction',next_month_prediction_json)
+
+
+
+            # 소비 예측 차트를 위한 값 불러오기
+            
+            # 직전 1달
+            # 현재 월에서 한 달을 빼고 그 월의 첫째 날 계산
+            if today.month == 3:
+                fred_start_date = today.replace(year=today.year - 3, month=12)
+            else:
+                fred_start_date = today.replace(month=today.month - 3)
+
+            # start_date에서 지난달
+            fred_start_date = fred_start_date - relativedelta(months=1)
+
+            fred_spend_amounts = SpendAmount.objects.filter(
+                CustomerID=customer_id ,
+                SDate__gte=fred_start_date  # 시작 날짜 이후의 데이터만 가져옴
+            ).values()
+            # print('fred_spend_amounts',fred_spend_amounts)
+
+            # QuerySet에서 리스트로 변환
+            fred_spend_amounts_list = list(fred_spend_amounts)
+
+            # 월별 데이터 딕셔너리 생성
+            fred_spend_amounts_by_month = {
+                item['SDate']: {key: value for key, value in item.items() if key not in ['CustomerID', 'SDate']}
+                for item in fred_spend_amounts_list
+            }
+
+            # 월별 데이터 쪼개기
+            months = list(fred_spend_amounts_by_month.keys())  # 월 목록 생성 (예: ['2024-09', '2024-10', '2024-11'])
+            print("Original months:", months)
+
+
+            split_month_dict = [
+                fred_spend_amounts_by_month[month] for month in months
+            ]
+
+            # json1, json2, json3으로 저장
+            month1_dict, month2_dict, month3_dict = split_month_dict
+
+
+
+            # 키 매핑 정의
+            key_mapping = {
+                "allowance": "allowance_amount",
+                "eat": "eat_amount",
+                "fashion": "fashion_amount",
+                "hobby": "hobby_amount",
+                "home": "home_amount",
+                "medical": "medical_amount",
+                "party": "party_amount",
+                "phone": "phone_amount",
+                "study": "study_amount",
+                "transfer": "transfer_amount",
+                "predicted_total": "TotalAmount"
+            }
+            # key_mapping을 반대로 변환
+            reversed_key_mapping = {value: key for key, value in key_mapping.items()}
+            
+            # 반전된 key_mapping을 사용하여 각 월별 데이터 변환
+            month1_dict_map = apply_mapping(month1_dict, reversed_key_mapping)
+            month2_dict_map = apply_mapping(month2_dict, reversed_key_mapping)
+            month3_dict_map = apply_mapping(month3_dict, reversed_key_mapping)
+
+            # JSON으로 변환
+            month1_json = json.dumps(month1_dict_map)
+            month2_json = json.dumps(month2_dict_map)
+            month3_json = json.dumps(month3_dict_map)
+
+
+            # 월 추출
+            result = []
+            prev_year = None
+            # 마지막 달 계산 및 다음 달 추가
+            last_month = months[-1]
+            year, month = map(int, last_month.split('-'))
+
+            if month == 12:  # 마지막 달이 12월인 경우
+                next_year = year + 1
+                next_month = 1
+            else:  # 12월이 아닌 경우
+                next_year = year
+                next_month = month + 1
+
+            # 다음 달 추가
+            next_month_str = f"{next_year}-{str(next_month).zfill(2)}"
+            months.append(next_month_str)
+            # 리스트를 JSON으로 변환
+            months_json = json.dumps(months)
+
+            print(months_json)
+            # print('months',months)
+            
+            # 추가적으로 월 형식으로 바꾸고 싶을 때 사용할 코드
+            # for date in months:
+            #     year, month = date.split('-')
+            #     if prev_year != year:  # 해가 바뀌는 경우
+            #         korean_month = f"{str(year)[-2:]}년 {int(month)}월 "  # 한국어 형식: 1월 (25년)
+            #     else:  # 같은 해인 경우
+            #         korean_month = f"{int(month)}월"  # 한국어 형식: 1월
+            #     result.append(korean_month)
+            #     prev_year = year
+
+            # # 결과 출력
+            # print("Processed months:", result)
+
+
+                        
+
         except UserProfile.DoesNotExist:
             pass  # 사용자가 없을 경우 기본값 유지
 
     ## 소비예측 모델 넣기
     # MySQL 연결 정보
-
-    pd.options.display.float_format = '{:,.2f}'.format
-    next_month_prediction = None
-    if __name__ == "__main__":
-        prediction= senter()
-        # JSON 형식으로 변환
-        next_month_prediction = json.dumps(prediction)
+        
 
     context = {
         'user_name': user_name,
-        'next_month_prediction' : next_month_prediction, # 다음 달 소비 예측 json.
+        'sorted_categories_json' : sorted_categories_json, 
+        'amount_total_json' : amount_total_json, 
+        'Freq_sorted_categories_json' : Freq_sorted_categories_json,
+        'Freq_total_json' : Freq_total_json,
+        'next_month_prediction_json' : next_month_prediction_json,
+        'month1_json' : month1_json,
+        'month2_json' : month2_json,
+        'month3_json' : month3_json,
+        'months_json' : months_json,
     }
     return render(request, 'spending_mbti.html', context)
 
@@ -433,7 +746,7 @@ def summary_view(request):
 
 
     birth_year = user.Birth.year  # 주민번호 앞자리로 연도 추출
-    current_year = datetime.datetime.now().year
+    current_year = datetime.now().year
     age = current_year - birth_year
     cluster = assign_cluster(user.Stageclass, user.sex, age)
 

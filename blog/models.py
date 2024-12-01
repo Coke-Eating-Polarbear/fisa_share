@@ -189,18 +189,20 @@ class MyDataDS(models.Model):
         return f"{self.CustomerID} - {self.AccountID}"
     
 class MyDataPay(models.Model):
-    CustomerID = models.CharField(max_length=256)  # CustomerID
-    pdate = models.DateField()  # Pdate
-    bizcode = models.CharField(max_length=256)  # Bizcode
-    store = models.CharField(max_length=256)  # Store
-    price = models.IntegerField()  # Price
-    type = models.CharField(max_length=256)  # Type
+    CustomerID = models.CharField(max_length=256, primary_key=True)  # CustomerID
+    pdate = models.DateField(null=True)  # Pdate (null 허용)
+    bizcode = models.CharField(max_length=256, null=True)  # Bizcode (null 허용)
+    price = models.BigIntegerField(null=True)  # Price (null 허용)
+    pyear = models.SmallIntegerField(null=True)  # Pyear (null 허용)
+    pmonth = models.SmallIntegerField(null=True)  # Pmonth (null 허용)
 
     def __str__(self):
-        return f"{self.CustomerID} - {self.store} ({self.pdate})"
+        return f"{self.CustomerID} ({self.pyear}-{self.pmonth})"
     
     class Meta:
         db_table = 'mydata_pay'
+        # managed = False  # Django가 이 테이블을 관리하지 않음
+
 
 class SpendAmount(models.Model):
     CustomerID = models.CharField(max_length=256, primary_key=True)  # CustomerID
