@@ -30,7 +30,7 @@
                 <span style="font-size: 1.5rem; font-weight: bold; margin-left: 10px;">예/적금 추천 서비스</span>
         </div>
         <div class="nav-links" style="flex-grow: 1; text-align: center;">
-                <a href="./report.html" style=" font-weight: bold; color: #121212;">금융분석 리포트</a> 
+                <a href="{% url 'originreport' %}" style=" font-weight: bold; color: #121212;">금융분석 리포트</a> 
                 <div class="dropdown">
                     <a href="#" style=" font-weight: bold; color: #121212;">예/적금 추천</a>
                     <div class="dropdown-content">
@@ -38,7 +38,7 @@
                         <a href="{% url 'better' %}" style="font-size: 0.9rem;">기존상품비교</a>
                     </div>
                 </div> 
-                <a href="#" style=" font-weight: bold; color: #121212;">소비MBTI</a>
+                <a href="{% url 'spending_mbti' %}" style=" font-weight: bold; color: #121212;">소비MBTI</a>
    </div>
 
    <!-- 회원 정보 및 마이페이지 -->

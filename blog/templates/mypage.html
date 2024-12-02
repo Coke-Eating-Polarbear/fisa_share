@@ -19,7 +19,7 @@
                     <img src="{% static 'img\header_logo.png' %}" style="vertical-align: middle; margin-left: 100px;" alt="로고">
                 </div>
                 <div class="nav-links" style="flex-grow: 1; text-align: center; margin-right: 220px;">
-                    <a href="./loginmain" style=" font-weight: bold; color: #121212;">금융분석 리포트</a> 
+                    <a href="{% url 'originreport' %}" style=" font-weight: bold; color: #121212;">금융분석 리포트</a> 
                     <div class="dropdown">
                         <a href="#" style=" font-weight: bold; color: #121212;">예/적금 추천</a>
                         <div class="dropdown-content">
@@ -27,7 +27,7 @@
                             <a href="{% url 'better' %}" style="font-size: 0.8rem;">기존상품비교</a>
                         </div>
                     </div> 
-                    <a href="spending_mbti" style=" font-weight: bold; color: #121212;">소비MBTI</a>
+                    <a href="{% url 'spending_mbti' %}" style=" font-weight: bold; color: #121212;">소비MBTI</a>
                 </div>
                <!-- 회원 정보 및 마이페이지 -->
             <div class="user-info">
