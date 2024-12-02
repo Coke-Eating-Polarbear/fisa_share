@@ -58,16 +58,19 @@
     </div>
     </header>
 
-    <div class="container">
-        <div class="content">
+    <div class="container" style="justify-content: center; justify-items: center; margin-top: 50px;">
+        <div class="content" style="justify-content: center; justify-items: center;">
             <div class="box">
                 <h2>{{ user_name }}님의 금융분석 리포트입니다 😊</h2>
             </div>
-            <div class="box score-summary">
-                <p>금융 자산 분석 점수: <span id="analysis-score"></span> 🔍
-                <p>한 줄 요약: <span id="summary"></span></p>
+            <div style="display: grid; grid-template-columns: 2fr 2fr 6fr; width: 90%; max-height: 80%; max-width: 1200px; align-items: center; justify-content: center; gap: 20px; justify-items: center;">
+                <div class="box" id="analysis-score" style="font-size: 30px; text-align: cente; min-height: 80%;"></div>
+                <div class="box score-summary" style="border-radius: 10px; border: 1px solid #ddd; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); margin: 0 auto; padding: 10px; font-size: 60px; text-align: center; display: flex; align-items: center; justify-content: center;">
+                    <span id="score-summary" style="font-size: 100%;"></span>
+                </div>
+                <div class="box" id="summary" style="text-align: center; max-height: 80%;"></div>
             </div>
-            <div class="main-container">
+            <div class="main-container" style="width: 90%; max-width: 1200px;">
                 <!-- 막대 그래프 박스 -->
                 <div class="bar-chart-container chart-box">
                     <div class="chart-box small">
@@ -114,6 +117,7 @@
                     </form>
                 {% endif %}
             </div>
+        </div>
     </div>
 
 
@@ -373,7 +377,7 @@
             // 데이터 화면에 출력
             document.getElementById('analysis-score').textContent = `${score}점`;
             document.getElementById('summary').textContent = summary;
-            document.querySelector('.score-summary').innerHTML += `<p>현재 날씨: ${weather} ${emoji}</p>`;
+            document.querySelector('.score-summary').innerHTML += `<p>${emoji}</p>`;
         });
 
 
