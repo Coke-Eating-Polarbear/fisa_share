@@ -47,6 +47,56 @@ client = OpenAI()
 rc('font', family='Malgun Gothic')
 logger = logging.getLogger(__name__)
 
+def get_sorted_categories_json(customer_id, start_date):
+    """
+    특정 고객의 소비 데이터를 기반으로 sorted_categories_json을 생성합니다.
+    """
+    # `SpendAmount`에서 기간에 맞는 데이터 필터링
+    spend_amounts = SpendAmount.objects.filter(
+        CustomerID=customer_id, 
+        SDate__gte=start_date  # 시작 날짜 이후의 데이터만 가져옴
+    )
+    
+    # 각 항목별로 총합을 구합니다.
+    category_totals = spend_amounts.aggregate(
+        total_eat_amount=Sum('eat_amount'),
+        total_transfer_amount=Sum('transfer_amount'),
+        total_utility_amount=Sum('utility_amount'),
+        total_phone_amount=Sum('phone_amount'),
+        total_home_amount=Sum('home_amount'),
+        total_hobby_amount=Sum('hobby_amount'),
+        total_fashion_amount=Sum('fashion_amount'),
+        total_party_amount=Sum('party_amount'),
+        total_allowance_amount=Sum('allowance_amount'),
+        total_study_amount=Sum('study_amount'),
+        total_medical_amount=Sum('medical_amount'),
+        total_total_amount=Sum('TotalAmount')  # 전체 합계
+    )
+
+    # 항목을 한국어로 맵핑한 딕셔너리로 저장
+    category_dict = {
+        '식비': category_totals['total_eat_amount'] or 0,
+        '교통비': category_totals['total_transfer_amount'] or 0,
+        '공과금': category_totals['total_utility_amount'] or 0,
+        '통신비': category_totals['total_phone_amount'] or 0,
+        '주거비': category_totals['total_home_amount'] or 0,
+        '여가/취미': category_totals['total_hobby_amount'] or 0,
+        '패션/잡화': category_totals['total_fashion_amount'] or 0,
+        '모임회비': category_totals['total_party_amount'] or 0,
+        '경조사': category_totals['total_allowance_amount'] or 0,
+        '교육비': category_totals['total_study_amount'] or 0,
+        '의료비': category_totals['total_medical_amount'] or 0,
+    }
+
+    # 항목을 값 기준으로 내림차순 정렬하여 상위 항목 추출
+    sorted_categories = sorted(category_dict.items(), key=lambda x: x[1], reverse=True)
+    sorted_categories_dict = dict(sorted_categories)
+
+    # JSON 형식으로 변환
+    sorted_categories_json = json.dumps(sorted_categories_dict)
+    
+    return sorted_categories_json
+
 def login_required_session(view_func):
     """
     세션에 'user_id'가 없을 경우 로그인 페이지로 리디렉션하는 데코레이터.
@@ -1103,6 +1153,85 @@ def originreport_page(request):
         # 제외할 키를 명시적으로 정의
         excluded_keys = {'CustomerID', 'SDate', 'TotalAmount'}
 
+        # 함수 호출하여 JSON 데이터 생성
+        period = '1m'
+
+
+            # 현재 날짜 가져오기
+        today = date.today()
+        
+
+        # 기간에 따라 시작 날짜 계산
+        if period == '1m':
+            # 직전 1달
+            # 현재 월에서 한 달을 빼고 그 월의 첫째 날 계산
+            if today.month == 1:
+                start_date = today.replace(year=today.year - 1, month=12)
+            else:
+                start_date = today.replace(month=today.month - 1)
+
+
+        # start_date에서 지난달
+        start_date = start_date - relativedelta(months=1)
+        print('start_date',start_date)
+        asset_data = MyDataAsset.objects.filter(CustomerID=customer_id).values('estate', 'financial', 'ect')
+        print("Query Result:", list(asset_data))  # 쿼리 결과 확인
+        mydata_assets_list = list(asset_data)  # QuerySet을 리스트로 변환
+        mapped_assets = {
+            "부동산": mydata_assets_list[0]["estate"] if mydata_assets_list else 0,
+            "금융": mydata_assets_list[0]["financial"] if mydata_assets_list else 0,
+            "기타": mydata_assets_list[0]["ect"] if mydata_assets_list else 0,
+        }
+
+        # JSON으로 변환
+        mydata_assets_json = json.dumps(mapped_assets, ensure_ascii=False)
+        # `SpendAmount`에서 기간에 맞는 데이터 필터링
+        spend_amounts = SpendAmount.objects.filter(
+            CustomerID=customer_id, 
+            SDate__gte=start_date  # 시작 날짜 이후의 데이터만 가져옴
+        )
+        
+            # 각 항목별로 총합을 구합니다.
+        category_totals = spend_amounts.aggregate(
+            total_eat_amount=Sum('eat_amount'),
+            total_transfer_amount=Sum('transfer_amount'),
+            total_utility_amount=Sum('utility_amount'),
+            total_phone_amount=Sum('phone_amount'),
+            total_home_amount=Sum('home_amount'),
+            total_hobby_amount=Sum('hobby_amount'),
+            total_fashion_amount=Sum('fashion_amount'),
+            total_party_amount=Sum('party_amount'),
+            total_allowance_amount=Sum('allowance_amount'),
+            total_study_amount=Sum('study_amount'),
+            total_medical_amount=Sum('medical_amount'),
+            total_total_amount=Sum('TotalAmount')  # 전체 합계
+        )
+
+        # 항목을 한국어로 맵핑한 딕셔너리로 저장
+        # 항목을 한국어로 맵핑한 딕셔너리로 저장
+        category_dict = {
+            '식비': category_totals['total_eat_amount'] or 0,
+            '교통비': category_totals['total_transfer_amount'] or 0,
+            '공과금': category_totals['total_utility_amount'] or 0,
+            '통신비': category_totals['total_phone_amount'] or 0,
+            '주거비': category_totals['total_home_amount'] or 0,
+            '여가/취미': category_totals['total_hobby_amount'] or 0,
+            '패션/잡화': category_totals['total_fashion_amount'] or 0,
+            '모임회비': category_totals['total_party_amount'] or 0,
+            '경조사': category_totals['total_allowance_amount'] or 0,
+            '교육비': category_totals['total_study_amount'] or 0,
+            '의료비': category_totals['total_medical_amount'] or 0,
+        }
+
+        # 항목을 값 기준으로 내림차순 정렬하여 상위 7개 항목을 추출
+        sorted_categories = sorted(category_dict.items(), key=lambda x: x[1] or 0, reverse=True)
+        # print(sorted_categories)
+
+        # 상위 4개 항목을 구합니다.
+        sorted_categories = dict(sorted_categories)
+
+        # sorted_categories와 amount_total을 JSON으로 변환
+        sorted_categories_json = json.dumps(sorted_categories)
         # TotalAmount 값 검증 및 정수로 변환
         total_amount = int(spend_amount.TotalAmount if spend_amount.TotalAmount else 0)
 
@@ -1140,7 +1269,7 @@ def originreport_page(request):
         group_spend_ratio = average_data.spend / average_data.income  # 그룹 지출 비율
 
 
-                # 데이터 준비
+        # 데이터 준비
         bar_data = {
             '총자산': user_asset_data.total,
             '현금자산': user_asset_data.financial,
@@ -1261,10 +1390,6 @@ def originreport_page(request):
         # openai.api_key = os.getenv('APIKEY')
         # response = openai.ChatCompletion.create(
         report_content = request.session.get('report_content', None)
-
-        # 디버깅용 출력
-        print(f"Initial report_content: {report_content}")
-
         if request.method == 'POST' and not report_content:
             # OpenAI API 호출 또는 리포트 생성
             response = client.chat.completions.create(
@@ -1292,8 +1417,9 @@ def originreport_page(request):
             'average_data': json.dumps(average_values, ensure_ascii=False),
             'user_name': user_name,
             "report": report_content,
+            'sorted_categories_json' : sorted_categories_json,
+            'mydata_assets_json' : mydata_assets_json,
         }
-
         return render(request, 'report_origin.html', context)
 
     # except Exception as e:
