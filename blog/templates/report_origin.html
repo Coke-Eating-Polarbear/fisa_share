@@ -100,11 +100,19 @@
                 </div>
             </div>
             
-        <div class="box report-summary">
-            <h3>만덕이가 분석한 금융 리포트</h3>
-            <!--<p id="full-report"> {{ report }} </p>-->
-            <div id="report-container">{{ report }}</div>
-        </div>
+            <div class="box report-summary">
+                <h3>만덕이가 분석한 금융 리포트</h3>
+            
+               {% if report %}
+                    <p>{{ report }}</p>
+                {% else %}
+                    <p>리포트를 생성하려면 버튼을 눌러주세요.</p>
+                    <form method="POST">
+                        {% csrf_token %}
+                        <button type="submit">리포트 생성</button>
+                    </form>
+                {% endif %}
+            </div>
     </div>
 
 
@@ -254,6 +262,7 @@
         // 파이 차트 생성
         createPieChart('pieChart1', pieData1);
         createPieChart('pieChart2', pieData2);
+
     </script>
 
     <footer>
