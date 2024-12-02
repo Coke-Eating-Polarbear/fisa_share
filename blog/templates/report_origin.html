@@ -64,7 +64,8 @@
                 <h2>{{ user_name }}님의 금융분석 리포트입니다 😊</h2>
             </div>
             <div class="box score-summary">
-                <p>금융 자산 분석 점수: <span id="analysis-score">88점</span> 🔍 | 한 줄 요약: <span id="summary">키워드로? 아님 진짜 한줄 요약으로</span></p>
+                <p>금융 자산 분석 점수: <span id="analysis-score"></span> 🔍
+                <p>한 줄 요약: <span id="summary"></span></p>
             </div>
             <div class="main-container">
                 <!-- 막대 그래프 박스 -->
@@ -104,7 +105,7 @@
                 <h3>만덕이가 분석한 금융 리포트</h3>
             
                {% if report %}
-                    <p>{{ report }}</p>
+                    <p  id="report-container">{{ report }}</p>
                 {% else %}
                     <p>리포트를 생성하려면 버튼을 눌러주세요.</p>
                     <form method="POST">
@@ -262,6 +263,67 @@
         // 파이 차트 생성
         createPieChart('pieChart1', pieData1);
         createPieChart('pieChart2', pieData2);
+
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const totalIncome = userValues[2]; // 총수입
+            const totalSpending = userValues[3]; // 총지출
+            const averageIncome = averageValues[2]; // 평균수입
+
+            // A 계산 (지출/수입 비율)
+            const spendingRatio = (totalSpending / totalIncome) * 100;
+            let aStatus;
+            if (spendingRatio <= 50) {
+                aStatus = "좋음";
+            } else if (spendingRatio <= 70) {
+                aStatus = "보통";
+            } else {
+                aStatus = "나쁨";
+            }
+
+            // B 계산 (평균 수입과 비교)
+            const bStatus = totalIncome > averageIncome ? "높음" : "낮음";
+
+            // 점수와 금융 날씨 결정
+            let score, weather, summary, emoji;
+            if (aStatus === "좋음" && bStatus === "높음") {
+                score = 100;
+                weather = "쾌청";
+                summary = "모든 조건이 이상적이며 재정 상태가 매우 좋습니다.";
+                emoji = "☀️";
+            } else if (aStatus === "좋음" && bStatus === "낮음") {
+                score = 90;
+                weather = "맑음";
+                summary = "지출 비율이 좋지만 평균 수입보다 낮습니다.";
+                emoji = "🌤️";
+            } else if (aStatus === "보통" && bStatus === "높음") {
+                score = 80;
+                weather = "약간 흐림";
+                summary = "수입이 평균보다 높지만 지출이 많습니다.";
+                emoji = "⛅";
+            } else if (aStatus === "보통" && bStatus === "낮음") {
+                score = 70;
+                weather = "흐림";
+                summary = "지출과 수입 모두 개선이 필요합니다.";
+                emoji = "☁️";
+            } else if (aStatus === "나쁨" && bStatus === "높음") {
+                score = 60;
+                weather = "소나기";
+                summary = "수입이 많지만 지출이 너무 많습니다.";
+                emoji = "🌧️";
+            } else {
+                score = 50;
+                weather = "장마";
+                summary = "재정 상태가 위험합니다. 즉각적인 조치가 필요합니다.";
+                emoji = "🌩️";
+            }
+
+            // 데이터 화면에 출력
+            document.getElementById('analysis-score').textContent = `${score}점`;
+            document.getElementById('summary').textContent = summary;
+            document.querySelector('.score-summary').innerHTML += `<p>현재 날씨: ${weather} ${emoji}</p>`;
+        });
+
 
     </script>
 
