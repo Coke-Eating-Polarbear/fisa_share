@@ -38,6 +38,8 @@ from django.core import serializers
 from django.db.models import Sum
 import calendar
 from dateutil.relativedelta import relativedelta
+from django.db.models import Q
+import re
 
 es = Elasticsearch([os.getenv('ES')])  # Elasticsearch 설정
 load_dotenv() 
@@ -279,6 +281,99 @@ def senter(mydata_pay):
 # 함수로 데이터 키 변환 정의
 def apply_mapping(data_dict, mapping):
     return {mapping.get(k, k): v for k, v in data_dict.items()}
+
+
+
+# 숫자와 %가 있는 부분 추출 함수 (배달앱 포함 일반화)
+def extract_percentage_sentences(data, keywords):
+    result = []
+    for sentence in data:
+        # 키워드가 문장에 포함되어 있는지 확인 (앞뒤로 붙는 단어 포함)
+        if any(re.search(rf'\b{keyword}\b', sentence) for keyword in keywords):
+            # 숫자% 추출
+            percentages = re.findall(r'\d+%', sentence)
+            if percentages:
+                result.extend(percentages)
+    return result
+
+
+def card_top(keywords) :
+    
+    
+
+    #card
+    benefits = card.objects.values('benefits')
+    print('benefits',benefits)
+
+    # Q 객체를 사용하여 OR 조건 생성
+    query = Q()
+    for keyword in keywords:
+        query |= Q(benefits__icontains=keyword)
+
+    # 조건에 맞는 Name 컬럼만 가져오기
+    names = card.objects.filter(query).values_list('Name', flat=True)
+
+    # 조건에 맞는 Detail 컬럼 가져오기
+    detail = card.objects.filter(query).values_list('Detail', flat=True)
+
+    name_list = list(names)
+    detail_list = list(detail)
+
+    # 데이터 초기화
+    final_result = defaultdict(dict)  # 키가 없어도 기본값 리스트를 생성
+
+    # 데이터 처리
+    for card_name, sentence in zip(name_list, detail_list):
+        for keyword in keywords:
+            # 키워드와 숫자%가 함께 있는 경우만 추출
+            matches = re.findall(rf'{keyword}.*?(\d+%)', sentence)
+            if matches:
+                # 중복 제거 후 추가
+                if keyword in final_result[card_name]:
+                    existing = final_result[card_name][keyword]
+                    if isinstance(existing, list):
+                        final_result[card_name][keyword] = list(set(existing + matches))
+                    elif matches[0] not in existing:
+                        final_result[card_name][keyword] = [existing] + matches
+                else:
+                    final_result[card_name][keyword] = matches[0] if len(matches) == 1 else matches
+
+    # 결과 확인
+    result_dict = dict(final_result)
+    print('result_dict',result_dict)
+
+    # %의 숫자를 합산하고 가장 큰 값을 가진 딕셔너리 값 추출
+
+    # 숫자만 추출하고 합산한 값을 계산
+    max_card = None
+    max_sum = 0
+
+    for card_name, benefits in result_dict.items():
+        # 문자열이 아닌 값이 있을 경우 처리
+        total_percentage = sum(
+            int(value.rstrip('%')) for value in benefits.values() if isinstance(value, str) and value.endswith('%')
+        )
+        if total_percentage > max_sum:
+            max_sum = total_percentage
+            max_card_top1 = {card_name: benefits}
+
+    max_card_name = list(max_card_top1.keys())[0]
+    print(' max_card_name',  max_card_name)
+
+    max_card_detail_top1 = card.objects.filter(Name=max_card_name).values()
+
+    print('eat_max_card_detail_top1',max_card_detail_top1)
+
+    # eat_max_card_detail_top1_dict = dict(eat_max_card_detail_top1)
+
+    # 리스트를 JSON으로 변환
+    max_card_top1_json = json.dumps(max_card_top1)
+    max_card_datail_top1_json = json.dumps(list(max_card_detail_top1.values()), ensure_ascii=False, indent=4)
+    print('max_card_top1_json',max_card_top1_json)
+    print('max_card_datail_top1_json',max_card_datail_top1_json)
+
+    return max_card_top1_json, max_card_datail_top1_json
+
 
 @login_required_session
 def spending_mbti(request):
@@ -567,7 +662,122 @@ def spending_mbti(request):
             # # 결과 출력
             # print("Processed months:", result)
 
+            
 
+            # 카드 추천 만들기
+            # 대부분이 식비이긴한데, 일단 소비 위주로 맞추는게 좋지 않을까?
+
+            amount_top1 = list(sorted_categories.keys())
+            freq_top1 = list(Freq_sorted_categories.keys())
+            print('freq_top1',freq_top1)
+            # 결과 저장
+            top1 = None
+            top2 = None
+            top3 = None
+
+            # 첫 번째 자리 비교
+            if amount_top1[0] == freq_top1[0]:  # 첫 글자가 같다면
+                top1 = amount_top1[0]
+                # 두 번째 자리 비교
+                if amount_top1[1] == freq_top1[1]:
+                    top2 = amount_top1[1]
+                    # 세 번째 자리 비교
+                    if amount_top1[2] == freq_top1[2]:
+                        top3 = amount_top1[2]
+            else:  # 첫 글자가 다르면
+                top1 = amount_top1[0]
+                top2 = freq_top1[0]
+                # 두 번째 자리 비교
+                if amount_top1[1] == freq_top1[1]:
+                    top3 = freq_top1[1]
+
+            # 결과 확인
+            top_card_list = [top1, top2, top3]
+            print('top1, top2, top3',top1, top2, top3)
+
+            # 식비 관련 키워드
+            eat_keywords = ['푸드', '카페', '편의점', '레스토랑', '패밀리레스토랑','배달']
+            # 교통비
+            transport_keywords = ['대중교통', '교통', '택시', '자동차', '기차', '고속버스', 'SRT', 'KTX']
+            # 모임회비
+            allowance_keywords = ['용돈', '지원금', '보조금', '수당', '환급', '혜택', '할인']
+            # 교육 관련 키워드
+            study_keywords = [
+                '교육', '학원', '학습', '유치원', '학교', '수업', '강의', '코칭', '레슨', '튜터링',
+                '등록금', '학비', '수업료', '수강료', '교육비 지원', '학자금', '장학금',
+                '도서', '서적', '온라인 강의', 'E-러닝', '강의 콘텐츠', '교육 콘텐츠', '디지털 학습',
+                '교육 프로그램', '학습 도구', '시험', '어학시험', '자격증'
+            ]
+            # 주거비
+            # 주거비 관련 키워드 (공과금 키워드 제외)
+            home_keywords = [
+                '주거', '임대', '전세', '월세', '매매', '아파트', '빌라', '주택', '부동산',
+                '주택자금', '주거비 지원', '대출', '임대료', '보증금', '리모델링'
+            ]
+            # 공과금 관련 키워드
+            utility_keywords = ['전기료', '수도세', '가스비', '관리비', '유지비', '청소비', '공과금']
+            # 통신비 관련 키워드
+            phone_keywords = ['통신', '이동통신', '전화요금', '인터넷 요금', '휴대폰 요금', '모바일 데이터', '와이파이', '통신비']
+
+            # 여가/취미 관련 키워드
+            # 취미/여가 관련 키워드
+            hobby_keywords = [
+                '영화', '공연', '뮤지컬', '음악', '콘서트', '전시', '미술관', '박물관',
+                '테마파크', '여행', '숙박', '캠핑', '글램핑', '낚시', '레저', '스포츠',
+                '헬스', '요가', '필라테스', '수영', '등산', '골프', '공연티켓', '놀이공원',
+                '액티비티', '도서', '책', '독서', '커뮤니티'
+            ]
+            # 키워드 필터링
+            fashion_keywords = [
+                '쇼핑', '온라인쇼핑', '백화점', '베이커리', '패션', '잡화', '의류', '액세서리', '가방', '신발', '구두',
+                '뷰티', '화장품', '악세사리', '의류브랜드', '브랜드샵', '패션아이템', '디자인샵', '라이프스타일샵',
+                '아울렛', '세일', '할인', '쿠폰', '바우처', '캐시백', '마트/편의점'
+            ]
+            medical_keywords = [
+                '병원', '약국', '병원/약국', '의료', '의료비', '의료기관', '건강관리', '헬스케어',
+                '진료비', '건강', '치료', '의료서비스', '클리닉', '재활', '약', '의약품',
+                '건강보험', '건강검진'
+            ]
+
+            i = 0
+            # for문과 if-elif 구조로 연결
+            card_results = {}
+            card_detail_results = {}
+            for i, keyword in enumerate(top_card_list):
+                if keyword == '식비':
+                    max_card_json, max_card_detail_json = card_top(eat_keywords)
+                elif keyword == '교통비':
+                    max_card_json, max_card_detail_json = card_top(transport_keywords)
+                elif keyword == '모임회비':
+                    max_card_json, max_card_detail_json = card_top(allowance_keywords)
+                elif keyword == '교육':
+                    max_card_json, max_card_detail_json = card_top(study_keywords)
+                elif keyword == '주거비':
+                    max_card_json, max_card_detail_json = card_top(home_keywords)
+                elif keyword == '공과금':
+                    max_card_json, max_card_detail_json = card_top(utility_keywords)
+                elif keyword == '통신비':
+                    max_card_json, max_card_detail_json = card_top(phone_keywords)
+                elif keyword == '여가/취미':
+                    max_card_json, max_card_detail_json = card_top(hobby_keywords)
+                elif keyword == '패션/잡화/쇼핑':
+                    max_card_json, max_card_detail_json = card_top(fashion_keywords)
+                elif keyword == '의료':
+                    max_card_json, max_card_detail_json = card_top(medical_keywords)
+                else:
+                    max_card_json, max_card_detail_json = None, None
+                    print(f"{keyword}_{i+1}에 해당하는 카테고리가 없습니다.")
+                
+                # 결과값 저장
+                card_results[f"max_card_top{i+1}_json"] = max_card_json
+                card_detail_results[f"max_card_detail_top{i+1}_json"] = max_card_detail_json
+                print('card_detail_results',card_detail_results)
+                # 데이터 정리
+                for key, value in card_results.items():
+                    decoded_value = json.loads(value)  # 내부 JSON 문자열 디코딩
+                    card_results[key] = decoded_value
+                # 가독성 있게 출력
+                card_results_json = json.dumps(card_results, ensure_ascii=False, indent=4)
                         
 
         except UserProfile.DoesNotExist:
@@ -588,6 +798,8 @@ def spending_mbti(request):
         'month2_json' : month2_json,
         'month3_json' : month3_json,
         'months_json' : months_json,
+        'card_results' : json.dumps(card_results, ensure_ascii=False),
+        'card_detail_results' : json.dumps(card_detail_results, ensure_ascii=False),
     }
     return render(request, 'spending_mbti.html', context)
 
@@ -1299,3 +1511,57 @@ def originreport_page(request):
     except UserProfile.DoesNotExist:
         print("UserProfile 데이터가 없습니다.")  # 디버깅용
         return render(request, 'report_origin.html', {'error': '사용자 정보를 찾을 수 없습니다.'})
+
+
+
+# 예,적금 로그 데이터 저장
+@login_required_session
+@csrf_exempt
+def log_to_elasticsearch(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            # 세션에서 사용자 ID 가져오기
+            customer_id = request.session.get('user_id')
+            print('customer_class',customer_id)
+            user_name = "사용자"  # 기본값 설정
+            if customer_id:
+                try:
+                    # CustomerID로 UserProfile 조회
+                    user = UserProfile.objects.get(CustomerID=customer_id)
+                    user_name = user.username  # 사용자 이름 설정
+                    customer_class = {
+                        "Stageclass": user.Stageclass,  
+                        "Inlevel": user.Inlevel,        
+                    }
+                    print('user_name',user_name)
+                    print('customer_class',customer_class)
+                    # print('user_id',user_id)
+                    product_name = data.get('product_name')
+                    print('product_name',product_name)
+                    timestamp = datetime.now().isoformat()
+                except UserProfile.DoesNotExist:
+                    pass  # 사용자가 없을 경우 기본값 유지
+           
+
+            # Elasticsearch에 저장할 데이터
+            document = {
+                'customer_id': customer_id,
+                'data': {
+                    'product_name': data.get('product_name', 'N/A'),
+                    'bank': data.get('bank', 'N/A'),
+                    'baser': data.get('baser', 'N/A'),
+                    'maxir': data.get('maxir', 'N/A'),
+                    'method': data.get('method', 'N/A'),
+                },
+                'customer_class' :customer_class,
+                'timestamp': timestamp
+            }
+
+            # Elasticsearch에 데이터 저장
+            es.index(index="ps_product_click_logs", document=document)
+
+            return JsonResponse({"status": "success", "message": "Click logged to Elasticsearch"}, status=200)
+        except Exception as e:
+            return JsonResponse({"status": "error", "message": str(e)}, status=500)
+    return JsonResponse({"status": "error", "message": "Invalid request method"}, status=400)

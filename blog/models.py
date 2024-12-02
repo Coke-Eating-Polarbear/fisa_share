@@ -137,13 +137,15 @@ class spend(models.Model):
         db_table = 'spend'
 
 class card(models.Model):
-    cardID = models.CharField(max_length=256, primary_key=True)
-    cardName = models.CharField(max_length=256)
-    benefits = models.CharField(max_length=256)
-    image = models.CharField(max_length=256)
-    details = models.TextField()
-    url = models.CharField(max_length=256)
-    cardType = models.CharField(max_length=1)
+    #CardID, Link, Name, corp, Benefits, Image, Detail, Type
+    CardID = models.CharField(max_length=256, primary_key=True)
+    Link = models.TextField(max_length=256)
+    Name = models.CharField(max_length=256)
+    corp = models.CharField(max_length=256)
+    benefits = models.TextField()
+    image = models.TextField()
+    Detail = models.TextField()
+    Type = models.CharField(max_length=1)
 
     class Meta:
         db_table = 'card'
