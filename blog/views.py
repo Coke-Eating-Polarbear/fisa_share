@@ -80,7 +80,7 @@ def update_profile(request):
     age = current_year - birth_year
 
     # 역매핑 계산
-    reverse_data = reverse_mapping_with_age(user.stageclass, age)
+    reverse_data = reverse_mapping_with_age(user.Stageclass, age)
 
     if request.method == 'POST':
         # 사용자 입력 데이터 가져오기
@@ -102,7 +102,7 @@ def update_profile(request):
         user.Pw = pw
         user.Email = email
         user.Phone = phone
-        user.stageclass = updated_stage_class
+        user.Stageclass = updated_stage_class
         user.save()
 
         return redirect('mypage')  # 프로필 페이지로 리디렉션
