@@ -359,16 +359,16 @@ def spending_mbti(request):
             # 항목을 한국어로 맵핑한 딕셔너리로 저장
             category_dict = {
                 '식비': category_totals['total_eat_amount'] or 0,
-                '이체': category_totals['total_transfer_amount'] or 0,
+                '교통비': category_totals['total_transfer_amount'] or 0,
                 '공과금': category_totals['total_utility_amount'] or 0,
-                '전화': category_totals['total_phone_amount'] or 0,
-                '집': category_totals['total_home_amount'] or 0,
-                '취미': category_totals['total_hobby_amount'] or 0,
-                '패션': category_totals['total_fashion_amount'] or 0,
-                '파티': category_totals['total_party_amount'] or 0,
-                '용돈': category_totals['total_allowance_amount'] or 0,
-                '학습': category_totals['total_study_amount'] or 0,
-                '의료': category_totals['total_medical_amount'] or 0,
+                '통신비': category_totals['total_phone_amount'] or 0,
+                '주거비': category_totals['total_home_amount'] or 0,
+                '여가/취미': category_totals['total_hobby_amount'] or 0,
+                '패션/잡화': category_totals['total_fashion_amount'] or 0,
+                '모임회비': category_totals['total_party_amount'] or 0,
+                '경조사': category_totals['total_allowance_amount'] or 0,
+                '교육비': category_totals['total_study_amount'] or 0,
+                '의료비': category_totals['total_medical_amount'] or 0,
             }
 
             # 항목을 값 기준으로 내림차순 정렬하여 상위 7개 항목을 추출
@@ -417,16 +417,16 @@ def spending_mbti(request):
             # 항목을 한국어로 맵핑한 딕셔너리로 저장
             Freq_category_dict = {
                 '식비': Freq_category_totals['total_eat_Freq'] or 0,
-                '이체': Freq_category_totals['total_transfer_Freq'] or 0,
+                '교통비': Freq_category_totals['total_transfer_Freq'] or 0,
                 '공과금': Freq_category_totals['total_utility_Freq'] or 0,
-                '전화': Freq_category_totals['total_phone_Freq'] or 0,
-                '집': Freq_category_totals['total_home_Freq'] or 0,
-                '취미': Freq_category_totals['total_hobby_Freq'] or 0,
-                '패션': Freq_category_totals['total_fashion_Freq'] or 0,
-                '파티': Freq_category_totals['total_party_Freq'] or 0,
-                '용돈': Freq_category_totals['total_allowance_Freq'] or 0,
-                '학습': Freq_category_totals['total_study_Freq'] or 0,
-                '의료': Freq_category_totals['total_medical_Freq'] or 0,
+                '통신비': Freq_category_totals['total_phone_Freq'] or 0,
+                '주거비': Freq_category_totals['total_home_Freq'] or 0,
+                '여가/취미': Freq_category_totals['total_hobby_Freq'] or 0,
+                '패션/잡화': Freq_category_totals['total_fashion_Freq'] or 0,
+                '모임회비': Freq_category_totals['total_party_Freq'] or 0,
+                '경조사': Freq_category_totals['total_allowance_Freq'] or 0,
+                '교육비': Freq_category_totals['total_study_Freq'] or 0,
+                '의료비': Freq_category_totals['total_medical_Freq'] or 0,
             }
 
             # 항목을 한국어로 맵핑한 딕셔너리로 저장
