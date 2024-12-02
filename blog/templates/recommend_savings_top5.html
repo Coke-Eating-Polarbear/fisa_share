@@ -136,7 +136,7 @@
             <div class="recommendations">
                 {% for product in deposit_recommend %}
                 <div class="card">
-                    <img src="https://via.placeholder.com/50x70" alt="상품 이미지">
+                    <img src="https://via.placeholder.com/200x178" alt="상품 이미지">
                     <div class="card-content">
                         <span class="card-title">{{ product.name }}</span><br>
                         <p><strong>은행:</strong> {{ product.bank }}</p>
@@ -162,10 +162,9 @@
             <div class="recommendations">
                 {% for product in final_recommend %}
                 <div class="card">
-                    <img src="https://via.placeholder.com/50x70" alt="상품 이미지">
+                    <img src="https://via.placeholder.com/200x178" alt="상품 이미지">
                     <div class="card-content">
-                        <span class="card-title"></span>
-                        <p><strong>상품명:</strong> {{ product.product_name }}</p>
+                        <span class="card-title">{{ product.product_name }}</span><br>
                         <p><strong>은행:</strong> {{ product.bank_name }}</p>
                         <p><strong>기준 금리:</strong> {{ product.base_rate }}</p>
                         <p><strong>최대 금리:</strong> {{ product.max_preferential_rate }}</p>
