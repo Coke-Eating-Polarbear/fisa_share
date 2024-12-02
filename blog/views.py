@@ -66,6 +66,7 @@ def logout_view(request):
     # main.html로 리다이렉트
     return redirect('main')  # 'main'은 urls.py에서 정의된 main.html의 URL name
 
+@login_required_session
 def update_profile(request):
     # 세션에서 user_id 가져오기
     user_id = request.session.get('user_id')
@@ -278,7 +279,6 @@ def senter(mydata_pay):
 # 함수로 데이터 키 변환 정의
 def apply_mapping(data_dict, mapping):
     return {mapping.get(k, k): v for k, v in data_dict.items()}
-
 
 @login_required_session
 def spending_mbti(request):
@@ -895,8 +895,6 @@ def top5(request):
             pass  # 사용자가 없을 경우 기본값 유지
     final_recommend = request.session.get('final_recommend')
     deposit_recommend = request.session.get('deposit_recommend')
-    print("Final Recommend:", final_recommend)
-    print("Deposit Recommend:", deposit_recommend)
     context = {
         'user_name': user_name,
         'top5_products': top5_products,
@@ -1141,6 +1139,21 @@ def originreport_page(request):
         personal_spend_ratio = (spend_amount.TotalAmount + user_asset_data.rent) / user_asset_data.monthly_income  # 개인 지출 비율
         group_spend_ratio = average_data.spend / average_data.income  # 그룹 지출 비율
 
+
+                # 데이터 준비
+        bar_data = {
+            '총자산': user_asset_data.total,
+            '현금자산': user_asset_data.financial,
+            '수입': user_asset_data.monthly_income,
+            '지출': abs(spend_amount.TotalAmount)
+        }
+        average_values = {
+            '총자산': (average_data.asset + average_data.finance),
+            '현금자산': average_data.finance,
+            '수입': average_data.income,
+            '지출': average_data.spend
+        }
+
         # 데이터 정리
         analysis_results = {
             "net_income" : net_income,
@@ -1274,37 +1287,32 @@ def originreport_page(request):
 
         # openai.api_key = os.getenv('APIKEY')
         # response = openai.ChatCompletion.create(
-        response = client.chat.completions.create(
-            model="gpt-4", 
-            messages=[
-                {"role": "system", "content": "You are a helpful assistant."},
-                {"role": "user", "content": prompt}
-            ],
-            max_tokens=1000,
-            temperature=0.7
-        )
+        report_content = request.session.get('report_content', None)
 
-        report_content = response.choices[0].message.content
-        print(report_content)
+        # 디버깅용 출력
+        print(f"Initial report_content: {report_content}")
 
+        if request.method == 'POST' and not report_content:
+            # OpenAI API 호출 또는 리포트 생성
+            response = client.chat.completions.create(
+                model="gpt-4", 
+                messages=[
+                    {"role": "system", "content": "You are a helpful assistant."},
+                    {"role": "user", "content": prompt}
+                ],
+                max_tokens=1000,
+                temperature=0.7
+            )
+            report_content = response.choices[0].message.content
 
-        # 데이터 준비
-        bar_data = {
-            '총자산': user_asset_data.total,
-            '현금자산': user_asset_data.financial,
-            '수입': user_asset_data.monthly_income,
-            '지출': abs(spend_amount.TotalAmount)
-        }
-        print("Debug: bar_data contents:", bar_data)
-        average_values = {
-            '총자산': (average_data.asset + average_data.finance),
-            '현금자산': average_data.finance,
-            '수입': average_data.income,
-            '지출': average_data.spend
-        }
-        print("Debug: bar_data contents:", average_values)
+            # 세션에 저장
+            print("Report content to be saved:", report_content)
+            request.session['report_content'] = report_content
+            request.session.modified = True  # 세션 변경 사항 저장을 강제
 
-
+            print("Saved report_content in session:", request.session.get('report_content'))
+        if report_content is None:
+            report_content = ""
         # JSON 직렬화된 데이터를 템플릿에 전달
         context = {
             'bar_data': json.dumps(bar_data, ensure_ascii=False),
@@ -1321,6 +1329,3 @@ def originreport_page(request):
     except UserProfile.DoesNotExist:
         print("UserProfile 데이터가 없습니다.")  # 디버깅용
         return render(request, 'report_origin.html', {'error': '사용자 정보를 찾을 수 없습니다.'})
-    # except Exception as e:
-    #     print("에러 발생:", str(e))  # 디버깅용
-    #     return render(request, 'report_origin.html', {'error': str(e)})
