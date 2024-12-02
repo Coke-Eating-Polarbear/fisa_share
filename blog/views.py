@@ -786,12 +786,16 @@ def summary_view(request):
         filtered_results.append(pd.DataFrame(filtered_deposits_query))
     request.session['clusters'] = top_clusters
     final_recommendations = pd.concat(filtered_results, ignore_index=True)
-    top2 = final_recommendations.sort_values(by='maxir', ascending=False).head(5)
-    deposit_recommend_json = top2.to_dict(orient='records')
+    # 중복 제거
+    final_recommendations_drop_duplicates = final_recommendations[['name', 'bank', 'baser', 'maxir','method']].drop_duplicates()
+
+    top2 = final_recommendations_drop_duplicates.sort_values(by='maxir', ascending=False).head(5)
+    print('예금 중복 삭제', top2)
+    deposit_recommend_dict = top2.to_dict(orient='records')
     request.session['final_recommend'] = final_recommend_json[:5]  # 적금 Top 5
-    request.session['deposit_recommend'] = deposit_recommend_json[:5]  # 예금 Top 5
+    request.session['deposit_recommend'] = deposit_recommend_dict[:5]  # 예금 Top 5
     final_recommend_display = final_recommend_json[:2]  # 적금 2개
-    deposit_recommend_display = deposit_recommend_json[:3]  # 예금 3개
+    deposit_recommend_display = deposit_recommend_dict[:3]  # 예금 3개
     # 최종 데이터 전달
     context = {
         'product_details': product_details,
