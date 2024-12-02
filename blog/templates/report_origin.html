@@ -21,20 +21,20 @@
                 <img src="{% static 'img\header_logo.png' %}" style="vertical-align: middle; margin-left: 100px;" alt="로고">
             </div>
             <div class="nav-links" style="flex-grow: 1; text-align: center; margin-right: 220px;">
-                <a href="./loginmain" style=" font-weight: bold; color: #121212;">금융분석 리포트</a> 
+                <a href="{% url 'originreport' %}" style=" font-weight: bold; color: #121212;">금융분석 리포트</a> 
                 <div class="dropdown">
                     <a href="#" style=" font-weight: bold; color: #121212;">예/적금 추천</a>
                     <div class="dropdown-content">
-                        <a href="savings_info1" style="font-size: 0.8rem;">신규적금추천</a>
-                        <a href="compare_products" style="font-size: 0.8rem;">기존상품비교</a>
+                        <a href="{% url 'top5' %}" style="font-size: 0.8rem;">신규적금추천</a>
+                        <a href="{% url 'better' %}" style="font-size: 0.8rem;">기존상품비교</a>
                     </div>
                 </div> 
-                <a href="spending_mbti" style=" font-weight: bold; color: #121212;">소비MBTI</a>
+                <a href="{% url 'spending_mbti' %}" style=" font-weight: bold; color: #121212;">소비MBTI</a>
             </div>
            <!-- 회원 정보 및 마이페이지 -->
         <div class="user-info">
             <span style="font-size: 1.1rem;">{{ user_name }}님</span> 
-            <a href="./mypage" style="margin-left: 15px; 
+            <a href="{% url 'mypage' %}" style="margin-left: 15px; 
             text-decoration: none; 
             font-size: 1.1rem; 
             font-weight: bold; 
@@ -64,7 +64,8 @@
                 <h2>{{ user_name }}님의 금융분석 리포트입니다 😊</h2>
             </div>
             <div class="box score-summary">
-                <p>금융 자산 분석 점수: <span id="analysis-score">88점</span> 🔍 | 한 줄 요약: <span id="summary">키워드로? 아님 진짜 한줄 요약으로</span></p>
+                <p>금융 자산 분석 점수: <span id="analysis-score"></span> 🔍
+                <p>한 줄 요약: <span id="summary"></span></p>
             </div>
             <div class="main-container">
                 <!-- 막대 그래프 박스 -->
@@ -90,12 +91,12 @@
                 <!-- 파이 차트 박스 -->
                 <div class="pie-chart-container chart-box">
                     <div class="chart-box small">
-                        <h3>수입 구성 비율</h3>
-                        <canvas id="pieChart2"></canvas>
+                        <h3>자산 구성 비율</h3>
+                        <canvas id="pieChart1"class="chart"></canvas>
                     </div>
                     <div class="chart-box small">
                         <h3>지출 구성 비율</h3>
-                        <canvas id="pieChart1"></canvas>
+                        <canvas id="pieChart2" class="chart"></canvas>
                     </div>
                 </div>
             </div>
@@ -104,7 +105,7 @@
                 <h3>만덕이가 분석한 금융 리포트</h3>
             
                {% if report %}
-                    <p>{{ report }}</p>
+                    <p  id="report-container">{{ report }}</p>
                 {% else %}
                     <p>리포트를 생성하려면 버튼을 눌러주세요.</p>
                     <form method="POST">
@@ -164,51 +165,86 @@
         // 차트 생성 함수
         function createBarChart(chartId, label, userValue, averageValue) {
             const ctx = document.getElementById(chartId).getContext('2d');
-            new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: [label], // 단일 레이블
-                    datasets: [
-                        {
-                            label: '사용자 데이터',
-                            data: [userValue],
-                            backgroundColor: '#A3D5A3',
-                            borderWidth: 1
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            display: false // 범례 숨김
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    const diff = context.raw - averageValue;
-                                    return `사용자 데이터: ${context.raw.toLocaleString()}원\n(평균보다 ${diff > 0 ? '+' : ''}${diff.toLocaleString()}원)`;
+
+            // Y축 범위 계산
+            const range = Math.abs(userValue - averageValue);
+            const buffer = range * 0.5;
+            const minValue = Math.min(userValue, averageValue) - buffer;
+            const maxValue = Math.max(userValue, averageValue) + buffer;
+
+            // 평균선 플러그인
+            const averageLinePlugin = {
+                id: 'averageLine',
+                beforeDraw: (chart) => {
+                    const ctx = chart.ctx;
+                    const yScale = chart.scales.y;
+                    const xScale = chart.scales.x;
+
+                    const averageY = yScale.getPixelForValue(averageValue);
+
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.moveTo(xScale.left, averageY);
+                    ctx.lineTo(xScale.right, averageY);
+                    ctx.strokeStyle = '#FF0000'; // 평균선 색상 (빨강)
+                    ctx.lineWidth = 2;
+                    ctx.setLineDash([15, 10]);
+                    ctx.stroke();
+                    ctx.restore();
+
+                    // 평균선 레이블 추가
+                    ctx.font = '12px Arial';
+                    ctx.fillStyle = 'lightgray';
+                    ctx.fillText(`평균: ${averageValue.toLocaleString()}원`, xScale.right - 100, averageY - 5);
+                    }
+                };
+
+                // 차트 생성
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: [label], // 단일 레이블
+                        datasets: [
+                            {
+                                label: '사용자 데이터',
+                                data: [userValue],
+                                backgroundColor: '#A3D5A3',
+                                borderWidth: 1
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                display: false // 범례 숨김
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function (context) {
+                                        const diff = context.raw - averageValue;
+                                        return `사용자 데이터: ${context.raw.toLocaleString()}원\n(평균보다 ${diff > 0 ? '+' : ''}${diff.toLocaleString()}원)`;
+                                    }
                                 }
                             }
                         },
-                        averageLine: {
-                            value: averageValue // 플러그인에 전달할 평균 값
+                        scales: {
+                            y: {
+                                beginAtZero: false, // 0부터 시작하지 않도록 설정
+                                min: minValue, // 동적 최소값
+                                max: maxValue, // 동적 최대값
+                                ticks: {
+                                    callback: function (value) {
+                                        return value.toLocaleString() + '원'; // Y축 단위 표시
+                                    }
+                                }
+                            }
                         }
                     },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                callback: function(value) {
-                                    return value.toLocaleString() + '원'; // Y축 단위 표시
-                                }
-                            }
-                        }
-                    }
-                },
-                plugins: [drawAverageLinePlugin] // 플러그인 추가
-            });
-        }
+                    plugins: [averageLinePlugin] // 플러그인 추가
+                });
+            }
+
 
         // 4개의 그래프 생성
         createBarChart('chartTotal', '총자산', userValues[0], averageValues[0]);
@@ -220,24 +256,40 @@
 
 
         // 파이 차트 데이터
-        const pieData1 = {
-            labels: ['식비', '교통비', '쇼핑', '기타'],
+
+        const sortedCategoriesJson = '{{ sorted_categories_json|safe }}'; // Django 템플릿에서 가져오기
+        const sortedCategories = JSON.parse(sortedCategoriesJson); // JSON 문자열을 객체로 변환
+        
+        const assetDataJson = '{{ mydata_assets_json|escapejs|safe }}'; // 안전하게 JavaScript용 JSON으로 변환
+        console.log("Raw assetDataJson:", assetDataJson);
+        const assetData = JSON.parse(assetDataJson);
+        
+        console.log("Parsed assetData:", assetData);
+
+            
+
+        // Chart.js에서 사용할 데이터 형식으로 변환
+        const pieData2 = {
+            labels: Object.keys(sortedCategories), // 항목 이름 (예: 식비, 교통비, 통신비 등)
             datasets: [
                 {
-                    label: '지출 구성 비율',
-                    data: [40, 20, 25, 15],
-                    backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0']
+                    data: Object.values(sortedCategories), // 각 항목의 값
+                    backgroundColor: [ // 차트의 색상 배열
+                        '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0',
+                        '#9966FF', '#FF9F40', '#FFCD56', '#FF6384'
+                    ],
                 }
             ]
         };
 
-        const pieData2 = {
-            labels: ['월급', '이자수익', '기타수익'],
+        const pieData1 = {
+            labels: Object.keys(assetData), // 항목 이름 (예: 식비, 교통비, 통신비 등)
             datasets: [
                 {
-                    label: '수입 구성 비율',
-                    data: [70, 20, 10],
-                    backgroundColor: ['#4BC0C0', '#FF9F40', '#9966FF']
+                    data: Object.values(assetData), // 각 항목의 값
+                    backgroundColor: [ // 차트의 색상 배열
+                        '#FF6384', '#36A2EB', '#FFCE56'
+                    ],
                 }
             ]
         };
@@ -253,15 +305,77 @@
                     plugins: {
                         legend: {
                             display: true,
-                            position: 'right'
+                            position: 'right' // 범례를 오른쪽에 배치
                         }
                     }
                 }
             });
         }
-        // 파이 차트 생성
-        createPieChart('pieChart1', pieData1);
-        createPieChart('pieChart2', pieData2);
+
+        // 각각의 `<canvas>` ID로 차트를 생성
+        createPieChart('pieChart1', pieData1); // 첫 번째 차트 (MyDataAsset 기반)
+        createPieChart('pieChart2', pieData2); // 두 번째 차트 (Sorted Categories 기반)
+
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const totalIncome = userValues[2]; // 총수입
+            const totalSpending = userValues[3]; // 총지출
+            const averageIncome = averageValues[2]; // 평균수입
+
+            // A 계산 (지출/수입 비율)
+            const spendingRatio = (totalSpending / totalIncome) * 100;
+            let aStatus;
+            if (spendingRatio <= 50) {
+                aStatus = "좋음";
+            } else if (spendingRatio <= 70) {
+                aStatus = "보통";
+            } else {
+                aStatus = "나쁨";
+            }
+
+            // B 계산 (평균 수입과 비교)
+            const bStatus = totalIncome > averageIncome ? "높음" : "낮음";
+
+            // 점수와 금융 날씨 결정
+            let score, weather, summary, emoji;
+            if (aStatus === "좋음" && bStatus === "높음") {
+                score = 100;
+                weather = "쾌청";
+                summary = "모든 조건이 이상적이며 재정 상태가 매우 좋습니다.";
+                emoji = "☀️";
+            } else if (aStatus === "좋음" && bStatus === "낮음") {
+                score = 90;
+                weather = "맑음";
+                summary = "지출 비율이 좋지만 평균 수입보다 낮습니다.";
+                emoji = "🌤️";
+            } else if (aStatus === "보통" && bStatus === "높음") {
+                score = 80;
+                weather = "약간 흐림";
+                summary = "수입이 평균보다 높지만 지출이 많습니다.";
+                emoji = "⛅";
+            } else if (aStatus === "보통" && bStatus === "낮음") {
+                score = 70;
+                weather = "흐림";
+                summary = "지출과 수입 모두 개선이 필요합니다.";
+                emoji = "☁️";
+            } else if (aStatus === "나쁨" && bStatus === "높음") {
+                score = 60;
+                weather = "소나기";
+                summary = "수입이 많지만 지출이 너무 많습니다.";
+                emoji = "🌧️";
+            } else {
+                score = 50;
+                weather = "장마";
+                summary = "재정 상태가 위험합니다. 즉각적인 조치가 필요합니다.";
+                emoji = "🌩️";
+            }
+
+            // 데이터 화면에 출력
+            document.getElementById('analysis-score').textContent = `${score}점`;
+            document.getElementById('summary').textContent = summary;
+            document.querySelector('.score-summary').innerHTML += `<p>현재 날씨: ${weather} ${emoji}</p>`;
+        });
+
 
     </script>
 

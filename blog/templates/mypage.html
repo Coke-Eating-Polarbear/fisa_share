@@ -19,15 +19,15 @@
                     <img src="{% static 'img\header_logo.png' %}" style="vertical-align: middle; margin-left: 100px;" alt="로고">
                 </div>
                 <div class="nav-links" style="flex-grow: 1; text-align: center; margin-right: 220px;">
-                    <a href="./loginmain" style=" font-weight: bold; color: #121212;">금융분석 리포트</a> 
+                    <a href="{% url 'originreport' %}" style=" font-weight: bold; color: #121212;">금융분석 리포트</a> 
                     <div class="dropdown">
                         <a href="#" style=" font-weight: bold; color: #121212;">예/적금 추천</a>
                         <div class="dropdown-content">
-                            <a href="savings_info1" style="font-size: 0.8rem;">신규적금추천</a>
-                            <a href="compare_products" style="font-size: 0.8rem;">기존상품비교</a>
+                            <a href="{% url 'top5' %}" style="font-size: 0.8rem;">신규적금추천</a>
+                            <a href="{% url 'better' %}" style="font-size: 0.8rem;">기존상품비교</a>
                         </div>
                     </div> 
-                    <a href="spending_mbti" style=" font-weight: bold; color: #121212;">소비MBTI</a>
+                    <a href="{% url 'spending_mbti' %}" style=" font-weight: bold; color: #121212;">소비MBTI</a>
                 </div>
                <!-- 회원 정보 및 마이페이지 -->
             <div class="user-info">
@@ -57,30 +57,57 @@
         </header>
 
         <div class="container">
-            <!-- Left Box -->
-            <div class="left-box">
-                <h2>{{ user_name }}님</h2>
+            <!-- 목표 소비 상자 -->
+            <div class="box-container">
+                <!-- 상단: 사용자 이름과 프로필 수정 버튼 -->
+                <div class="header-row">
+                    <h2 class="user-name">{{ user_name }}님</h2>
+                    <a href="{% url 'update_profile' %}" class="edit-profile-button">프로필 수정</a>
+                </div>
+        
+                <!-- 중앙: 목표 소비 정보 -->
                 <div class="info">
                     <p>이번달 목표 소비액 : <span id="goalAmount">500,000</span>원</p>
                     <p>실제 이번달 지출 총액 : <span id="spentAmount">200,000</span>원</p>
                     <div class="progress-bar">
                         <div class="progress-bar-inner" id="savingsProgressBar">50%</div>
                     </div>
-                    <p id="result">목표 소비액보다 200,000원 덜 쓰셨어요<br>잘하고 있어요~ 지금처럼만 ✨<br></p>
+                    <span id="result">목표 소비액보다 200,000원 덜 쓰셨어요! 잘하고 있어요~ 지금처럼만 ✨</span>
                 </div>
-                <a href="{% url 'update_profile' %}" class="edit-profile-button">프로필 수정</a>
             </div>
+            
         
-            <!-- Right Box -->
-            <div class="right-box">
-                <h2>카드 결제 내역 분석</h2>
-                <p>- 카테고리별 카드 사용 비율 -</p>
-                <div class="pie-chart">
-                    <!-- 차트를 제대로 참조할 수 있도록 canvas ID를 고유하게 유지 -->
-                    <canvas id="pieChart"></canvas>
+            <!-- Row for Right Box and Favorite List -->
+            <div class="row-container">
+                <!-- Right Box: 카드 결제 내역 분석 -->
+                <div class="right-box">
+                    <h2>카드 결제 내역 분석</h2>
+                    <p>- 카테고리별 카드 사용 비율 -</p>
+                    <div class="pie-chart">
+                        <canvas id="pieChart"></canvas>
+                    </div>
+                </div>
+        
+                <!-- Favorite Box: 찜한 상품 목록 -->
+                <div class="favorite-box">
+                    <h2>찜한 상품 목록</h2>
+                    <div class="favorite-list">
+                        {% if favorite_products %}
+                            {% for favorite in favorite_products %}
+                                <div class="favorite-item">
+                                    <h4>{{ favorite.name }}</h4>
+                                    <p>은행: {{ favorite.bank }}</p>
+                                    <p>우대금리: {{ favorite.preferential_rate }}%</p>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <p>찜한 상품이 없습니다.</p>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
         </div>
+        
         
         <!-- 탭과 상품 정보 영역 -->
 <div class="tab-container">
@@ -155,6 +182,7 @@
         <p class="show-more-text" onclick="showMoreProducts('savings')">더보기</p>
     </div>
 </div>
+
 
 <div id="expiring-notification" class="expiring-container" style="display: none;">
     <p><strong>얼마 뒤면 <span id="expiring-product-name"></span>이 만기에요!</strong></p>
