@@ -1299,3 +1299,32 @@ def originreport_page(request):
     except UserProfile.DoesNotExist:
         print("UserProfile 데이터가 없습니다.")  # 디버깅용
         return render(request, 'report_origin.html', {'error': '사용자 정보를 찾을 수 없습니다.'})
+
+def better_option(request):
+    customer_id = request.session.get('user_id')  
+    user_name = "사용자"  # 기본값 설정
+    top5_products = []  # 추천 상품 리스트 초기화
+
+    if customer_id:
+        try:
+            # CustomerID로 UserProfile 조회
+            user = UserProfile.objects.get(CustomerID=customer_id)
+            user_name = user.username  # 사용자 이름 설정
+
+            # Favorite 테이블에서 사용자와 관련된 DSID 가져오기
+            favorites = Favorite.objects.filter(CustomerID=user).select_related('content_type')
+
+            # Favorite에 등록된 상품 중 상위 5개 가져오기
+            top5_products = favorites[:5]  # 필요한 로직에 따라 상위 5개만 선택
+        except UserProfile.DoesNotExist:
+            pass  # 사용자가 없을 경우 기본값 유지
+    final_recommend = request.session.get('final_recommend')
+    deposit_recommend = request.session.get('deposit_recommend')
+    context = {
+        'user_name': user_name,
+        'top5_products': top5_products,
+        'final_recommend': final_recommend,  # 적금 Top 5
+        'deposit_recommend': deposit_recommend  # 예금 Top 5
+    }
+
+    return render(request, 'better_options.html',context)
