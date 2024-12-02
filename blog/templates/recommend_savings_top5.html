@@ -69,6 +69,61 @@
                 console.log("Removed from favorites:", productId);
             }
         });
+
+
+        // 예적금 자세히 보기 로그 수집을 위한 자바 스크립트 코드 추가
+        document.addEventListener("DOMContentLoaded", function () {
+            document.querySelectorAll(".card-button").forEach(button => {
+                button.addEventListener("click", function () {
+                    const card = this.closest(".card");
+                    const productData = {
+                        product_name: card.querySelector(".card-title").innerText.trim(),
+                        bank: card.querySelector(".card-content p:nth-of-type(1)").innerText.replace("은행:", "").trim(),
+                        baser: card.querySelector(".card-content p:nth-of-type(2)").innerText.replace("기준 금리:", "").trim(),
+                        maxir: card.querySelector(".card-content p:nth-of-type(3)").innerText.replace("최대 금리:", "").trim(),
+                        method: card.querySelector(".card-content p:nth-of-type(4)").innerText.replace("가입 방법:", "").trim(),
+                    };
+                    console.log(JSON.stringify(productData,));
+
+                    // AJAX 요청으로 클릭 로그 저장
+                    fetch('/log_click/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': getCookie('csrftoken')  // CSRF 토큰 추가
+                        },
+                        body: JSON.stringify(productData)
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === "success") {
+                            console.log("Click logged successfully:", productData);
+                        } else {
+                            console.error("Error logging click:", data.message);
+                        }
+                    })
+                    .catch(error => console.error("Error:", error));
+                });
+            });
+
+            // CSRF 토큰 가져오기 함수
+            function getCookie(name) {
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    const cookies = document.cookie.split(';');
+                    for (let i = 0; i < cookies.length; i++) {
+                        const cookie = cookies[i].trim();
+                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+        });
+
+
     </script>
 <header>
     <div class="navbar">

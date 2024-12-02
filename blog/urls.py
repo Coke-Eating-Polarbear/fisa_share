@@ -17,5 +17,6 @@ urlpatterns = [
     path('originreport/', views.originreport_page, name='originreport'),
     path('logout/', views.logout_view, name='logout'),
     path('update/', views.update_profile, name='update_profile'),
+    path('log_click/', views.log_to_elasticsearch, name='log_to_elasticsearch'),
     path('better', views.better_option, name='better'),
 ]
