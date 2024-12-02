@@ -1,20 +1,15 @@
-from django.shortcuts import render, redirect,get_object_or_404 # type: ignore
-from django.contrib.auth import authenticate, login,logout # type: ignore
+from django.shortcuts import render, redirect# type: ignore
+from django.contrib.auth import logout # type: ignore
 from django.utils import timezone # type: ignore
 from datetime import timedelta
 from datetime import date
-import matplotlib.pyplot as plt # type: ignore
 import base64
-import io
-from matplotlib import font_manager, rc # type: ignore
-from django.contrib import messages # type: ignore
-from .forms import UserProfileForm
+from matplotlib import rc # type: ignore
 from blog.models import UserProfile,Recommend, Wc, News, Favorite, Average,card, MyDataAsset, MyDataDS, MyDataPay,SpendAmount, DProduct, SProduct, SpendFreq  # UserProfile 모델도 가져옵니다
 from django.contrib.auth.hashers import check_password# type: ignore
 from django.views.decorators.http import require_POST# type: ignore
-from django.http import HttpResponse,JsonResponse# type: ignore
+from django.http import JsonResponse# type: ignore
 from django.db.models import F # type: ignore
-import random
 import logging
 from .logging import *
 from elasticsearch import Elasticsearch # type: ignore
@@ -22,12 +17,9 @@ from django.views.decorators.csrf import csrf_exempt # type: ignore
 import json
 import os
 from dotenv import load_dotenv # type: ignore
-from collections import defaultdict
 from accounts.views import map_person
-from .utils import income_model
 import pandas as pd
 from datetime import datetime
-from sqlalchemy import create_engine
 from joblib import load
 import numpy as np
 from django.conf import settings
@@ -36,14 +28,12 @@ from django.db.models import Q
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core import serializers
 from django.db.models import Sum
-import calendar
 from dateutil.relativedelta import relativedelta
 
 es = Elasticsearch([os.getenv('ES')])  # Elasticsearch 설정
 load_dotenv() 
 # openai.api_key = os.getenv('APIKEY')
 client = OpenAI()
-
 rc('font', family='Malgun Gothic')
 logger = logging.getLogger(__name__)
 
@@ -240,7 +230,6 @@ def fetch_sql_processed_data(mydata_pay):
     # """
     # QuerySet을 Pandas DataFrame으로 변환
     df = pd.DataFrame(list(mydata_pay))
-    print('mydata_pay_df',df)
     # df = pd.read_sql(query, engine)
     # 1. TotalPrice 계산: Pyear, Pmonth, Bizcode별로 Price 합산
     df_grouped = df.groupby(['pyear', 'pmonth', 'bizcode'], as_index=False)['price'].sum()
@@ -257,9 +246,7 @@ def fetch_sql_processed_data(mydata_pay):
 
 
     # 결과 출력
-    print('df_grouped',df_grouped)
     df=df_grouped
-    print('df',df)
 
     # Pivot 변환: Bizcode를 열로 만들고 각 Ratio 값을 채움
     pivot_data = df.pivot(index=['pyear', 'pmonth'], columns='bizcode', values='Ratio').fillna(0)
@@ -282,14 +269,9 @@ def predict_next_month(preprocessed_data, model_features):
     most_recent_period = preprocessed_data.index.max()
     most_recent_data = preprocessed_data.loc[most_recent_period]
 
-    # 디버깅: 가장 최근 데이터 확인
-    print(f"가장 최근 데이터 (모델 입력 전):\n{most_recent_data}")
 
     # Series에서 모델 입력 데이터 생성
     model_input = most_recent_data.drop(labels=['TotalSpending'], errors='ignore')
-
-    # 디버깅: 모델 입력 데이터 확인
-    print(f"모델 입력 데이터 (가장 최근 데이터):\n{model_input}")
 
     # 모델 로드 및 예측
     model = load('./models/Consumption_Prediction_rfm.joblib')
@@ -309,21 +291,11 @@ def predict_next_month(preprocessed_data, model_features):
     return result
 
 def senter(mydata_pay):
-    """
-    메인 함수: 데이터 처리, 예측, 출력 수행
-    """
-    print("SQL에서 전처리된 데이터를 가져옵니다...")
     preprocessed_data = fetch_sql_processed_data(mydata_pay)
-    print("Preprocessed Data Columns:", preprocessed_data.columns)
-
-    print("저장된 모델의 입력 형식을 확인합니다...")
     model = os.path.join(settings.BASE_DIR, 'models', 'Consumption_prediction_rfm.joblib')
     model_features = list(model.feature_names_in_) if hasattr(model, 'feature_names_in_') else preprocessed_data.columns.drop('TotalSpending')
 
-    print("다음 달 예측 결과:")
     next_month_prediction = predict_next_month(preprocessed_data, model_features)
-    print(f"연도: {next_month_prediction.name[0]}, 월: {next_month_prediction.name[1]}")
-    print(next_month_prediction)
     return next_month_prediction
 
 # 함수로 데이터 키 변환 정의
@@ -378,7 +350,6 @@ def spending_mbti(request):
 
             # start_date에서 지난달
             start_date = start_date - relativedelta(months=1)
-            print('start_date',start_date)
 
             # `SpendAmount`에서 기간에 맞는 데이터 필터링
             spend_amounts = SpendAmount.objects.filter(
@@ -423,7 +394,6 @@ def spending_mbti(request):
 
             # 항목을 값 기준으로 내림차순 정렬하여 상위 7개 항목을 추출
             sorted_categories = sorted(category_dict.items(), key=lambda x: x[1] or 0, reverse=True)
-            # print(sorted_categories)
 
             # 상위 4개 항목을 구합니다.
             sorted_categories = dict(sorted_categories)
@@ -438,8 +408,7 @@ def spending_mbti(request):
 
             # # "기타" 항목 추가
             # top4_categories['기타'] = other_categories_total
-
-            # print(top4_categories)    
+ 
 
             # 여기서 부터는 spendfreq 시작
             # # `SpendFreq`에서 기간에 맞는 데이터 필터링
@@ -447,7 +416,6 @@ def spending_mbti(request):
                 CustomerID=customer_id, 
                 SDate__gte=start_date  # 시작 날짜 이후의 데이터만 가져옴
             )     
-            print('spend_freq',spend_freq)
 
             # 각 항목별로 총합을 구합니다.
             Freq_category_totals = spend_freq.aggregate(
@@ -486,7 +454,6 @@ def spending_mbti(request):
 
             # 항목을 값 기준으로 내림차순 정렬하여 상위 7개 항목을 추출
             Freq_sorted_categories = sorted(Freq_category_dict.items(), key=lambda x: x[1] or 0, reverse=True)
-            # print(sorted_categories)
 
             # 상위 4개 항목을 구합니다.
             Freq_sorted_categories = dict(Freq_sorted_categories)
@@ -500,7 +467,6 @@ def spending_mbti(request):
             mydata_pay = MyDataPay.objects.filter(
                 CustomerID=customer_id
             ).values()     
-            print('mydata_pay',mydata_pay)
             pd.options.display.float_format = '{:,.2f}'.format
             
             # series 타입을 직렬화
@@ -508,9 +474,6 @@ def spending_mbti(request):
             # JSON 형식으로 변환
             prediction_dict = prediction.to_dict()
             next_month_prediction_json = json.dumps(prediction_dict)
-            print('next_month_prediction',next_month_prediction_json)
-
-
 
             # 소비 예측 차트를 위한 값 불러오기
             
@@ -528,7 +491,6 @@ def spending_mbti(request):
                 CustomerID=customer_id ,
                 SDate__gte=fred_start_date  # 시작 날짜 이후의 데이터만 가져옴
             ).values()
-            # print('fred_spend_amounts',fred_spend_amounts)
 
             # QuerySet에서 리스트로 변환
             fred_spend_amounts_list = list(fred_spend_amounts)
@@ -541,8 +503,6 @@ def spending_mbti(request):
 
             # 월별 데이터 쪼개기
             months = list(fred_spend_amounts_by_month.keys())  # 월 목록 생성 (예: ['2024-09', '2024-10', '2024-11'])
-            print("Original months:", months)
-
 
             split_month_dict = [
                 fred_spend_amounts_by_month[month] for month in months
@@ -601,31 +561,8 @@ def spending_mbti(request):
             # 리스트를 JSON으로 변환
             months_json = json.dumps(months)
 
-            print(months_json)
-            # print('months',months)
-            
-            # 추가적으로 월 형식으로 바꾸고 싶을 때 사용할 코드
-            # for date in months:
-            #     year, month = date.split('-')
-            #     if prev_year != year:  # 해가 바뀌는 경우
-            #         korean_month = f"{str(year)[-2:]}년 {int(month)}월 "  # 한국어 형식: 1월 (25년)
-            #     else:  # 같은 해인 경우
-            #         korean_month = f"{int(month)}월"  # 한국어 형식: 1월
-            #     result.append(korean_month)
-            #     prev_year = year
-
-            # # 결과 출력
-            # print("Processed months:", result)
-
-
-                        
-
         except UserProfile.DoesNotExist:
             pass  # 사용자가 없을 경우 기본값 유지
-
-    ## 소비예측 모델 넣기
-    # MySQL 연결 정보
-        
 
     context = {
         'user_name': user_name,
@@ -840,7 +777,6 @@ def summary_view(request):
     final_recommendations_drop_duplicates = final_recommendations[['name', 'bank', 'baser', 'maxir','method']].drop_duplicates()
 
     top2 = final_recommendations_drop_duplicates.sort_values(by='maxir', ascending=False).head(5)
-    print('예금 중복 삭제', top2)
     deposit_recommend_dict = top2.to_dict(orient='records')
     request.session['final_recommend'] = final_recommend_json[:5]  # 적금 Top 5
     request.session['deposit_recommend'] = deposit_recommend_dict[:5]  # 예금 Top 5
@@ -1086,10 +1022,7 @@ def originreport_page(request):
 
         # CustomerID로 UserProfile 조회
         user = UserProfile.objects.get(CustomerID=customer_id)
-        print("Customer ID:", customer_id)  # 디버깅용 출력
-        print("User Data:", user)
         cnow = datetime.now()
-        current_month = cnow.strftime("%Y-%m")
         # 한 달 전 날짜 계산
         last_month = cnow - timedelta(days=30)  # 30일을 빼서 대략적으로 한 달을 계산
         last_month_str = last_month.strftime("%Y-%m")  # 형식에 맞게 문자열로 변환
@@ -1105,7 +1038,6 @@ def originreport_page(request):
 
         if not average_data:
             raise ValueError(f"소득 분위 데이터가 없습니다. (Stage Class: {user.Stageclass}, Inlevel: {user.Inlevel})")
-        print("Average Data:", average_data)  # 디버깅용 출력
 
         # MyData에서 고객 데이터 조회
         if not user_asset_data:
@@ -1114,9 +1046,6 @@ def originreport_page(request):
             raise ValueError(f"사용자 데이터를 찾을 수 없습니다. (Customer ID: {customer_id})")
         if not spend_freq:
             raise ValueError(f"사용자 데이터를 찾을 수 없습니다. (Customer ID: {customer_id})")
-        print("User Financial Data-usd:", user_asset_data)  # 디버깅용 출력
-        print("User Financial Data-sa:", spend_amount)  # 디버깅용 출력
-        print("User Financial Data-sf:", spend_freq)  # 디버깅용 출력
 
          # 분석 로직
         # 개인 자산 데이터 기반 계산
@@ -1173,9 +1102,7 @@ def originreport_page(request):
 
         # start_date에서 지난달
         start_date = start_date - relativedelta(months=1)
-        print('start_date',start_date)
         asset_data = MyDataAsset.objects.filter(CustomerID=customer_id).values('estate', 'financial', 'ect')
-        print("Query Result:", list(asset_data))  # 쿼리 결과 확인
         mydata_assets_list = list(asset_data)  # QuerySet을 리스트로 변환
         mapped_assets = {
             "부동산": mydata_assets_list[0]["estate"] if mydata_assets_list else 0,
@@ -1225,7 +1152,6 @@ def originreport_page(request):
 
         # 항목을 값 기준으로 내림차순 정렬하여 상위 7개 항목을 추출
         sorted_categories = sorted(category_dict.items(), key=lambda x: x[1] or 0, reverse=True)
-        # print(sorted_categories)
 
         # 상위 4개 항목을 구합니다.
         sorted_categories = dict(sorted_categories)
@@ -1404,11 +1330,9 @@ def originreport_page(request):
             report_content = response.choices[0].message.content
 
             # 세션에 저장
-            print("Report content to be saved:", report_content)
             request.session['report_content'] = report_content
             request.session.modified = True  # 세션 변경 사항 저장을 강제
 
-            print("Saved report_content in session:", request.session.get('report_content'))
         if report_content is None:
             report_content = ""
         # JSON 직렬화된 데이터를 템플릿에 전달
@@ -1426,7 +1350,6 @@ def originreport_page(request):
     #     return render(request, "error.html", {"message": str(e)})
 
     except UserProfile.DoesNotExist:
-        print("UserProfile 데이터가 없습니다.")  # 디버깅용
         return render(request, 'report_origin.html', {'error': '사용자 정보를 찾을 수 없습니다.'})
 
 def better_option(request):
