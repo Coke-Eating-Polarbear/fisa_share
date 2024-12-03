@@ -2,111 +2,131 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>상세 설명</title>
-<link rel="stylesheet" href="{% static 'css/ds_details.css' %}">
-<style>
-</style>
-<script>
-    // "자세히보기" 버튼 클릭 시 새 창으로 상세 설명 표시
-    function openDetailsWindow(url) {
-        window.open(url, '_blank', 'width=600,height=400,scrollbars=yes,resizable=yes');
-    }
- </script>
- 
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>상세 설명</title>
+    <link rel="stylesheet" href="{% static 'css/ds_detail.css' %}">
+    <style>
+    </style>
 </head>
 <body>
     {% csrf_token %}
     <header>
-    <div class="navbar">
-        <div class="logo">
-            <a href="{% url 'loginmain' %}">
-                <img src="./static/img/fisa_logo_after.png" style="vertical-align: middle;" alt="우리 FISA 로고">
-                <span style="font-size: 1.5rem; font-weight: bold; margin-left: 10px;">예/적금 추천 서비스</span>
-        </div>
-        <div class="nav-links" style="flex-grow: 1; text-align: center;">
-                <a href="{% url 'originreport' %}" style=" font-weight: bold; color: #121212;">금융분석 리포트</a> 
-                <div class="dropdown">
-                    <a href="#" style=" font-weight: bold; color: #121212;">예/적금 추천</a>
-                    <div class="dropdown-content">
-                        <a href="{% url 'top5' %}" style="font-size: 0.9rem;">신규적금추천</a>
-                        <a href="{% url 'better' %}" style="font-size: 0.9rem;">기존상품비교</a>
-                    </div>
-                </div> 
-                <a href="{% url 'spending_mbti' %}" style=" font-weight: bold; color: #121212;">소비MBTI</a>
-   </div>
-
-   <!-- 회원 정보 및 마이페이지 -->
-   <div class="user-info">
-       <span style="font-size: 1.1rem;">회원이름님</span> <a href="#mypage" style="margin-left: 15px; text-decoration: none; font-size: 1.1rem; font-weight: bold; color: #121212;">마이페이지</a> 
-       <button style="margin-left: 10px; padding: 5px 10px; font-size: 0.9rem; font-weight: bold; background-color: #007BFF; color: white; border: none; border-radius: 5px; cursor: pointer;">
-        로그아웃
-    </button>
-   </div>
-</div>
-</header>
-
-<div class="container">
-
-    <!-- 빈 박스 영역 -->
-    <div class="empty-box-row">
-        <!-- 빈 박스 1 -->
-        <div class="empty-box"></div>
-        <!-- 빈 박스 2 -->
-        <div class="empty-box"></div>
-        <!-- 빈 박스 3 -->
-        <div class="empty-box"></div>
-    </div>
-<div class="checklist">
-   <h2>예적금 가입 전 체크했덕? 🦆</h2>
-   <ul>
-       <li>상품의 가입대상, 가입금액(최소금액 및 한도), 계약기간 등 주요 거래조건을 확인하세요.</li>
-       <li>비과세 상품 또는 세율 우대 가입가능한지 알아보세요.</li>
-       <!-- 자세히보기 버튼 -->
-       <button class="details-btn" onclick="openDetailsWindow('/details-page-url')">자세히보기</button>
-                <!-- 숨겨진 세부 정보 -->
-                <div id="details-content" class="details-content">
-                <!-- 상품1 -->
-                <h4>상품명 : 상품1</h4>
-                <p>은행명 : OO은행</p>
+        <div class="navbar">
+            <div class="logo">
+                <a href="{% url 'loginmain' %}">
+                    <img src="{% static 'img\header_logo.png' %}" style="vertical-align: middle; margin-left: 100px;" alt="로고">
                 </div>
-       <li>예금자보호 대상이 되는지 확인하세요.</li>
-   </ul>
-</div>
-   
-   <!-- 상품 세부 정보 -->
-   <div class="checklist">
-       <img src="https://via.placeholder.com/100" alt="은행 로고 이미지">
-       <h3>상품 이름 | 은행 이름</h3>
-       <p>[표 형식으로 금리 / 우대금리 간단 정리]</p>
-       <p>우대조건 간단하게 나열</p>
-   </div>
+                <div class="nav-links" style="flex-grow: 1; text-align: center; margin-right: 220px;">
+                    <a href="{% url 'originreport' %}" style=" font-weight: bold; color: #121212;">금융분석 리포트</a> 
+                    <div class="dropdown">
+                        <a href="#" style=" font-weight: bold; color: #121212;">예/적금 추천</a>
+                        <div class="dropdown-content">
+                            <a href="{% url 'top5' %}" style="font-size: 0.8rem;">신규적금추천</a>
+                            <a href="{% url 'better' %}" style="font-size: 0.8rem;">기존상품비교</a>
+                        </div>
+                    </div> 
+                    <a href="{% url 'spending_mbti' %}" style=" font-weight: bold; color: #121212;">소비MBTI</a>
+                </div>
+               <!-- 회원 정보 및 마이페이지 -->
+            <div class="user-info">
+                <span style="font-size: 1.1rem;">{{ user_name }}님</span> 
+                <a href="./mypage" style="margin-left: 15px; 
+                text-decoration: none; 
+                font-size: 1.1rem; 
+                font-weight: bold; 
+                color: #121212;">마이페이지</a> 
+                <form method="POST" action="{% url 'logout' %}" style="display: inline;">
+                    {% csrf_token %}
+                    <button name="logout" style="margin-left: 10px; 
+                    margin-right: 100px; 
+                    padding: 5px 10px; 
+                    font-size: 0.9rem; 
+                    font-weight: bold; 
+                    background-color: #291e4ee5; 
+                    color: white; 
+                    border: none; 
+                    border-radius: 5px; 
+                    cursor: pointer;">
+                        로그아웃
+                    </button>
+                </form>
+            </div>
+        </div>
+        </header>
+    
+    
+    <div class="container">
+    
+        <div class="checklist">
+       <h2>예적금 가입 전 체크했덕? 🦆</h2>
+       <div class="inner-box">
+       <ul>
+           <li>상품의 가입대상, 가입금액(최소금액 및 한도), 계약기간 등 주요 거래조건을 확인하세요.</li>
+           <li>비과세 상품 또는 세율 우대 가입가능한지 알아보세요.
+           <!-- 자세히보기 버튼 -->
+           <button class="details-btn" onclick="openDetailsWindow('/details-page-url')">자세히보기</button></li>
+                    <!-- 숨겨진 세부 정보 -->
+                    <div id="details-content" class="details-content">
+                    <!-- 상품1 -->
+                    <h4>상품명 : 상품1</h4>
+                    <p>은행명 : OO은행</p>
+                    </div>
+           <li>예금자보호 대상이 되는지 확인하세요.</li>
+       </ul>
+        </div>
+        </div>
+       
+       <!-- 상품 세부 정보 -->
+        <div class="card">
+            <img src="{% static product.logo|default:'path/to/default_logo.png' %}" alt="{{ product.bank|default:'은행 정보 없음' }} 로고" style="width: 100px; height: auto;">
+            <div class="card-content">
+                <span class="card-title">{{ product.name|default:"상품 이름 없음" }}</span><br>
+                <p><strong>은행:</strong> {{ product.bank|default:"은행 정보 없음" }}</p>
+                <p><strong>기준 금리:</strong> {{ product.baser|default:"기준 금리 정보 없음" }}</p>
+                <p><strong>최대 금리:</strong> {{ product.maxir|default:"최대 금리 정보 없음" }}</p>
+                <p><strong>가입 방법:</strong> {{ product.method|default:"가입 방법 정보 없음" }}</p>
+            </div>
+        </div>
 
-<!-- 만덕이가 알기 쉽게 정리했덕-!!! 요약 설명 -->
-<div class="checklist">
-   <h3>만덕이가 알기 쉽게 정리했덕-!!!</h3>
+        <!-- 만덕이가 알기 쉽게 정리했덕-!!! 요약 설명 -->
+        <div class="checklist">
+       <h3>만덕이가 알기 쉽게 정리했덕-!!!🦆</h3>
+    
+            <div class="inner-box">
+                <p>## 경은언니 상품설명 프롬포트 들어갈자리 ##</p>
+            </div>
 
-   ## 상품들은 기본적으로 3.0%의 금리를 제공해!<br><br>
+        </div>
+           <!-- 빈 박스 영역 -->
+           <div class="empty-box-row">
+            <!-- 빈 박스 1 -->
+            <div class="checklist">
+                <h3>만덕이가 주의를 준덕 (*￣3￣)╭ 🦆</h3>
+                <div class="inner-box">
+                    <p>## 경은언니 프롬포트 들어갈자리 ##</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer>
+        <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0;">서울특별시 마포구 월드컵북로 434 상암IT타워 6층</p> 
+        <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0;">고객지원 : 02-3151-7000 | 이메일: woorifis.lab44@gmail.com </p >
+        <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0;">COPYRIGHT©2024 우리 천만해요</p >
+    </footer >
 
-   추가로 **은행에서 한 번도 거래한 적 없는 사람이라면** 최대 **0.5%의 금리를 더 받을 수 있어~!**<br><br>
 
-   ## 상품은 예금자보호가 되는 상품이기 때문에 해당 상품에 가입할 때 마음 놓고 예치할 수 있어!<br><br>
+    <script>
+        // "자세히보기" 버튼 클릭 시 새 창으로 상세 설명 표시
+        function openDetailsWindow(url) {
+            window.open(url, '_blank', 'width=600,height=400,scrollbars=yes,resizable=yes');
+        }
+     </script>
 
-   ## 만기가 긴 적금을 선택할 때는 이자가 더 높아질 수 있으니 장기적으로 돈을 묶어두는 것도 좋은 방법이야!<br><br>
-</div>
-
-
-
-</div><!-- product-list 끝 -->
-
-</div><!-- container 끝 -->
-
-<footer>
-<p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0;">서울특별시 마포구 월드컵북로 434 상암IT타워 6층</p> 
-<p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0;">고객지원 : 02-3151-7000 | 이메일: worifisa@worifisa.com </p >
-<p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0;">COPYRIGHT©우리팀이름~</p >
-</footer >
 
 </body >
+
+
+
+
 </html >
