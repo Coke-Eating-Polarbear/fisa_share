@@ -31,7 +31,7 @@ from django.db.models import Sum
 from dateutil.relativedelta import relativedelta
 from django.db.models import Q
 import re
-
+from collections import defaultdict
 es = Elasticsearch([os.getenv('ES')])  # Elasticsearch 설정
 load_dotenv() 
 # openai.api_key = os.getenv('APIKEY')
@@ -303,8 +303,6 @@ def senter(mydata_pay):
 # 함수로 데이터 키 변환 정의
 def apply_mapping(data_dict, mapping):
     return {mapping.get(k, k): v for k, v in data_dict.items()}
-
-
 
 # 숫자와 %가 있는 부분 추출 함수 (배달앱 포함 일반화)
 def extract_percentage_sentences(data, keywords):
@@ -656,7 +654,6 @@ def spending_mbti(request):
             # 리스트를 JSON으로 변환
             months_json = json.dumps(months)
 
-            print(months_json)
             # print('months',months)
             
             # 추가적으로 월 형식으로 바꾸고 싶을 때 사용할 코드
@@ -679,7 +676,6 @@ def spending_mbti(request):
 
             amount_top1 = list(sorted_categories.keys())
             freq_top1 = list(Freq_sorted_categories.keys())
-            print('freq_top1',freq_top1)
             # 결과 저장
             top1 = None
             top2 = None
@@ -703,7 +699,6 @@ def spending_mbti(request):
 
             # 결과 확인
             top_card_list = [top1, top2, top3]
-            print('top1, top2, top3',top1, top2, top3)
 
             # 식비 관련 키워드
             eat_keywords = ['푸드', '카페', '편의점', '레스토랑', '패밀리레스토랑','배달']
@@ -781,16 +776,33 @@ def spending_mbti(request):
                 # 결과값 저장
                 card_results[f"max_card_top{i+1}_json"] = max_card_json
                 card_detail_results[f"max_card_detail_top{i+1}_json"] = max_card_detail_json
-                print('card_detail_results',card_detail_results)
-                # 데이터 정리
-                for key, value in card_results.items():
-                    decoded_value = json.loads(value)  # 내부 JSON 문자열 디코딩
-                    card_results[key] = decoded_value
-                # 가독성 있게 출력
-                card_results_json = json.dumps(card_results, ensure_ascii=False, indent=4)
 
+            # JSON 문자열 여부를 확인 후 변환
+            for key, value in card_detail_results.items():
+                if isinstance(value, str):  # value가 JSON 문자열인지 확인
+                    try:
+                        card_detail_results[key] = json.loads(value)  # JSON 문자열을 Python 객체로 변환
+                    except json.JSONDecodeError:
+                        print(f"Invalid JSON in key {key}: {value}")
+                else:
+                    card_detail_results[key] = value  # 이미 Python 객체라면 그대로 저장
+
+            # `card_results`도 동일한 방식으로 처리
+            for key, value in card_results.items():
+                if isinstance(value, str):  # value가 JSON 문자열인지 확인
+                    try:
+                        card_results[key] = json.loads(value)  # JSON 문자열을 Python 객체로 변환
+                    except json.JSONDecodeError:
+                        print(f"Invalid JSON in key {key}: {value}")
+                else:
+                    card_results[key] = value  # 이미 Python 객체라면 그대로 저장
+
+            # JSON으로 변환하여 템플릿에 전달
+            card_results_json = json.dumps(card_results, ensure_ascii=False, indent=4)
+            card_detail_results_json = json.dumps(card_detail_results, ensure_ascii=False)
         except UserProfile.DoesNotExist:
             pass  # 사용자가 없을 경우 기본값 유지
+    print("Card Detail Results JSON:", card_results_json)
 
     context = {
         'user_name': user_name,
@@ -803,8 +815,8 @@ def spending_mbti(request):
         'month2_json' : month2_json,
         'month3_json' : month3_json,
         'months_json' : months_json,
-        'card_results' : json.dumps(card_results, ensure_ascii=False),
-        'card_detail_results' : json.dumps(card_detail_results, ensure_ascii=False),
+        'card_results_json' : card_results_json,
+        'card_detail_results': card_detail_results
     }
     return render(request, 'spending_mbti.html', context)
 
