@@ -197,7 +197,6 @@ class MyDataPay(models.Model):
     store = models.CharField(max_length=256)  # Store
     price = models.IntegerField()  # Price
     type = models.CharField(max_length=256)  # Type
-    # CustomerID, Pdate, Bizcode, Price, Pyear, Pmonth
 
     def __str__(self):
         return f"{self.CustomerID} ({self.pyear}-{self.pmonth})"
