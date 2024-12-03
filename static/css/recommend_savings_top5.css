@@ -132,6 +132,7 @@ header, footer {
 
         .container {
             margin-top: 20px; /* 상단 여백 줄이기 */
+            margin-bottom: 20px; /* 하단 여백 */
             flex: 1;
             width: 70%;
             max-width: none;
@@ -141,6 +142,7 @@ header, footer {
             border: 1px solid #dee2e6;
             border-radius: 10px;
             box-sizing: border-box;
+            display: block; /* 다른 정렬 속성에 영향 미치지 않도록 */
         }
         
 
@@ -201,7 +203,7 @@ header, footer {
     border: 1px solid #dee2e6;
     text-align: left;
     padding: 15px;
-    margin-bottom: 10px;
+    margin-bottom: 15px;
 }
 
 .card img {
@@ -243,22 +245,6 @@ header, footer {
     cursor: pointer;
 }
 
-.heart-icon {
-    font-size: 25px;
-    cursor: pointer;
-    color: #ddd;
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    transition: color 0.3s;
-}
-
-.heart-icon.liked {
-    color: red; /* 클릭 시 붉은 하트 색상 */
-    font-size: 25px; /* 클릭 시 크기 유지 */
-    transform: scale(1.1); /* 살짝 커지도록 애니메이션 */
-    transition: all 0.3s ease;
-}
 
 .details-box {
     display: none;
@@ -336,3 +322,52 @@ header, footer {
 }
 
 
+/* 실시간 추천 섹션 */
+.real-time-recommendations {
+    margin-top: 40px;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    border: 1px solid #dee2e6; /* 테두리 추가 */
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* 부드러운 그림자 */
+}
+
+.real-time-recommendations h2 {
+    text-align: center; /* 텍스트 중앙 정렬 */
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 0 auto 20px; /* 아래 간격 */
+    display: flex; /* flexbox 사용 */
+    justify-content: center; /* 컨테이너 내 중앙 정렬 */
+    align-items: center; /* 세로축 중앙 정렬 */
+}
+
+
+.recommendation-boxes {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.recommendation-box {
+    flex: 0 0 48%; /* 두 상자가 균등하게 48%씩 차지 */
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.recommendation-box h3 {
+    font-size: 1.2rem;
+    margin-bottom: 15px;
+    color: #007BFF;
+    text-align: center;
+}
+
+.recommendations_2  {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    margin: 0px 5px; /* 위아래 10px, 좌우 10px */
+}
