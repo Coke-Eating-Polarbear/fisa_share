@@ -31,6 +31,8 @@ from django.db.models import Sum
 from dateutil.relativedelta import relativedelta
 from django.db.models import Q
 import re
+from collections import Counter
+import requests
 from collections import defaultdict
 es = Elasticsearch([os.getenv('ES')])  # Elasticsearch 설정
 load_dotenv() 
@@ -876,6 +878,83 @@ def assign_cluster(stage_class, sex, age):
     else:
         return [1, 4]
 
+
+# 로그 데이터를 이용한 상품 추천
+
+def get_top_data_by_customer_class(stageclass, inlevel):
+    # Elasticsearch 연결
+    
+    
+    stageclass = stageclass
+    inlevel = inlevel
+    print("inlevel",inlevel)
+    headers = {
+        "Content-Type": "application/json"
+    }
+    # Elasticsearch 쿼리
+    query = {
+        "query": {
+            "bool": {
+                "filter": [
+                    {"term": {"customer_class.Stageclass.keyword": stageclass}},  # keyword로 정확 매칭
+                    {"term": {"customer_class.Inlevel": inlevel}}
+                ]
+            }
+        },
+        "aggs": {
+            "group_by_data": {
+                "terms": {
+                    "script": {
+                    "source": """
+                        def data = doc['data.product_name.keyword'].value + '|' +
+                                doc['data.bank.keyword'].value + '|' +
+                                doc['data.baser.keyword'].value + '|' +
+                                doc['data.maxir.keyword'].value + '|' +
+                                doc['data.method.keyword'].value;
+                        return data;
+                    """,
+                    "lang": "painless"
+                    },
+                    "size": 3,
+                    "order": {"_count": "desc"}
+                },
+                "aggs": {
+                    "top_hits": {
+                        "top_hits": {
+                            "size": 1,
+                            "_source": {
+                            "includes": ["data", "customer_class", "timestamp"]
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "size": 0
+    }
+
+    try:
+        # Elasticsearch에서 데이터 가져오기
+        response = es.search(index="ps_product_click_logs", body=query)
+        # 집계 데이터 추출
+        aggs_results = response.get("aggregations", {}).get("group_by_data", {}).get("buckets", [])
+
+        # 상위 3개 데이터만 추출
+        top_data = []
+        for bucket in aggs_results:
+            top_hit = bucket.get("top_hits", {}).get("hits", {}).get("hits", [])
+            if top_hit:
+                top_data.append({
+                    "data": top_hit[0]["_source"]["data"],
+                    "count": bucket["doc_count"]  # 해당 데이터의 카운트
+                })
+
+        return top_data
+
+    except Exception as e:
+        # 오류 처리
+        return JsonResponse({"error": str(e)}, status=500)
+
 @login_required_session
 def summary_view(request):
     customer_id = request.session.get('user_id')  # 세션에서 CustomerID 가져오기
@@ -915,6 +994,7 @@ def summary_view(request):
     recommended_products = Recommend.objects.filter(CustomerID=customer_id)
     recommended_count = recommended_products.count()
     recommended_dsid_list = {'dproduct': [], 'sproduct': []}
+    print('recommended_dsid_list',recommended_dsid_list)
 
     if recommended_count > 0:
         # DProduct와 SProduct 각각 추천 가져오기
@@ -923,16 +1003,19 @@ def summary_view(request):
 
     # 추천 상품 세부 정보 가져오기
     recommended_product_details = list(
-        DProduct.objects.filter(dsid__in=recommended_dsid_list['dproduct']).values('dsname', 'bank', 'baser', 'maxir')
+        DProduct.objects.filter(dsid__in=recommended_dsid_list['dproduct']).values('dsid','dsname', 'bank', 'baser', 'maxir')
     ) + [
-        {
+        {   
+            'dsid' : sp['dsid'],
             'dsname': sp['product_name'],
             'bank': sp['bank_name'],
             'baser': sp['base_rate'],
             'maxir': sp['max_preferential_rate']
         }
-        for sp in SProduct.objects.filter(DSID__in=recommended_dsid_list['sproduct']).values('product_name', 'bank_name', 'base_rate', 'max_preferential_rate')
+        for sp in SProduct.objects.filter(DSID__in=recommended_dsid_list['sproduct']).values('DSID','product_name', 'bank_name', 'base_rate', 'max_preferential_rate')
     ]
+
+    print('recommended_product_details',recommended_product_details)
 
     # 랜덤 상품 추가
     if recommended_count < 5:
@@ -940,8 +1023,9 @@ def summary_view(request):
         random_dproducts = DProduct.objects.exclude(dsid__in=recommended_dsid_list['dproduct']).order_by('?')[:remaining_count]
         random_sproducts = SProduct.objects.exclude(DSID__in=recommended_dsid_list['sproduct']).order_by('?')[:remaining_count]
 
-        random_product_details = list(random_dproducts.values('dsname', 'bank', 'baser', 'maxir')) + [
+        random_product_details = list(random_dproducts.values('dsid','dsname', 'bank', 'baser', 'maxir')) + [
             {
+                'dsid' : sp.DSID,
                 'dsname': sp.product_name,
                 'bank': sp.bank_name,
                 'baser': sp.base_rate,
@@ -958,6 +1042,7 @@ def summary_view(request):
     unique_product_details = {p['dsname']: p for p in product_details if p['dsname']}.values()
     product_details = list(unique_product_details)[:5]
 
+    print('product_details',product_details)
 
     ## 적금 추천 상품 top 3
     # Django ORM을 사용하여 데이터 가져오기
@@ -986,7 +1071,7 @@ def summary_view(request):
                 final_result = pd.concat([final_result, top_result], ignore_index=True)
 
     # 적금 최종 추천 3개로 제한
-    final_recommend_json = final_result.head(5)[["product_name", "bank_name", "max_preferential_rate", "base_rate", "signup_method"]].to_dict(orient='records')
+    final_recommend_json = final_result.head(5)[["DSID","product_name", "bank_name", "max_preferential_rate", "base_rate", "signup_method"]].to_dict(orient='records')
     
 
     # 예금 추천 처리
@@ -1013,21 +1098,31 @@ def summary_view(request):
         filtered_results.append(pd.DataFrame(filtered_deposits_query))
     request.session['clusters'] = top_clusters
     final_recommendations = pd.concat(filtered_results, ignore_index=True)
+    print('final_recommendations',final_recommendations)
     # 중복 제거
-    final_recommendations_drop_duplicates = final_recommendations[['name', 'bank', 'baser', 'maxir','method']].drop_duplicates()
-
+    final_recommendations_drop_duplicates = final_recommendations.drop_duplicates(subset=["name", "bank", "baser", "maxir", "method"])
+    print('final_recommendations_drop_duplicates',final_recommendations_drop_duplicates)
     top2 = final_recommendations_drop_duplicates.sort_values(by='maxir', ascending=False).head(5)
     deposit_recommend_dict = top2.to_dict(orient='records')
-    final_recommend_json_with_type = [
-    {**item, "type": "sproduct"} for item in final_recommend_json[:5]
-    ]
-    deposit_recommend_dict_with_type = [
-    {**item, "type": "dproduct"} for item in deposit_recommend_dict[:5]
-    ]
-    request.session['final_recommend'] = final_recommend_json_with_type[:5]  # 적금 Top 5
-    request.session['deposit_recommend'] = deposit_recommend_dict_with_type[:5]  # 예금 Top 5
+    request.session['final_recommend'] = final_recommend_json[:5]  # 적금 Top 5
+    request.session['deposit_recommend'] = deposit_recommend_dict[:5]  # 예금 Top 5
+
     final_recommend_display = final_recommend_json[:2]  # 적금 2개
     deposit_recommend_display = deposit_recommend_dict[:3]  # 예금 3개
+    print('final_recommend_display',final_recommend_display)
+    
+    
+    # 로그 데이터 확인 
+    log_cluster = get_top_data_by_customer_class(user.Stageclass, user.Inlevel)
+
+    # "data" 부분만 추출
+    filtered_data = [item['data'] for item in log_cluster]
+
+    # JSON으로 변환
+    filtered_data_json = json.dumps(filtered_data, ensure_ascii=False)
+    print('filtered_data_json',filtered_data_json)
+
+
     # 최종 데이터 전달
     context = {
         'product_details': product_details,
@@ -1035,7 +1130,8 @@ def summary_view(request):
         'news_entries': news_entries,
         'user_name': user_name,
         'final_recommend': final_recommend_display,  # 적금 Top 3
-        'deposit_recommend': deposit_recommend_display  # 예금 Top 2
+        'deposit_recommend': deposit_recommend_display,  # 예금 Top 2
+        'filtered_data_json' : filtered_data_json, # 로그로 뽑은 top3
     }
 
     return render(request, 'loginmain.html', context)
