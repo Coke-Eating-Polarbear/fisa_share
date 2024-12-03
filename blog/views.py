@@ -187,6 +187,7 @@ def mypage(request):
     customer_id = request.session.get('user_id')  # 세션에서 CustomerID 가져오기
     user_name = "사용자"
     accounts = []  # 사용자 계좌 정보 저장
+    expiring_accounts = []  # 만기일이 90일 이내로 남은 계좌
 
     if customer_id:
         try:
@@ -195,13 +196,52 @@ def mypage(request):
             user_name = user.username  # 사용자 이름 설정
 
             # MyDataDS 모델에서 해당 CustomerID에 연결된 계좌 정보 가져오기
-            accounts = MyDataDS.objects.filter(CustomerID=customer_id).values('AccountID', 'balance')
+            accounts = MyDataDS.objects.filter(CustomerID=customer_id).values('AccountID', 'balance','pname', 'ds_rate','end_date','dstype')
+
+            # 오늘 날짜 계산
+            today = timezone.now().date()
+
+            # 90일 이내 만기일 필터링
+            expiring_accounts = [
+                {
+                    "AccountID": account['AccountID'],
+                    "balance": account['balance'],
+                    "pname" : account['pname'],
+                    "ds_rate": float(account['ds_rate']), 
+                    "end_date": account['end_date'].strftime("%Y-%m-%d") ,  # 날짜를 JSON 직렬화 가능하도록 문자열로 변환
+                    "days_remaining": (account['end_date'] - today).days
+                }
+                for account in accounts
+                if (account['end_date'] - today).days <= 90
+            ]
+            accounts_list = [
+                {
+                    "AccountID": account['AccountID'],
+                    "balance": account['balance'],
+                    "pname": account['pname'],
+                    "ds_rate": float(account['ds_rate']),
+                    "dstype" : account['dstype'],
+                    "end_date": account['end_date'].strftime("%Y-%m-%d"),
+                    "days_remaining": (account['end_date'] - today).days
+                }
+                for account in accounts
+            ]
+            d_list = [account for account in accounts_list if account['dstype'] == 'd']
+            s_list = [account for account in accounts_list if account['dstype'] == 's']
+            expiring_accounts_json = json.dumps(expiring_accounts)
         except UserProfile.DoesNotExist:
             pass  # 사용자가 없을 경우 기본값 유지
 
+    # JSON 직렬화
+    
     context = {
-        'user_name': user_name,  # 사용자 이름
-        'accounts': accounts,   # 계좌 정보 리스트
+        'user_name': user_name,          # 사용자 이름
+        'accounts': accounts,           # 전체 계좌 정보
+        'expiring_accounts': expiring_accounts,  # 만기일 90일 이내 계좌 (리스트 형태)
+        'expiring_accounts_json': expiring_accounts_json,  # 만기일 90일 이내 계좌 (JSON 문자열 형태)
+        'accounts_list': accounts_list,
+        'd_list' : d_list,
+        's_list' : s_list,
     }
     return render(request, 'mypage.html', context)
 
@@ -878,9 +918,6 @@ def assign_cluster(stage_class, sex, age):
     else:
         return [1, 4]
 
-
-# 로그 데이터를 이용한 상품 추천
-
 def get_top_data_by_customer_class(stageclass, inlevel):
     # Elasticsearch 연결
     
@@ -1257,6 +1294,7 @@ def log_click_event(request):
         es.index(index="django_logs", body=event_data)
         return JsonResponse({"status": "success"})
     return JsonResponse({"status": "failed"}, status=400)
+
 @login_required_session
 def originreport_page(request):
     # 세션에서 사용자 ID 가져오기
@@ -1606,8 +1644,6 @@ def originreport_page(request):
 
     except UserProfile.DoesNotExist:
         return render(request, 'report_origin.html', {'error': '사용자 정보를 찾을 수 없습니다.'})
-
-# 예,적금 로그 데이터 저장
 
 @csrf_exempt
 def log_to_elasticsearch(request):
