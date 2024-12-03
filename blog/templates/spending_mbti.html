@@ -147,46 +147,24 @@
             </div>
     
             <!-- 카드 추천 박스 -->
-            <div class="card-container">
-                <div class="card-box">
-                    <a href="https://card-website1.com" target="_blank" class="card-image-box">
-                        <img src="https://via.placeholder.com/80x50" alt="카드 이미지">
-                        <div class="card-name">은행사 이름 - 카드 이름</div>
-                    </a>
-                    <div class="card-description-box">
-                        <div class="card-description">
-                            카드 설명: 식비 혜택이 풍부하여 외식을 즐기는 분들에게 적합합니다. <br>
-                            카드 혜택: 외식 시 10% 할인, 영화관 5% 캐시백 제공
+            
+        </div>
+        <div id="card-container">
+            {% for key, card_list in card_detail_results.items %}
+                {% for card in card_list %}
+                    <div class="card-box">
+                        <a href="{{ card.Link }}" target="_blank" class="card-image-box">
+                            <img src="{{ card.image }}" alt="{{ card.Name }} 이미지">
+                            <div class="card-name">{{ card.corp }} - {{ card.Name }}</div>
+                        </a>
+                        <div class="card-description-box">
+                            <div class="card-description">
+                                {{ card.Detail|safe }}
+                            </div>
                         </div>
                     </div>
-                </div>
-    
-                <div class="card-box">
-                    <a href="https://card-website2.com" target="_blank" class="card-image-box">
-                        <img src="https://via.placeholder.com/80x50" alt="카드 이미지">
-                        <div class="card-name">은행사 이름 - 카드 이름</div>
-                    </a>
-                    <div class="card-description-box">
-                        <div class="card-description">
-                            카드 설명: 쇼핑과 의류 구매에 대한 할인 혜택이 제공됩니다. <br>
-                            카드 혜택: 백화점 및 온라인 쇼핑 10% 할인
-                        </div>
-                    </div>
-                </div>
-    
-                <div class="card-box">
-                    <a href="https://card-website3.com" target="_blank" class="card-image-box">
-                        <img src="https://via.placeholder.com/80x50" alt="카드 이미지">
-                        <div class="card-name">은행사 이름 - 카드 이름</div>
-                    </a>
-                    <div class="card-description-box">
-                        <div class="card-description">
-                            카드 설명: 교통비와 대중교통 이용 시 추가 적립 혜택이 있습니다. <br>
-                            카드 혜택: 지하철 및 버스 요금 5% 적립
-                        </div>
-                    </div>
-                </div>
-            </div>
+                {% endfor %}
+            {% endfor %}
         </div>
     </div>
 
@@ -204,7 +182,7 @@
                 </div>
             </div>
     <script>
-        
+
         // Django에서 전달된 JSON 데이터를 JavaScript 객체로 변환
         const nextMonthPrediction = JSON.parse('{{ next_month_prediction_json|safe }}');
 
@@ -246,7 +224,6 @@
         
         const sortedCategories = JSON.parse('{{ sorted_categories_json|escapejs }}');
         const amountTotal = JSON.parse('{{ amount_total_json|escapejs }}'); 
-
         
         const amount_labels = Object.keys(sortedCategories); // 키를 라벨로 사용
         const amount_data = Object.values(sortedCategories); // 값을 데이터로 사용
@@ -263,7 +240,6 @@
                 backgroundColor: colors
             }]
         };
-        console.log(amountData);
         
 
         // 차트 생성
@@ -362,7 +338,6 @@
                 predictionChart.destroy();
             }
             const months = JSON.parse('{{ months_json|escapejs }}');  // Django 데이터 JS로 전달
-            console.log(months);  // JavaScript에서 데이터 출력
             // 새로운 차트 생성
             predictionChart = new Chart(ctx, {
                 type: 'line',
@@ -409,7 +384,6 @@
         // 드롭다운 선택값에 따라 차트 업데이트
         function updatePredictionChart() {
             const selectedCategory = document.getElementById('categorySelect').value;
-            console.log('Selected Category:', selectedCategory);
             const selectedData1 = month1[selectedCategory]; // JSON에서 선택된 키의 값 가져오기
             const selectedData2 = month2[selectedCategory]; // JSON에서 선택된 키의 값 가져오기
             const selectedData3 = month3[selectedCategory]; // JSON에서 선택된 키의 값 가져오기
