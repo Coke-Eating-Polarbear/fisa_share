@@ -1709,14 +1709,38 @@ def log_to_elasticsearch(request):
 def better_option(request):
     customer_id = request.session.get('user_id')  
     user_name = "사용자"  # 기본값 설정
-    top5_products = []  # 추천 상품 리스트 초기화
 
     if customer_id:
         try:
             # CustomerID로 UserProfile 조회
             user = UserProfile.objects.get(CustomerID=customer_id)
             user_name = user.username  # 사용자 이름 설정
+            accounts = MyDataDS.objects.filter(CustomerID=customer_id).values('AccountID','bank_name', 'balance','pname', 'ds_rate','end_date','dstype')
+            today = timezone.now().date()
+            accounts_list = [
+                {
+                    "AccountID": account['AccountID'],
+                    "bank_name": account['bank_name'],
+                    "balance": account['balance'],
+                    "pname": account['pname'],
+                    "ds_rate": float(account['ds_rate']),
+                    "dstype": account['dstype'],
+                    "end_date": account['end_date'],
+                    "days_remaining": (account['end_date'] - today).days
+                }
+                for account in accounts
+                if account['end_date'] > today  # 만기가 지나지 않은 상품만 포함
+            ]
+            if accounts_list:
+                nearest_expiring = min(accounts_list, key=lambda x: x['days_remaining'])
+            d_list = [account for account in accounts_list if account['dstype'] == 'd']
+            s_list = [account for account in accounts_list if account['dstype'] == 's']
 
+            # 각각의 리스트에서 만기일이 가장 가까운 상품 선택
+            if d_list:
+                nearest_d = min(d_list, key=lambda x: x['days_remaining'])
+            if s_list:
+                nearest_s = min(s_list, key=lambda x: x['days_remaining'])
         except UserProfile.DoesNotExist:
             pass  # 사용자가 없을 경우 기본값 유지
     final_recommend = request.session.get('final_recommend')
@@ -1724,7 +1748,9 @@ def better_option(request):
     context = {
         'user_name': user_name,
         'final_recommend': final_recommend,  # 적금 Top 5
-        'deposit_recommend': deposit_recommend  # 예금 Top 5
+        'deposit_recommend': deposit_recommend,  # 예금 Top 5
+        'nearest_d' : nearest_d,
+        'nearest_s' : nearest_s,
     }
 
     return render(request, 'better_options.html',context)

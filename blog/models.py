@@ -173,7 +173,7 @@ class MyDataAsset(models.Model):
 class MyDataDS(models.Model):
     CustomerID = models.CharField(max_length=256)  # CustomerID
     AccountID = models.CharField(max_length=256)  # AccountID
-    bank_name = models.CharField(max_length=256)  # BankName
+    bank_name = models.CharField(db_column='BankName',max_length=256)  # BankName
     pname = models.CharField(db_column='PName',max_length=256)  # PName
     balance = models.BigIntegerField()  # Balance
     ds_rate = models.DecimalField(db_column='DSrate',max_digits=4, decimal_places=2)  # DSRate
