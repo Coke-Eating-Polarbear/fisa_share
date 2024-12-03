@@ -1674,3 +1674,5 @@ def better_option(request):
 
     return render(request, 'better_options.html',context)
 
+def ds_detail(request):
+    return render(request, 'ds_detail.html')

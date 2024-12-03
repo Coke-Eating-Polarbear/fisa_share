@@ -4,21 +4,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>예/적금 추천 페이지</title>
+<title>상세 설명</title>
 <link rel="stylesheet" href="{% static 'css/ds_details.css' %}">
 <style>
 </style>
 <script>
-   // "자세히보기" 버튼 클릭 시 상세 설명 표시/숨기기
-   function toggleDetails(id) {
-       var content = document.getElementById(id);
-       if (content.style.display === "none" || content.style.display === "") {
-           content.style.display = "block";
-       } else {
-           content.style.display = "none";
-       }
-   }
-</script>
+    // "자세히보기" 버튼 클릭 시 새 창으로 상세 설명 표시
+    function openDetailsWindow(url) {
+        window.open(url, '_blank', 'width=600,height=400,scrollbars=yes,resizable=yes');
+    }
+ </script>
+ 
 </head>
 <body>
     {% csrf_token %}
@@ -68,7 +64,7 @@
        <li>상품의 가입대상, 가입금액(최소금액 및 한도), 계약기간 등 주요 거래조건을 확인하세요.</li>
        <li>비과세 상품 또는 세율 우대 가입가능한지 알아보세요.</li>
        <!-- 자세히보기 버튼 -->
-        <button class="details-btn" onclick="toggleDetails('details-content')">자세히보기</button>
+       <button class="details-btn" onclick="openDetailsWindow('/details-page-url')">자세히보기</button>
                 <!-- 숨겨진 세부 정보 -->
                 <div id="details-content" class="details-content">
                 <!-- 상품1 -->
