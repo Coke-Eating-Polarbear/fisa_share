@@ -24,26 +24,6 @@
                 });
             });
 
-            // 하트 클릭 동작 설정
-            function toggleHeart(heart, productId) {
-                if (heart.classList.contains("liked")) {
-                    heart.classList.remove("liked");
-                    heart.innerText = "♡";
-                    removeFromFavorites(productId);
-                } else {
-                    heart.classList.add("liked");
-                    heart.innerText = "♥";
-                    addToFavorites(productId);
-                }
-            }
-
-            document.querySelectorAll(".heart-icon").forEach((heart, index) => {
-                const productId = "product-" + (index + 1);
-                heart.addEventListener("click", function () {
-                    toggleHeart(heart, productId);
-                });
-            });
-
             // 자세히보기 토글 설정
             document.querySelectorAll(".card-button").forEach((button) => {
                 button.addEventListener("click", function () {
@@ -157,7 +137,6 @@
                         <p><strong>최대 금리:</strong> {{ product.maxir }}</p>
                         <p><strong>가입 방법:</strong> {{ product.method }}</p>
                     </div>
-                    <span class="heart-icon">♡</span>
                     <button class="card-button">자세히보기</button>
                     <div class="details-box">
                         <button class="close-button">✕</button>
@@ -197,7 +176,6 @@
                         <p><strong>최대 금리:</strong> {{ product.max_preferential_rate }}</p>
                         <p><strong>가입 방법:</strong> {{ product.signup_method }}</p>
                     </div>
-                    <span class="heart-icon">♡</span>
                     <button class="card-button">자세히보기</button>
                     <div class="details-box">
                         <button class="close-button">✕</button>
@@ -215,7 +193,7 @@
 
     <footer>
         <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0;">서울특별시 마포구 월드컵북로 434 상암IT타워 6층</p> 
-        <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0;">고객지원 : 02-3151-7000 | 이메일: worifisa@worifisa.com </p >
+        <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0;">고객지원 : 02-3151-7000 | 이메일: woorifis.lab44@gmail.com </p >
         <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0;">COPYRIGHT©2024 우리 천만해요</p >
     </footer >
 
