@@ -1,20 +1,15 @@
-from django.shortcuts import render, redirect,get_object_or_404 # type: ignore
-from django.contrib.auth import authenticate, login,logout # type: ignore
+from django.shortcuts import render, redirect# type: ignore
+from django.contrib.auth import logout # type: ignore
 from django.utils import timezone # type: ignore
 from datetime import timedelta
 from datetime import date
-import matplotlib.pyplot as plt # type: ignore
 import base64
-import io
-from matplotlib import font_manager, rc # type: ignore
-from django.contrib import messages # type: ignore
-from .forms import UserProfileForm
+from matplotlib import rc # type: ignore
 from blog.models import UserProfile,Recommend, Wc, News, Favorite, Average,card, MyDataAsset, MyDataDS, MyDataPay,SpendAmount, DProduct, SProduct, SpendFreq  # UserProfile 모델도 가져옵니다
 from django.contrib.auth.hashers import check_password# type: ignore
 from django.views.decorators.http import require_POST# type: ignore
-from django.http import HttpResponse,JsonResponse# type: ignore
+from django.http import JsonResponse# type: ignore
 from django.db.models import F # type: ignore
-import random
 import logging
 from .logging import *
 from elasticsearch import Elasticsearch # type: ignore
@@ -22,12 +17,9 @@ from django.views.decorators.csrf import csrf_exempt # type: ignore
 import json
 import os
 from dotenv import load_dotenv # type: ignore
-from collections import defaultdict
 from accounts.views import map_person
-from .utils import income_model
 import pandas as pd
 from datetime import datetime
-from sqlalchemy import create_engine
 from joblib import load
 import numpy as np
 from django.conf import settings
@@ -36,7 +28,6 @@ from django.db.models import Q
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core import serializers
 from django.db.models import Sum
-import calendar
 from dateutil.relativedelta import relativedelta
 from django.db.models import Q
 import re
@@ -47,9 +38,58 @@ es = Elasticsearch([os.getenv('ES')])  # Elasticsearch 설정
 load_dotenv() 
 # openai.api_key = os.getenv('APIKEY')
 client = OpenAI()
-
 rc('font', family='Malgun Gothic')
 logger = logging.getLogger(__name__)
+
+def get_sorted_categories_json(customer_id, start_date):
+    """
+    특정 고객의 소비 데이터를 기반으로 sorted_categories_json을 생성합니다.
+    """
+    # `SpendAmount`에서 기간에 맞는 데이터 필터링
+    spend_amounts = SpendAmount.objects.filter(
+        CustomerID=customer_id, 
+        SDate__gte=start_date  # 시작 날짜 이후의 데이터만 가져옴
+    )
+    
+    # 각 항목별로 총합을 구합니다.
+    category_totals = spend_amounts.aggregate(
+        total_eat_amount=Sum('eat_amount'),
+        total_transfer_amount=Sum('transfer_amount'),
+        total_utility_amount=Sum('utility_amount'),
+        total_phone_amount=Sum('phone_amount'),
+        total_home_amount=Sum('home_amount'),
+        total_hobby_amount=Sum('hobby_amount'),
+        total_fashion_amount=Sum('fashion_amount'),
+        total_party_amount=Sum('party_amount'),
+        total_allowance_amount=Sum('allowance_amount'),
+        total_study_amount=Sum('study_amount'),
+        total_medical_amount=Sum('medical_amount'),
+        total_total_amount=Sum('TotalAmount')  # 전체 합계
+    )
+
+    # 항목을 한국어로 맵핑한 딕셔너리로 저장
+    category_dict = {
+        '식비': category_totals['total_eat_amount'] or 0,
+        '교통비': category_totals['total_transfer_amount'] or 0,
+        '공과금': category_totals['total_utility_amount'] or 0,
+        '통신비': category_totals['total_phone_amount'] or 0,
+        '주거비': category_totals['total_home_amount'] or 0,
+        '여가/취미': category_totals['total_hobby_amount'] or 0,
+        '패션/잡화': category_totals['total_fashion_amount'] or 0,
+        '모임회비': category_totals['total_party_amount'] or 0,
+        '경조사': category_totals['total_allowance_amount'] or 0,
+        '교육비': category_totals['total_study_amount'] or 0,
+        '의료비': category_totals['total_medical_amount'] or 0,
+    }
+
+    # 항목을 값 기준으로 내림차순 정렬하여 상위 항목 추출
+    sorted_categories = sorted(category_dict.items(), key=lambda x: x[1], reverse=True)
+    sorted_categories_dict = dict(sorted_categories)
+
+    # JSON 형식으로 변환
+    sorted_categories_json = json.dumps(sorted_categories_dict)
+    
+    return sorted_categories_json
 
 def login_required_session(view_func):
     """
@@ -84,7 +124,7 @@ def update_profile(request):
     age = current_year - birth_year
 
     # 역매핑 계산
-    reverse_data = reverse_mapping_with_age(user.stageclass, age)
+    reverse_data = reverse_mapping_with_age(user.Stageclass, age)
 
     if request.method == 'POST':
         # 사용자 입력 데이터 가져오기
@@ -106,7 +146,7 @@ def update_profile(request):
         user.Pw = pw
         user.Email = email
         user.Phone = phone
-        user.stageclass = updated_stage_class
+        user.Stageclass = updated_stage_class
         user.save()
 
         return redirect('mypage')  # 프로필 페이지로 리디렉션
@@ -194,7 +234,6 @@ def fetch_sql_processed_data(mydata_pay):
     # """
     # QuerySet을 Pandas DataFrame으로 변환
     df = pd.DataFrame(list(mydata_pay))
-    print('mydata_pay_df',df)
     # df = pd.read_sql(query, engine)
     # 1. TotalPrice 계산: Pyear, Pmonth, Bizcode별로 Price 합산
     df_grouped = df.groupby(['pyear', 'pmonth', 'bizcode'], as_index=False)['price'].sum()
@@ -211,9 +250,7 @@ def fetch_sql_processed_data(mydata_pay):
 
 
     # 결과 출력
-    print('df_grouped',df_grouped)
     df=df_grouped
-    print('df',df)
 
     # Pivot 변환: Bizcode를 열로 만들고 각 Ratio 값을 채움
     pivot_data = df.pivot(index=['pyear', 'pmonth'], columns='bizcode', values='Ratio').fillna(0)
@@ -236,14 +273,9 @@ def predict_next_month(preprocessed_data, model_features):
     most_recent_period = preprocessed_data.index.max()
     most_recent_data = preprocessed_data.loc[most_recent_period]
 
-    # 디버깅: 가장 최근 데이터 확인
-    print(f"가장 최근 데이터 (모델 입력 전):\n{most_recent_data}")
 
     # Series에서 모델 입력 데이터 생성
     model_input = most_recent_data.drop(labels=['TotalSpending'], errors='ignore')
-
-    # 디버깅: 모델 입력 데이터 확인
-    print(f"모델 입력 데이터 (가장 최근 데이터):\n{model_input}")
 
     # 모델 로드 및 예측
     model = load('./models/Consumption_Prediction_rfm.joblib')
@@ -263,21 +295,11 @@ def predict_next_month(preprocessed_data, model_features):
     return result
 
 def senter(mydata_pay):
-    """
-    메인 함수: 데이터 처리, 예측, 출력 수행
-    """
-    print("SQL에서 전처리된 데이터를 가져옵니다...")
     preprocessed_data = fetch_sql_processed_data(mydata_pay)
-    print("Preprocessed Data Columns:", preprocessed_data.columns)
-
-    print("저장된 모델의 입력 형식을 확인합니다...")
     model = os.path.join(settings.BASE_DIR, 'models', 'Consumption_prediction_rfm.joblib')
     model_features = list(model.feature_names_in_) if hasattr(model, 'feature_names_in_') else preprocessed_data.columns.drop('TotalSpending')
 
-    print("다음 달 예측 결과:")
     next_month_prediction = predict_next_month(preprocessed_data, model_features)
-    print(f"연도: {next_month_prediction.name[0]}, 월: {next_month_prediction.name[1]}")
-    print(next_month_prediction)
     return next_month_prediction
 
 # 함수로 데이터 키 변환 정의
@@ -425,7 +447,6 @@ def spending_mbti(request):
 
             # start_date에서 지난달
             start_date = start_date - relativedelta(months=1)
-            print('start_date',start_date)
 
             # `SpendAmount`에서 기간에 맞는 데이터 필터링
             spend_amounts = SpendAmount.objects.filter(
@@ -470,7 +491,6 @@ def spending_mbti(request):
 
             # 항목을 값 기준으로 내림차순 정렬하여 상위 7개 항목을 추출
             sorted_categories = sorted(category_dict.items(), key=lambda x: x[1] or 0, reverse=True)
-            # print(sorted_categories)
 
             # 상위 4개 항목을 구합니다.
             sorted_categories = dict(sorted_categories)
@@ -485,8 +505,7 @@ def spending_mbti(request):
 
             # # "기타" 항목 추가
             # top4_categories['기타'] = other_categories_total
-
-            # print(top4_categories)    
+ 
 
             # 여기서 부터는 spendfreq 시작
             # # `SpendFreq`에서 기간에 맞는 데이터 필터링
@@ -494,7 +513,6 @@ def spending_mbti(request):
                 CustomerID=customer_id, 
                 SDate__gte=start_date  # 시작 날짜 이후의 데이터만 가져옴
             )     
-            print('spend_freq',spend_freq)
 
             # 각 항목별로 총합을 구합니다.
             Freq_category_totals = spend_freq.aggregate(
@@ -533,7 +551,6 @@ def spending_mbti(request):
 
             # 항목을 값 기준으로 내림차순 정렬하여 상위 7개 항목을 추출
             Freq_sorted_categories = sorted(Freq_category_dict.items(), key=lambda x: x[1] or 0, reverse=True)
-            # print(sorted_categories)
 
             # 상위 4개 항목을 구합니다.
             Freq_sorted_categories = dict(Freq_sorted_categories)
@@ -547,7 +564,6 @@ def spending_mbti(request):
             mydata_pay = MyDataPay.objects.filter(
                 CustomerID=customer_id
             ).values()     
-            print('mydata_pay',mydata_pay)
             pd.options.display.float_format = '{:,.2f}'.format
             
             # series 타입을 직렬화
@@ -555,9 +571,6 @@ def spending_mbti(request):
             # JSON 형식으로 변환
             prediction_dict = prediction.to_dict()
             next_month_prediction_json = json.dumps(prediction_dict)
-            print('next_month_prediction',next_month_prediction_json)
-
-
 
             # 소비 예측 차트를 위한 값 불러오기
             
@@ -575,7 +588,6 @@ def spending_mbti(request):
                 CustomerID=customer_id ,
                 SDate__gte=fred_start_date  # 시작 날짜 이후의 데이터만 가져옴
             ).values()
-            # print('fred_spend_amounts',fred_spend_amounts)
 
             # QuerySet에서 리스트로 변환
             fred_spend_amounts_list = list(fred_spend_amounts)
@@ -588,8 +600,6 @@ def spending_mbti(request):
 
             # 월별 데이터 쪼개기
             months = list(fred_spend_amounts_by_month.keys())  # 월 목록 생성 (예: ['2024-09', '2024-10', '2024-11'])
-            print("Original months:", months)
-
 
             split_month_dict = [
                 fred_spend_amounts_by_month[month] for month in months
@@ -780,14 +790,9 @@ def spending_mbti(request):
                     card_results[key] = decoded_value
                 # 가독성 있게 출력
                 card_results_json = json.dumps(card_results, ensure_ascii=False, indent=4)
-                        
 
         except UserProfile.DoesNotExist:
             pass  # 사용자가 없을 경우 기본값 유지
-
-    ## 소비예측 모델 넣기
-    # MySQL 연결 정보
-        
 
     context = {
         'user_name': user_name,
@@ -1088,7 +1093,6 @@ def summary_view(request):
     final_recommendations_drop_duplicates = final_recommendations.drop_duplicates(subset=["name", "bank", "baser", "maxir", "method"])
     print('final_recommendations_drop_duplicates',final_recommendations_drop_duplicates)
     top2 = final_recommendations_drop_duplicates.sort_values(by='maxir', ascending=False).head(5)
-    print('예금 중복 삭제', top2)
     deposit_recommend_dict = top2.to_dict(orient='records')
     
     request.session['final_recommend'] = final_recommend_json[:5]  # 적금 Top 5
@@ -1350,10 +1354,7 @@ def originreport_page(request):
 
         # CustomerID로 UserProfile 조회
         user = UserProfile.objects.get(CustomerID=customer_id)
-        print("Customer ID:", customer_id)  # 디버깅용 출력
-        print("User Data:", user)
         cnow = datetime.now()
-        current_month = cnow.strftime("%Y-%m")
         # 한 달 전 날짜 계산
         last_month = cnow - timedelta(days=30)  # 30일을 빼서 대략적으로 한 달을 계산
         last_month_str = last_month.strftime("%Y-%m")  # 형식에 맞게 문자열로 변환
@@ -1369,7 +1370,6 @@ def originreport_page(request):
 
         if not average_data:
             raise ValueError(f"소득 분위 데이터가 없습니다. (Stage Class: {user.Stageclass}, Inlevel: {user.Inlevel})")
-        print("Average Data:", average_data)  # 디버깅용 출력
 
         # MyData에서 고객 데이터 조회
         if not user_asset_data:
@@ -1378,9 +1378,6 @@ def originreport_page(request):
             raise ValueError(f"사용자 데이터를 찾을 수 없습니다. (Customer ID: {customer_id})")
         if not spend_freq:
             raise ValueError(f"사용자 데이터를 찾을 수 없습니다. (Customer ID: {customer_id})")
-        print("User Financial Data-usd:", user_asset_data)  # 디버깅용 출력
-        print("User Financial Data-sa:", spend_amount)  # 디버깅용 출력
-        print("User Financial Data-sf:", spend_freq)  # 디버깅용 출력
 
          # 분석 로직
         # 개인 자산 데이터 기반 계산
@@ -1417,6 +1414,82 @@ def originreport_page(request):
         # 제외할 키를 명시적으로 정의
         excluded_keys = {'CustomerID', 'SDate', 'TotalAmount'}
 
+        # 함수 호출하여 JSON 데이터 생성
+        period = '1m'
+
+
+            # 현재 날짜 가져오기
+        today = date.today()
+        
+
+        # 기간에 따라 시작 날짜 계산
+        if period == '1m':
+            # 직전 1달
+            # 현재 월에서 한 달을 빼고 그 월의 첫째 날 계산
+            if today.month == 1:
+                start_date = today.replace(year=today.year - 1, month=12)
+            else:
+                start_date = today.replace(month=today.month - 1)
+
+
+        # start_date에서 지난달
+        start_date = start_date - relativedelta(months=1)
+        asset_data = MyDataAsset.objects.filter(CustomerID=customer_id).values('estate', 'financial', 'ect')
+        mydata_assets_list = list(asset_data)  # QuerySet을 리스트로 변환
+        mapped_assets = {
+            "부동산": mydata_assets_list[0]["estate"] if mydata_assets_list else 0,
+            "금융": mydata_assets_list[0]["financial"] if mydata_assets_list else 0,
+            "기타": mydata_assets_list[0]["ect"] if mydata_assets_list else 0,
+        }
+
+        # JSON으로 변환
+        mydata_assets_json = json.dumps(mapped_assets, ensure_ascii=False)
+        # `SpendAmount`에서 기간에 맞는 데이터 필터링
+        spend_amounts = SpendAmount.objects.filter(
+            CustomerID=customer_id, 
+            SDate__gte=start_date  # 시작 날짜 이후의 데이터만 가져옴
+        )
+        
+            # 각 항목별로 총합을 구합니다.
+        category_totals = spend_amounts.aggregate(
+            total_eat_amount=Sum('eat_amount'),
+            total_transfer_amount=Sum('transfer_amount'),
+            total_utility_amount=Sum('utility_amount'),
+            total_phone_amount=Sum('phone_amount'),
+            total_home_amount=Sum('home_amount'),
+            total_hobby_amount=Sum('hobby_amount'),
+            total_fashion_amount=Sum('fashion_amount'),
+            total_party_amount=Sum('party_amount'),
+            total_allowance_amount=Sum('allowance_amount'),
+            total_study_amount=Sum('study_amount'),
+            total_medical_amount=Sum('medical_amount'),
+            total_total_amount=Sum('TotalAmount')  # 전체 합계
+        )
+
+        # 항목을 한국어로 맵핑한 딕셔너리로 저장
+        # 항목을 한국어로 맵핑한 딕셔너리로 저장
+        category_dict = {
+            '식비': category_totals['total_eat_amount'] or 0,
+            '교통비': category_totals['total_transfer_amount'] or 0,
+            '공과금': category_totals['total_utility_amount'] or 0,
+            '통신비': category_totals['total_phone_amount'] or 0,
+            '주거비': category_totals['total_home_amount'] or 0,
+            '여가/취미': category_totals['total_hobby_amount'] or 0,
+            '패션/잡화': category_totals['total_fashion_amount'] or 0,
+            '모임회비': category_totals['total_party_amount'] or 0,
+            '경조사': category_totals['total_allowance_amount'] or 0,
+            '교육비': category_totals['total_study_amount'] or 0,
+            '의료비': category_totals['total_medical_amount'] or 0,
+        }
+
+        # 항목을 값 기준으로 내림차순 정렬하여 상위 7개 항목을 추출
+        sorted_categories = sorted(category_dict.items(), key=lambda x: x[1] or 0, reverse=True)
+
+        # 상위 4개 항목을 구합니다.
+        sorted_categories = dict(sorted_categories)
+
+        # sorted_categories와 amount_total을 JSON으로 변환
+        sorted_categories_json = json.dumps(sorted_categories)
         # TotalAmount 값 검증 및 정수로 변환
         total_amount = int(spend_amount.TotalAmount if spend_amount.TotalAmount else 0)
 
@@ -1454,7 +1527,7 @@ def originreport_page(request):
         group_spend_ratio = average_data.spend / average_data.income  # 그룹 지출 비율
 
 
-                # 데이터 준비
+        # 데이터 준비
         bar_data = {
             '총자산': user_asset_data.total,
             '현금자산': user_asset_data.financial,
@@ -1496,10 +1569,9 @@ def originreport_page(request):
         # 프롬프트 생성
         prompt = f"""
         당신은 금융 데이터 분석 전문가인 '만덕이'입니다. 고객의 자산, 소득, 지출 데이터를 기반으로 개인화된 금융 생활 분석 및 개선 리포트를 작성하세요.
-        만덕이는 긍정적이고 따뜻하게 응원해주는 친구로, 고객이 스스로를 격려하며 개선 방향을 이해할 수 있도록 설명합니다.
+        만덕이는 긍정적이고 따뜻하게 응원해주는 오리로, 고객이 스스로를 격려하며 개선 방향을 이해할 수 있도록 설명합니다.
         예를 들어, "오! 정말 잘하고 있어요! 조금만 더 이렇게 하면 완벽할 거예요"처럼 친절하고 귀여운 말투를 사용하세요.
-        리포트 작성 시 한 줄 마다 마크다운 문법으로 띄어쓰기, 줄바꿈 표시도 함께 넣어주세요.
-        리포트를 작성할 때 아래 기준을 참고해 고객의 상황을 자세히 분석해주세요.
+        리포트 작성 시 한 문장 마다 띄어쓰기해주세요. 리포트 각 항목마다 앞의 '-' 표시는 지우고 출력해주세요. 금액을 표시할때는 만단위로 말해주세요. 
 
         - 자산 정보:
                 - 총자산: {user_asset_data.total}
@@ -1545,37 +1617,37 @@ def originreport_page(request):
                     - 그룹 소득대비 지출비중: {analysis_results['group_spend_ratio']}
 
         ### **리포트 구성 항목**
+        안녕하세요-! 당신의 금융 파트너 만덕입니다-!
+        제가 당신의 금융 생활을 분석해왔어요-! 우리 같이 살펴볼까요? 🤗
+
         #### **자산 현황 분석**
+        비유동자산, 유동성비율 등 조금 어려운 금융용어는 쉬운 설명으로 바꿔서 출력해주세요. 
         고객의 자산현황을 분석하기위한 평가 지표는 다음과 같습니다. 
-        순자산이 평균 그룹의 순자산보다 많은지 비교하세요. 평균보다 높다면 잘하고 있는겁니다. 금융자산, 부동산자산, 기타자산의 비중을 정리하고 각 자산의 비중을 평균 그룹의 비중과 비교합니다. 비유동자산의 비율이 50이하면 좋음, 그렇지 않으면 위험이라는 것을 기준으로 비유동자산 상황을 분석합니다. 부채비율은 40 이하(이상적), 40-80(주의 필요), 80 이상(위험)을 기준으로 부채비율을 평가합니다. 유동성 비율은 2 이상(매우 양호), 1.5-2(양호), 1.0-1.5(주의 필요), 1.0 이하(위험)의 기준으로 평가합니다.  
+        순자산이 평균 그룹의 순자산보다 많은지 비교하세요. 평균보다 높다면 잘하고 있는겁니다. 금융자산, 부동산자산, 기타자산의 비중을 정리하고 각 자산의 비중을 그룹별 자산비중과 비교합니다. 비유동자산의 비율이 50이하면 좋음, 그렇지 않으면 위험이라는 것을 기준으로 비유동자산 상황을 분석합니다. 부채비율은 40 이하(이상적), 40-80(주의 필요), 80 이상(위험)을 기준으로 부채비율을 평가합니다. 유동성 비율은 2 이상(매우 양호), 1.5-2(양호), 1.0-1.5(주의 필요), 1.0 이하(위험)의 기준으로 평가합니다.  
+        고객에게 보여주는 리포트에는 고객의 자산이나 비율만 표시하고 기준점은 따로 설명하지 않습니다. 
         전반적인 평가를 모두 합쳐 고객의 자산상황을 평가하고 응원의 메세지와 함께 개선방향을 제시해주세요. 
 
         #### **저축 및 소비 습관 분석**
-        월저축률(월소득 대비 저축률)이 10-20% 미만이면 위험, 10-20%는 최소 충족, 50-60%가 이상적임을 기준으로 평가하고, 고객의 저축 습관에 대해 칭찬하거나 개선 방향을 제안하세요.
-        총자산저축률은 20-30%가 적절한 수준이며, 이를 기준으로 고객의 상황을 설명하고 개선 방법을 제시해주세요.
-        소득 대비 자산 비율은 3-5가 양호, 5 이상은 아주 좋은 수준, 3 미만은 자산 형성이 필요한 상태임을 기준으로 고객의 자산 형성 상태를 판단하세요.
-        고객의 전체적인 저축 상태를 진단하고, 저축 상태가 보통 또는 보통이하(위험) 수준이면 저축을 장려하는 응원 멘트를 함께 출력해주세요.
+        월저축률(월소득 대비 저축률)이 10-20% 미만이면 위험, 10-20%는 최소 충족, 50-60%가 이상적임을 기준으로 평가합니다. 50-60% 이하의 월 저축률은 조금 더 개선이 필요한 부분입니다. 월저축률이 최소충족 비율보다 높더라도 이상적인 기준보다 낮다면 저축을 늘릴 필요가 있다는 점을 알려주세요. 총자산저축률은 20-30%면 양호한 수준이지만 저축을 조금 더 늘리도록 장려할 필요가 있습니다. 소득 대비 자산 비율은 3-5가 양호, 5 이상은 아주 좋은 수준, 3 미만은 자산 형성이 필요한 상태임을 기준으로 평가합니다.
+        고객에게 보여주는 리포트에는 고객의 자산이나 비율만 표시하고 기준점은 따로 설명하지 않습니다.
+        고객의 전체적인 저축 상태를 진단하고, 저축 상태가 보통 또는 보통이하(위험) 수준이면 저축을 장려하는 응원 멘트화 함께 개선방향을 제시해주세요.
 
         #### **소비 분석**
-        평균과의 소비 비교 : 평균보다 많이 지출하거나 적게 지출하는지를 알려주고, 이에 대한 피드백을 주세요.
-        (예 : "평균보다 적게 쓰고 있어요. 저축도 잘하고 있는 모습이에요~", ""조금 많이 쓰는 경향이 있지만, 적당히 조절하면 완벽할 거예요~")
-        카테고리별 소비 차이 분석 : 소비 카테고리별 비중을 분석해 가장 소비가 많은 상위 5개 카테고리를 나열하고(빈도별, 금액별), 가장 많이 쓰는 카테고리 1개를 특별히 설명해주세요.
+        평균과의 소비 비교 : 평균보다 많이 지출하거나 적게 지출하는지를 기준으로 고객의 소비 습관을 판단합니다. 카테고리별 소비 차이 분석 : 소비 카테고리별 비중을 분석해 결제 빈도별, 결제 금액별 가장 소비가 많은 상위 5개 카테고리를 나열하고, 가장 많이 쓰는 카테고리 1개를 특별히 설명해주세요. 
+        고객에게 보여주는 리포트에는 고객의 자산이나 비율만 표시하고 기준점은 따로 설명하지 않습니다.
+        전체적인 고객의 소비패턴을 분석하고 개선방향을 알려주세요.
 
         #### **종합 판단**
         고객의 전체적인 자산 현황, 소비 패턴, 저축 상황 등을 종합적으로 판단하여 한 줄 요약으로 정리해주고, 마지막에는 응원의 메세지를 함께 출력해주세요.
 
         리포트를 작성할 때 따뜻하고 희망적인 메시지를 중심으로, 고객이 긍정적인 변화를 추구할 수 있도록 도와주세요!
-        리포트 각 항목마다 앞의 '-' 표시는 지우고 출력해주세요. 
+        리포트 작성 시 한 문장 마다 띄어쓰기해주세요. 
         """
         # OpenAI API 호출
 
         # openai.api_key = os.getenv('APIKEY')
         # response = openai.ChatCompletion.create(
         report_content = request.session.get('report_content', None)
-
-        # 디버깅용 출력
-        print(f"Initial report_content: {report_content}")
-
         if request.method == 'POST' and not report_content:
             # OpenAI API 호출 또는 리포트 생성
             response = client.chat.completions.create(
@@ -1590,11 +1662,9 @@ def originreport_page(request):
             report_content = response.choices[0].message.content
 
             # 세션에 저장
-            print("Report content to be saved:", report_content)
             request.session['report_content'] = report_content
             request.session.modified = True  # 세션 변경 사항 저장을 강제
 
-            print("Saved report_content in session:", request.session.get('report_content'))
         if report_content is None:
             report_content = ""
         # JSON 직렬화된 데이터를 템플릿에 전달
@@ -1603,18 +1673,16 @@ def originreport_page(request):
             'average_data': json.dumps(average_values, ensure_ascii=False),
             'user_name': user_name,
             "report": report_content,
+            'sorted_categories_json' : sorted_categories_json,
+            'mydata_assets_json' : mydata_assets_json,
         }
-
         return render(request, 'report_origin.html', context)
 
     # except Exception as e:
     #     return render(request, "error.html", {"message": str(e)})
 
     except UserProfile.DoesNotExist:
-        print("UserProfile 데이터가 없습니다.")  # 디버깅용
         return render(request, 'report_origin.html', {'error': '사용자 정보를 찾을 수 없습니다.'})
-
-
 
 # 예,적금 로그 데이터 저장
 @login_required_session
@@ -1667,3 +1735,32 @@ def log_to_elasticsearch(request):
         except Exception as e:
             return JsonResponse({"status": "error", "message": str(e)}, status=500)
     return JsonResponse({"status": "error", "message": "Invalid request method"}, status=400)
+def better_option(request):
+    customer_id = request.session.get('user_id')  
+    user_name = "사용자"  # 기본값 설정
+    top5_products = []  # 추천 상품 리스트 초기화
+
+    if customer_id:
+        try:
+            # CustomerID로 UserProfile 조회
+            user = UserProfile.objects.get(CustomerID=customer_id)
+            user_name = user.username  # 사용자 이름 설정
+
+            # Favorite 테이블에서 사용자와 관련된 DSID 가져오기
+            favorites = Favorite.objects.filter(CustomerID=user).select_related('content_type')
+
+            # Favorite에 등록된 상품 중 상위 5개 가져오기
+            top5_products = favorites[:5]  # 필요한 로직에 따라 상위 5개만 선택
+        except UserProfile.DoesNotExist:
+            pass  # 사용자가 없을 경우 기본값 유지
+    final_recommend = request.session.get('final_recommend')
+    deposit_recommend = request.session.get('deposit_recommend')
+    context = {
+        'user_name': user_name,
+        'top5_products': top5_products,
+        'final_recommend': final_recommend,  # 적금 Top 5
+        'deposit_recommend': deposit_recommend  # 예금 Top 5
+    }
+
+    return render(request, 'better_options.html',context)
+
