@@ -121,14 +121,13 @@
     <div id="all" class="tab-content active">
         <h2>전체 상품</h2>
         <div class="product-list">
-            {% for product in all_products %}
+            {% for product in accounts_list %}
             <div class="product-container hidden-product">
                 <div class="product-details">
-                    <h3>{{ product.name }}</h3>
-                    <td>{{ account.AccountID }}</td>
-                    <td>{{ account.balance }}</td>
-                    <p>금리: {{ product.interest_rate }}%</p>
-                    <p>기간: {{ product.start_date }} ~ {{ product.end_date }}</p>
+                    <h3>{{ product.pname }}</h3>
+                    <p>잔액: {{ product.balance }}원</p>
+                    <p>금리: {{ product.ds_rate }}%</p>
+                    <p>만기일: {{ product.end_date }}</p>
                 </div>
             </div>
             {% endfor %}
@@ -140,19 +139,20 @@
     <div id="deposit" class="tab-content">
         <h2>예금 상품</h2>
         <div class="product-list">
-            {% for deposit in deposit_products %}
+            {% for deposit in d_list %}
             <div class="product-container hidden-product">
                 <div class="product-details">
-                    <h3>{{ deposit.name }}</h3>
-                    <p>금리: {{ deposit.interest_rate }}%</p>
-                    <p>기간: {{ deposit.start_date }} ~ {{ deposit.end_date }}</p>
+                    <h3>{{ deposit.pname }}</h3>
+                    <p>잔액: {{ deposit.balance }}원</p>
+                    <p>금리: {{ deposit.ds_rate }}%</p>
+                    <p>만기일: {{ deposit.end_date }}</p>
                 </div>
                 <div class="additional-box">
                     <strong>
                     {% if deposit.maturity_amount %}
                         만기일에 받을 수 있는 예상 금액은 {{ deposit.maturity_amount }}원입니다!
                     {% else %}
-                        현재 잔액은 {{ deposit.current_balance }}원입니다.
+                        현재 잔액은 {{ deposit.balance }}원입니다.
                     {% endif %}
                     </strong>
                 </div>
@@ -161,20 +161,21 @@
         </div>
         <p class="show-more-text" onclick="showMoreProducts('deposit')">더보기</p>
     </div>
-
+    
     <!-- 적금 상품 정보 -->
     <div id="savings" class="tab-content">
         <h2>적금 상품</h2>
         <div class="product-list">
-            {% for savings in savings_products %}
+            {% for savings in s_list %}
             <div class="product-container hidden-product">
                 <div class="product-details">
-                    <h3>{{ savings.name }}</h3>
-                    <p>금리: {{ savings.interest_rate }}%</p>
-                    <p>기간: {{ savings.start_date }} ~ {{ savings.end_date }}</p>
+                    <h3>{{ savings.pname }}</h3>
+                    <p>잔액: {{ savings.balance }}원</p>
+                    <p>금리: {{ savings.ds_rate }}%</p>
+                    <p>만기일: {{ savings.end_date }}</p>
                 </div>
                 <div class="additional-box">
-                    <strong>목표 금액 달성까지 {{ savings.remaining_days }}일 남았습니다!</strong>
+                    <strong>목표 금액 달성까지 {{ savings.days_remaining }}일 남았습니다!</strong>
                 </div>
             </div>
             {% endfor %}
@@ -185,8 +186,20 @@
 
 
 <div id="expiring-notification" class="expiring-container" style="display: none;">
-    <p><strong>얼마 뒤면 <span id="expiring-product-name"></span>이 만기에요!</strong></p>
-    <p><a href="savings_info1" style="color: #007bff; text-decoration: none;">상품 둘러보러가기</a></p>
+    {% if expiring_accounts %}
+        {% for account in expiring_accounts %}
+            <p><strong>얼마 뒤면 <span class="expiring-product-name">{{ account.pname }}</span>이 만기에요!</strong></p>
+        {% endfor %}
+        <p><a href="{% url 'top5' %}" style="color: #007bff; text-decoration: none;">상품 둘러보러가기</a></p>
+    {% endif %}
+</div>
+
+<!-- 만기 상품이 없을 때 알림 -->
+<div id="no-expiry-notification" class="expiring-container" style="display: none;">
+    {% if not expiring_accounts %}
+        <p>현재 만기가 가까운 상품이 없습니다. 
+        <a href="{% url 'top5' %}" style="color: #007bff; text-decoration: none;">상품 둘러보러가기</a></p>
+    {% endif %}
 </div>
 
 <script>
@@ -249,77 +262,66 @@
     }
 });
 
-// 탭 전환 기능
-function showTab(tabId) {
-    document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-    document.querySelectorAll('.tab-button').forEach(button => button.classList.remove('active'));
+    // 탭 전환 기능
+    function showTab(tabId) {
+        document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+        document.querySelectorAll('.tab-button').forEach(button => button.classList.remove('active'));
 
-    document.getElementById(tabId).classList.add('active');
-    event.target.classList.add('active');
-}
+        document.getElementById(tabId).classList.add('active');
+        event.target.classList.add('active');
+    }
+        // 최대 5개 상품만 표시하고 나머지는 숨김
+    document.addEventListener('DOMContentLoaded', () => {
+        const allTabs = document.querySelectorAll('.tab-content');
+        allTabs.forEach(tab => {
+            const products = tab.querySelectorAll('.product-container');
+            products.forEach((product, index) => {
+                if (index < 3) {
+                    product.classList.remove('hidden-product');
+                }
+            });
 
-</script>
-<script>
-    // 최대 5개 상품만 표시하고 나머지는 숨김
-document.addEventListener('DOMContentLoaded', () => {
-    const allTabs = document.querySelectorAll('.tab-content');
-    allTabs.forEach(tab => {
-        const products = tab.querySelectorAll('.product-container');
-        products.forEach((product, index) => {
-            if (index < 5) {
-                product.classList.remove('hidden-product');
+            // 숨겨진 상품이 없으면 "더보기" 숨기기
+            const hiddenProducts = tab.querySelectorAll('.hidden-product');
+            if (hiddenProducts.length === 0) {
+                const moreText = tab.querySelector('.show-more-text');
+                moreText.style.display = 'none';
             }
         });
-
-        // 숨겨진 상품이 없으면 "더보기" 숨기기
-        const hiddenProducts = tab.querySelectorAll('.hidden-product');
-        if (hiddenProducts.length === 0) {
-            const moreText = tab.querySelector('.show-more-text');
-            moreText.style.display = 'none';
-        }
-    });
-});
-
-// 더보기 클릭 시 추가 상품 표시
-function showMoreProducts(tabId) {
-    const tab = document.getElementById(tabId);
-    const hiddenProducts = tab.querySelectorAll('.hidden-product');
-    hiddenProducts.forEach((product, index) => {
-        if (index < 5) {
-            product.classList.remove('hidden-product');
-        }
     });
 
-    // 더 이상 숨겨진 상품이 없으면 "더보기" 숨김
-    if (hiddenProducts.length <= 5) {
-        const moreText = tab.querySelector('.show-more-text');
-        moreText.style.display = 'none';
-    }
-}
+        // 더보기 클릭 시 추가 상품 표시
+        function showMoreProducts(tabId) {
+            const tab = document.getElementById(tabId);
+            const hiddenProducts = tab.querySelectorAll('.hidden-product');
+            hiddenProducts.forEach((product, index) => {
+                if (index < 3) {
+                    product.classList.remove('hidden-product');
+                }
+            });
 
-// 서버에서 예적금 만기 변수 필요
-document.addEventListener('DOMContentLoaded', () => {
-    const expiringProducts = [
-        { name: '적금 A', daysRemaining: 95 },
-        { name: '적금 B', daysRemaining: 80 },
-        { name: '적금 C', daysRemaining: 10 }
-    ]; // 예시 데이터: 서버에서 받아올 수 있음
-
-    // 만기에 가까운 상품 찾기
-    const threshold = 90; // 90일 이내 만기
-    const nearExpiry = expiringProducts.find(product => product.daysRemaining <= threshold);
-
-    if (nearExpiry) {
+            // 더 이상 숨겨진 상품이 없으면 "더보기" 숨김
+            if (hiddenProducts.length <= 3) {
+                const moreText = tab.querySelector('.show-more-text');
+                moreText.style.display = 'none';
+            }
+        }
+        // 서버에서 예적금 만기 변수 필요
+            document.addEventListener('DOMContentLoaded', () => {
+        const expiringProducts = JSON.parse('{{ expiring_accounts_json|safe }}');
         const expiringContainer = document.getElementById('expiring-notification');
-        const productNameSpan = document.getElementById('expiring-product-name');
-
-        // 상품명 설정
-        productNameSpan.textContent = nearExpiry.name;
-
-        // 알림 컨테이너 표시
-        expiringContainer.style.display = 'block';
-    }
-});
+        const noExpiryContainer = document.getElementById('no-expiry-notification');
+        
+        if (expiringProducts.length > 0) {
+            // 만기 상품이 있는 경우
+            expiringContainer.style.display = 'block';
+            noExpiryContainer.style.display = 'none';
+        } else {
+            // 만기 상품이 없는 경우
+            noExpiryContainer.style.display = 'block';
+            expiringContainer.style.display = 'none';
+        }
+    });
 
 
 </script>
@@ -329,7 +331,7 @@ document.addEventListener('DOMContentLoaded', () => {
 <!-- footer는 컨테이너 밖으로 이동 -->
 <footer>
     <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0;">서울특별시 마포구 월드컵북로 434 상암IT타워 6층</p> 
-    <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0;">고객지원 : 02-3151-7000 | 이메일: worifisa@worifisa.com </p>
+    <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0;">고객지원 : 02-3151-7000 | 이메일: woorifis.lab44@gmail.com </p>
     <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0;">COPYRIGHT©우리팀이름~</p>
 </footer>
 

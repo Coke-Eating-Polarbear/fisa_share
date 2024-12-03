@@ -31,6 +31,8 @@ from django.db.models import Sum
 from dateutil.relativedelta import relativedelta
 from django.db.models import Q
 import re
+from collections import Counter
+import requests
 from collections import defaultdict
 es = Elasticsearch([os.getenv('ES')])  # Elasticsearch 설정
 load_dotenv() 
@@ -185,6 +187,7 @@ def mypage(request):
     customer_id = request.session.get('user_id')  # 세션에서 CustomerID 가져오기
     user_name = "사용자"
     accounts = []  # 사용자 계좌 정보 저장
+    expiring_accounts = []  # 만기일이 90일 이내로 남은 계좌
 
     if customer_id:
         try:
@@ -193,13 +196,52 @@ def mypage(request):
             user_name = user.username  # 사용자 이름 설정
 
             # MyDataDS 모델에서 해당 CustomerID에 연결된 계좌 정보 가져오기
-            accounts = MyDataDS.objects.filter(CustomerID=customer_id).values('AccountID', 'balance')
+            accounts = MyDataDS.objects.filter(CustomerID=customer_id).values('AccountID', 'balance','pname', 'ds_rate','end_date','dstype')
+
+            # 오늘 날짜 계산
+            today = timezone.now().date()
+
+            # 90일 이내 만기일 필터링
+            expiring_accounts = [
+                {
+                    "AccountID": account['AccountID'],
+                    "balance": account['balance'],
+                    "pname" : account['pname'],
+                    "ds_rate": float(account['ds_rate']), 
+                    "end_date": account['end_date'].strftime("%Y-%m-%d") ,  # 날짜를 JSON 직렬화 가능하도록 문자열로 변환
+                    "days_remaining": (account['end_date'] - today).days
+                }
+                for account in accounts
+                if (account['end_date'] - today).days <= 90
+            ]
+            accounts_list = [
+                {
+                    "AccountID": account['AccountID'],
+                    "balance": account['balance'],
+                    "pname": account['pname'],
+                    "ds_rate": float(account['ds_rate']),
+                    "dstype" : account['dstype'],
+                    "end_date": account['end_date'].strftime("%Y-%m-%d"),
+                    "days_remaining": (account['end_date'] - today).days
+                }
+                for account in accounts
+            ]
+            d_list = [account for account in accounts_list if account['dstype'] == 'd']
+            s_list = [account for account in accounts_list if account['dstype'] == 's']
+            expiring_accounts_json = json.dumps(expiring_accounts)
         except UserProfile.DoesNotExist:
             pass  # 사용자가 없을 경우 기본값 유지
 
+    # JSON 직렬화
+    
     context = {
-        'user_name': user_name,  # 사용자 이름
-        'accounts': accounts,   # 계좌 정보 리스트
+        'user_name': user_name,          # 사용자 이름
+        'accounts': accounts,           # 전체 계좌 정보
+        'expiring_accounts': expiring_accounts,  # 만기일 90일 이내 계좌 (리스트 형태)
+        'expiring_accounts_json': expiring_accounts_json,  # 만기일 90일 이내 계좌 (JSON 문자열 형태)
+        'accounts_list': accounts_list,
+        'd_list' : d_list,
+        's_list' : s_list,
     }
     return render(request, 'mypage.html', context)
 
@@ -316,7 +358,6 @@ def extract_percentage_sentences(data, keywords):
                 result.extend(percentages)
     return result
 
-
 def card_top(keywords) :
     
     
@@ -393,7 +434,6 @@ def card_top(keywords) :
     print('max_card_datail_top1_json',max_card_datail_top1_json)
 
     return max_card_top1_json, max_card_datail_top1_json
-
 
 @login_required_session
 def spending_mbti(request):
@@ -878,6 +918,80 @@ def assign_cluster(stage_class, sex, age):
     else:
         return [1, 4]
 
+def get_top_data_by_customer_class(stageclass, inlevel):
+    # Elasticsearch 연결
+    
+    
+    stageclass = stageclass
+    inlevel = inlevel
+    print("inlevel",inlevel)
+    headers = {
+        "Content-Type": "application/json"
+    }
+    # Elasticsearch 쿼리
+    query = {
+        "query": {
+            "bool": {
+                "filter": [
+                    {"term": {"customer_class.Stageclass.keyword": stageclass}},  # keyword로 정확 매칭
+                    {"term": {"customer_class.Inlevel": inlevel}}
+                ]
+            }
+        },
+        "aggs": {
+            "group_by_data": {
+                "terms": {
+                    "script": {
+                    "source": """
+                        def data = doc['data.product_name.keyword'].value + '|' +
+                                doc['data.bank.keyword'].value + '|' +
+                                doc['data.baser.keyword'].value + '|' +
+                                doc['data.maxir.keyword'].value + '|' +
+                                doc['data.method.keyword'].value;
+                        return data;
+                    """,
+                    "lang": "painless"
+                    },
+                    "size": 3,
+                    "order": {"_count": "desc"}
+                },
+                "aggs": {
+                    "top_hits": {
+                        "top_hits": {
+                            "size": 1,
+                            "_source": {
+                            "includes": ["data", "customer_class", "timestamp"]
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "size": 0
+    }
+
+    try:
+        # Elasticsearch에서 데이터 가져오기
+        response = es.search(index="ps_product_click_logs", body=query)
+        # 집계 데이터 추출
+        aggs_results = response.get("aggregations", {}).get("group_by_data", {}).get("buckets", [])
+
+        # 상위 3개 데이터만 추출
+        top_data = []
+        for bucket in aggs_results:
+            top_hit = bucket.get("top_hits", {}).get("hits", {}).get("hits", [])
+            if top_hit:
+                top_data.append({
+                    "data": top_hit[0]["_source"]["data"],
+                    "count": bucket["doc_count"]  # 해당 데이터의 카운트
+                })
+
+        return top_data
+
+    except Exception as e:
+        # 오류 처리
+        return JsonResponse({"error": str(e)}, status=500)
+
 @login_required_session
 def summary_view(request):
     customer_id = request.session.get('user_id')  # 세션에서 CustomerID 가져오기
@@ -917,6 +1031,7 @@ def summary_view(request):
     recommended_products = Recommend.objects.filter(CustomerID=customer_id)
     recommended_count = recommended_products.count()
     recommended_dsid_list = {'dproduct': [], 'sproduct': []}
+    print('recommended_dsid_list',recommended_dsid_list)
 
     if recommended_count > 0:
         # DProduct와 SProduct 각각 추천 가져오기
@@ -925,16 +1040,19 @@ def summary_view(request):
 
     # 추천 상품 세부 정보 가져오기
     recommended_product_details = list(
-        DProduct.objects.filter(dsid__in=recommended_dsid_list['dproduct']).values('dsname', 'bank', 'baser', 'maxir')
+        DProduct.objects.filter(dsid__in=recommended_dsid_list['dproduct']).values('dsid','dsname', 'bank', 'baser', 'maxir')
     ) + [
-        {
+        {   
+            'dsid' : sp['dsid'],
             'dsname': sp['product_name'],
             'bank': sp['bank_name'],
             'baser': sp['base_rate'],
             'maxir': sp['max_preferential_rate']
         }
-        for sp in SProduct.objects.filter(DSID__in=recommended_dsid_list['sproduct']).values('product_name', 'bank_name', 'base_rate', 'max_preferential_rate')
+        for sp in SProduct.objects.filter(DSID__in=recommended_dsid_list['sproduct']).values('DSID','product_name', 'bank_name', 'base_rate', 'max_preferential_rate')
     ]
+
+    print('recommended_product_details',recommended_product_details)
 
     # 랜덤 상품 추가
     if recommended_count < 5:
@@ -942,8 +1060,9 @@ def summary_view(request):
         random_dproducts = DProduct.objects.exclude(dsid__in=recommended_dsid_list['dproduct']).order_by('?')[:remaining_count]
         random_sproducts = SProduct.objects.exclude(DSID__in=recommended_dsid_list['sproduct']).order_by('?')[:remaining_count]
 
-        random_product_details = list(random_dproducts.values('dsname', 'bank', 'baser', 'maxir')) + [
+        random_product_details = list(random_dproducts.values('dsid','dsname', 'bank', 'baser', 'maxir')) + [
             {
+                'dsid' : sp.DSID,
                 'dsname': sp.product_name,
                 'bank': sp.bank_name,
                 'baser': sp.base_rate,
@@ -960,6 +1079,7 @@ def summary_view(request):
     unique_product_details = {p['dsname']: p for p in product_details if p['dsname']}.values()
     product_details = list(unique_product_details)[:5]
 
+    print('product_details',product_details)
 
     ## 적금 추천 상품 top 3
     # Django ORM을 사용하여 데이터 가져오기
@@ -988,7 +1108,7 @@ def summary_view(request):
                 final_result = pd.concat([final_result, top_result], ignore_index=True)
 
     # 적금 최종 추천 3개로 제한
-    final_recommend_json = final_result.head(5)[["product_name", "bank_name", "max_preferential_rate", "base_rate", "signup_method"]].to_dict(orient='records')
+    final_recommend_json = final_result.head(5)[["DSID","product_name", "bank_name", "max_preferential_rate", "base_rate", "signup_method"]].to_dict(orient='records')
     
 
     # 예금 추천 처리
@@ -1015,15 +1135,31 @@ def summary_view(request):
         filtered_results.append(pd.DataFrame(filtered_deposits_query))
     request.session['clusters'] = top_clusters
     final_recommendations = pd.concat(filtered_results, ignore_index=True)
+    print('final_recommendations',final_recommendations)
     # 중복 제거
-    final_recommendations_drop_duplicates = final_recommendations[['name', 'bank', 'baser', 'maxir','method']].drop_duplicates()
-
+    final_recommendations_drop_duplicates = final_recommendations.drop_duplicates(subset=["name", "bank", "baser", "maxir", "method"])
+    print('final_recommendations_drop_duplicates',final_recommendations_drop_duplicates)
     top2 = final_recommendations_drop_duplicates.sort_values(by='maxir', ascending=False).head(5)
     deposit_recommend_dict = top2.to_dict(orient='records')
     request.session['final_recommend'] = final_recommend_json[:5]  # 적금 Top 5
     request.session['deposit_recommend'] = deposit_recommend_dict[:5]  # 예금 Top 5
+
     final_recommend_display = final_recommend_json[:2]  # 적금 2개
     deposit_recommend_display = deposit_recommend_dict[:3]  # 예금 3개
+    print('final_recommend_display',final_recommend_display)
+    
+    
+    # 로그 데이터 확인 
+    log_cluster = get_top_data_by_customer_class(user.Stageclass, user.Inlevel)
+
+    # "data" 부분만 추출
+    filtered_data = [item['data'] for item in log_cluster]
+
+    # JSON으로 변환
+    filtered_data_json = json.dumps(filtered_data, ensure_ascii=False)
+    print('filtered_data_json',filtered_data_json)
+
+
     # 최종 데이터 전달
     context = {
         'product_details': product_details,
@@ -1031,7 +1167,8 @@ def summary_view(request):
         'news_entries': news_entries,
         'user_name': user_name,
         'final_recommend': final_recommend_display,  # 적금 Top 3
-        'deposit_recommend': deposit_recommend_display  # 예금 Top 2
+        'deposit_recommend': deposit_recommend_display,  # 예금 Top 2
+        'filtered_data_json' : filtered_data_json, # 로그로 뽑은 top3
     }
 
     return render(request, 'loginmain.html', context)
@@ -1106,28 +1243,32 @@ def info(request):
 def top5(request):
     customer_id = request.session.get('user_id')  
     user_name = "사용자"  # 기본값 설정
-    top5_products = []  # 추천 상품 리스트 초기화
 
     if customer_id:
         try:
             # CustomerID로 UserProfile 조회
             user = UserProfile.objects.get(CustomerID=customer_id)
             user_name = user.username  # 사용자 이름 설정
-
-            # Favorite 테이블에서 사용자와 관련된 DSID 가져오기
-            favorites = Favorite.objects.filter(CustomerID=user).select_related('content_type')
-
-            # Favorite에 등록된 상품 중 상위 5개 가져오기
-            top5_products = favorites[:5]  # 필요한 로직에 따라 상위 5개만 선택
         except UserProfile.DoesNotExist:
             pass  # 사용자가 없을 경우 기본값 유지
-    final_recommend = request.session.get('final_recommend')
-    deposit_recommend = request.session.get('deposit_recommend')
+
+    # 세션에서 추천 데이터를 가져오기
+    final_recommend = request.session.get('final_recommend', [])
+    deposit_recommend = request.session.get('deposit_recommend', [])
+
+    # 은행 이름에 해당하는 로고 파일명을 매핑
+    final_recommend_with_logo = [
+        {**item, "logo": get_bank_logo(item.get("bank_name", ""))} for item in final_recommend
+    ]
+    deposit_recommend_with_logo = [
+        {**item, "logo": get_bank_logo(item.get("bank", ""))} for item in deposit_recommend
+    ]
+
+    # Context에 데이터 추가
     context = {
         'user_name': user_name,
-        'top5_products': top5_products,
-        'final_recommend': final_recommend,  # 적금 Top 3
-        'deposit_recommend': deposit_recommend  # 예금 Top 2
+        'final_recommend': final_recommend_with_logo,  # 적금 Top 3 (로고 포함)
+        'deposit_recommend': deposit_recommend_with_logo  # 예금 Top 2 (로고 포함)
     }
 
     return render(request, 'recommend_savings_top5.html', context)
@@ -1163,86 +1304,6 @@ def log_click_event(request):
         es.index(index="django_logs", body=event_data)
         return JsonResponse({"status": "success"})
     return JsonResponse({"status": "failed"}, status=400)
-
-@login_required_session
-def favorite(request):
-    customer_id = request.session.get('user_id')
-    user_name = "사용자"
-    top5_products = []
-
-    if customer_id:
-        try:
-            # CustomerID로 UserProfile 조회
-            user = UserProfile.objects.get(CustomerID=customer_id)
-            user_name = user.username
-
-            # Favorite 테이블에서 사용자와 관련된 DSID 가져오기
-            top5_products = Favorite.objects.filter(CustomerID=user).select_related('DSID')[:5]
-        except UserProfile.DoesNotExist:
-            pass
-
-    context = {
-        'user_name': user_name,
-        'top5_products': top5_products,
-    }
-
-    return render(request, 'favorites.html', context)
-
-@csrf_exempt
-def add_favorite(request):
-    if request.method == "POST":
-        try:
-            data = json.loads(request.body)
-            product_id = data.get("product_id")  # 제품 ID
-            product_type = data.get("product_type")  # 제품 타입 (dproduct or sproduct)
-            customer_id = request.session.get('user_id')  # 세션에서 사용자 ID 가져오기
-
-            if customer_id and product_id and product_type:
-                user = UserProfile.objects.get(CustomerID=customer_id)
-
-                if product_type == "dproduct":  # 예금인 경우
-                    dproduct = DProduct.objects.get(dsid=product_id)
-                    Favorite.objects.get_or_create(CustomerID=user, dproduct=dproduct)
-                elif product_type == "sproduct":  # 적금인 경우
-                    sproduct = SProduct.objects.get(DSID=product_id)
-                    Favorite.objects.get_or_create(CustomerID=user, sproduct=sproduct)
-                else:
-                    return JsonResponse({"status": "error", "message": "Invalid product type"}, status=400)
-
-                return JsonResponse({"status": "success"})
-
-        except Exception as e:
-            return JsonResponse({"status": "error", "message": str(e)}, status=400)
-
-    return JsonResponse({"status": "error"}, status=400)
-
-@csrf_exempt
-def remove_favorite(request):
-    if request.method == "POST":
-        try:
-            data = json.loads(request.body)
-            product_id = data.get("product_id")  # 제품 ID
-            product_type = data.get("product_type")  # 제품 타입 (dproduct or sproduct)
-            customer_id = request.session.get('user_id')  # 세션에서 사용자 ID 가져오기
-
-            if customer_id and product_id and product_type:
-                user = UserProfile.objects.get(CustomerID=customer_id)
-
-                if product_type == "dproduct":  # 예금인 경우
-                    dproduct = DProduct.objects.get(dsid=product_id)
-                    Favorite.objects.filter(CustomerID=user, dproduct=dproduct).delete()
-                elif product_type == "sproduct":  # 적금인 경우
-                    sproduct = SProduct.objects.get(DSID=product_id)
-                    Favorite.objects.filter(CustomerID=user, sproduct=sproduct).delete()
-                else:
-                    return JsonResponse({"status": "error", "message": "Invalid product type"}, status=400)
-
-                return JsonResponse({"status": "success"})
-
-        except Exception as e:
-            return JsonResponse({"status": "error", "message": str(e)}, status=400)
-
-    return JsonResponse({"status": "error"}, status=400)
 
 @login_required_session
 def originreport_page(request):
@@ -1594,8 +1655,6 @@ def originreport_page(request):
     except UserProfile.DoesNotExist:
         return render(request, 'report_origin.html', {'error': '사용자 정보를 찾을 수 없습니다.'})
 
-# 예,적금 로그 데이터 저장
-@login_required_session
 @csrf_exempt
 def log_to_elasticsearch(request):
     if request.method == 'POST':
@@ -1645,6 +1704,8 @@ def log_to_elasticsearch(request):
         except Exception as e:
             return JsonResponse({"status": "error", "message": str(e)}, status=500)
     return JsonResponse({"status": "error", "message": "Invalid request method"}, status=400)
+
+@login_required_session
 def better_option(request):
     customer_id = request.session.get('user_id')  
     user_name = "사용자"  # 기본값 설정
@@ -1656,21 +1717,30 @@ def better_option(request):
             user = UserProfile.objects.get(CustomerID=customer_id)
             user_name = user.username  # 사용자 이름 설정
 
-            # Favorite 테이블에서 사용자와 관련된 DSID 가져오기
-            favorites = Favorite.objects.filter(CustomerID=user).select_related('content_type')
-
-            # Favorite에 등록된 상품 중 상위 5개 가져오기
-            top5_products = favorites[:5]  # 필요한 로직에 따라 상위 5개만 선택
         except UserProfile.DoesNotExist:
             pass  # 사용자가 없을 경우 기본값 유지
     final_recommend = request.session.get('final_recommend')
     deposit_recommend = request.session.get('deposit_recommend')
     context = {
         'user_name': user_name,
-        'top5_products': top5_products,
         'final_recommend': final_recommend,  # 적금 Top 5
         'deposit_recommend': deposit_recommend  # 예금 Top 5
     }
 
     return render(request, 'better_options.html',context)
 
+def ds_detail(request):
+    return render(request, 'ds_detail.html')
+
+def get_bank_logo(bank_name):
+    """
+    주어진 은행 이름에 해당하는 로고 이미지 파일명을 반환합니다.
+    """
+    logo_filename = f"{bank_name}.PNG"
+    logo_path = os.path.join("img/", logo_filename)  # 로고 파일이 저장된 디렉토리
+
+    # 파일 존재 여부 확인
+    if os.path.exists(os.path.join("static", logo_path)):
+        return logo_path
+    else:
+        return "img/default_logo.png"

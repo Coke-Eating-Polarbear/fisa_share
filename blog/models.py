@@ -174,10 +174,11 @@ class MyDataDS(models.Model):
     CustomerID = models.CharField(max_length=256)  # CustomerID
     AccountID = models.CharField(max_length=256)  # AccountID
     bank_name = models.CharField(max_length=256)  # BankName
-    pname = models.CharField(max_length=256)  # PName
+    pname = models.CharField(db_column='PName',max_length=256)  # PName
     balance = models.BigIntegerField()  # Balance
-    ds_rate = models.DecimalField(max_digits=4, decimal_places=2)  # DSRate
-    end_date = models.DateField()  # EndDate
+    ds_rate = models.DecimalField(db_column='DSrate',max_digits=4, decimal_places=2)  # DSRate
+    end_date = models.DateField(db_column='EndDate')  # EndDate
+    dstype = models.CharField(max_length=1)
 
     class Meta:
         db_table = 'mydata_ds'  # 테이블 이름
