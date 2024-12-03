@@ -2,7 +2,7 @@ body {
     background-color: #F5F6F7;
     font-family: Arial, sans-serif;
     width: 100vw;
-    padding-top: 150px;
+    padding-top: 120px;
     /* margin: 0;
     padding: 0; */
     box-sizing: border-box;
@@ -120,6 +120,7 @@ header, footer {
     border: 1px solid #ddd;
     border-radius: 10px;
 }
+
 .content-row {
     display: flex; /* 차트와 설명을 가로로 배치 */
     justify-content:center; /* 왼쪽 정렬 */
@@ -127,11 +128,32 @@ header, footer {
     gap: 20px; /* 차트와 설명 간 간격 */
     margin-bottom: 20px; /* 행 간 간격 */
 }
+
+.title-and-selector {
+    display: flex; /* 제목과 드롭다운을 한 줄로 */
+    justify-content: space-between; /* 제목은 왼쪽, 드롭다운은 오른쪽 */
+    align-items: center; /* 수직 정렬 */
+    margin-bottom: 20px; /* 아래 요소와 간격 */
+}
+
+.date-selector select {
+    font-size: 1rem; /* 드롭다운 크기 */
+    padding: 5px; /* 패딩 조정 */
+}
+
+.charts-section {
+    display: flex; /* 가로 배치 */
+    justify-content: space-between; /* 그래프 사이 간격 유지 */
+    align-items: flex-start; /* 상단 정렬 */
+    gap: 20px; /* 그래프 간 간격 */
+}
+
 .chart-container {
+    flex: 1;
     display: flex;
     flex-direction: column; /* 헤더와 차트를 수직으로 배치 */
     align-items: center; /* 차트를 중앙 정렬 */
-    max-width: 400px; /* 차트 컨테이너 최대 너비 */
+    max-width: 550px; /* 차트 컨테이너 최대 너비 */
     margin: 0; /* 외부 여백 제거 */
     padding: 0; /* 내부 여백 제거 */
 }
@@ -154,19 +176,15 @@ header, footer {
     height: 1.5px; /* 바 두께 */
     background-color: #ddd; /* 바 색상 */
 }
-.chart-title {
+
+.chart-header .chart-title {
     font-size: 14px;
     font-weight: bold;
     color: #333;
     text-align: left; /* 제목 중앙 정렬 */
-}
-.filter-section {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 10px;
-    margin-bottom: 10px;
-    width: 100%;
+    white-space: nowrap; /* 줄바꿈 방지 */
+    font-weight: bold; /* 제목 강조 */
+    font-size: 1.2rem; /* 제목 크기 조절 */
 }
 .sort-container select,
 .date-container input {
@@ -223,47 +241,69 @@ header, footer {
     max-height: 200px; /* 차트 최대 높이 */
     width: 100%; /* 차트가 컨테이너 너비를 차지 */
 }
-.description {
-    display: flex;
-    flex-direction: column; /* 설명 텍스트를 수직으로 배치 */
-    justify-content: flex-start; /* 텍스트 위쪽 정렬 */
-    align-items: flex-start; /* 텍스트 왼쪽 정렬 */
-    max-width: 300px; /* 설명 컨테이너 최대 너비 */
-}
+
 .highlight {
     font-weight: bold;
     color: #007bff;
 }
+
 .prediction-section .content-row {
     display: flex;
-    align-items: flex-start; /* 상단 맞춤 */
-    justify-content: space-between; /* 요소 간격 유지 */
+    align-items: center; /* 세로 중앙 정렬 */
+    justify-content: center; /* 가로 중앙 정렬 */
     gap: 20px; /* 요소 간 간격 */
 }
 
 .prediction-section .chart-container {
     flex: 2; /* 꺾은선 그래프가 더 넓게 차지 */
-    padding-right: 20px; /* 내부 여백 추가 */
+    align-items: center; /* 세로 중앙 정렬 */
+    justify-content: center; /* 가로 중앙 정렬 */
+    /* padding-right: 20px; 내부 여백 추가 */
+    margin-left: 20px;
+}
+.prediction-section .description-box {
+    border: 1px solid #ccc; /* 박스 테두리 색상 */
+    border-radius: 10px; /* 둥근 모서리 */
+    padding: 1rem; /* 내부 여백 */
+    background-color: #f9f9f9; /* 배경색 */
+    margin-top: 1rem; /* 위와의 간격 */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 박스 그림자 */
 }
 
 .prediction-section .description {
+    border: 1px solid #ccc; /* 박스 테두리 색상 */
+    border-radius: 10px; /* 둥근 모서리 */
+    padding: 0.5rem; /* 내부 여백 */
+    background-color: #f9f9f9; /* 배경색 */
+    margin-top: 1rem; /* 위와의 간격 */
+    margin-bottom: 1rem; /* 아래 간격 추가 */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 박스 그림자 */
+    width: 100%; /* 박스 크기 */
     display: flex; /* 가로 정렬 */
-    justify-content: space-between; /* 꺾은선 그래프와 카드 추천 사이 간격 */
-    align-items: flex-start; /* 세로 방향 상단 정렬 */
-    gap: 20px; /* 그래프와 카드 추천 간 간격 */
+    flex-direction: column; /* 수직 정렬 */
+    align-items: center; /* 세로 중앙 정렬 */
+    justify-content: center; /* 가로 중앙 정렬 */
+    text-align: center; /* 텍스트 중앙 정렬 */
+    /* margin-top: 10px; 위와의 간격 */
+     /*  gap: 20px;  그래프와 카드 추천 간 간격 */
 }
-.filter-section {
+
+.prediction-section .filter-section {
     display: flex;
-    justify-content: center; /* 드롭다운 정렬 */
+    justify-content: flex-end; /* 오른쪽 정렬 */
     align-items: center;
+    margin-top: 10px;
     gap: 10px;
-    margin-bottom: 20px;     /* 드롭다운 아래 간격 */
+    width: 100%;
 }
+
 .card-container {
     flex: 1; /* 카드 추천이 적절한 비율을 차지 */
     display: flex;
     flex-direction: column; /* 카드들을 세로로 나열 */
-    gap: 20px; /* 카드 간 간격 */
+    gap: 30px; /* 카드 간 간격 */
+    margin-right:30px;
+    justify-content: center;
 }
 .card-box {
     display: flex;
@@ -274,9 +314,8 @@ header, footer {
     background-color: #f8f9fa;
 }
 .card-image-box {
-    width: 40%;
     text-align: center;
-    padding: 15px;
+    padding: 5px;
     background-color: #ffffff;
     display: flex;
     flex-direction: column;
@@ -285,24 +324,32 @@ header, footer {
     border-right: 1px solid #dee2e6;
 }
 .card-image-box img {
-    width: 80px;
-    height: 50px;
-    margin-bottom: 10px;
+    width: 90px;
+    height: 100px;
     cursor: pointer;
     border-radius: 5px;
 }
 .card-name {
-    font-size: 14px;
+    font-size: 1.2rem;
     font-weight: bold;
     color: #333;
 }
 .card-description-box {
-    width: 60%;
-    padding: 15px;
+    width: 100%;
+    margin-left:10px;
     display: flex;
     align-items: center;
+    margin-bottom: 10px;
+    text-align: center;
 }
 .card-description {
     font-size: 14px;
     color: #555;
+}
+
+.content-container {
+    background-color: #ffffff;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
 }
