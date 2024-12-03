@@ -176,7 +176,7 @@
                 <!-- 추천 3개만 표시 -->
                 {% for product in deposit_recommend|slice:":3" %}   
                 <div class="card">
-                    <img src="https://via.placeholder.com/200x178" alt="상품 이미지">
+                    <img src="{% static product.logo %}" alt="{{ product.bank }} 로고">
                     <div class="card-content">
                         <span class="card-title">{{ product.name }}</span><br>
                         <p><strong>은행:</strong> {{ product.bank }}</p>
@@ -198,7 +198,7 @@
                 <div class="recommendations">
                     {% for product in final_recommend|slice:":3" %}
                     <div class="card">
-                        <img src="https://via.placeholder.com/200x178" alt="상품 이미지">
+                        <img src="{% static product.logo %}" alt="{{ product.bank }} 로고">
                         <div class="card-content">
                             <span class="card-title">{{ product.product_name }}</span><br>
                             <p><strong>은행:</strong> {{ product.bank_name }}</p>
@@ -225,7 +225,7 @@
             <div class="recommendations_2">
                 {% with recommend_log|first as product %}
                 <div class="card">
-                    <img src="https://via.placeholder.com/200x178" alt="상품 이미지">
+                    <img src="{% static product.logo %}" alt="{{ product.bank }} 로고">
                     <div class="card-content">
                         <span class="card-title">{{ product.name|default:"상품명 없음" }}</span><br>
                         <p><strong>은행:</strong> {{ product.bank|default:"은행 정보 없음" }}</p>
@@ -241,7 +241,7 @@
             <div class="recommendations_2">
                 {% with recommend_log|slice:"1:2"|first as product %}
                 <div class="card">
-                    <img src="https://via.placeholder.com/200x178" alt="상품 이미지">
+                    <img src="{% static product.logo %}" alt="{{ product.bank }} 로고">
                     <div class="card-content">
                         <span class="card-title">{{ product.product_name|default:"상품명 없음" }}</span><br>
                         <p><strong>은행:</strong> {{ product.bank_name|default:"은행 정보 없음" }}</p>

@@ -1243,22 +1243,32 @@ def info(request):
 def top5(request):
     customer_id = request.session.get('user_id')  
     user_name = "사용자"  # 기본값 설정
-    top5_products = []  # 추천 상품 리스트 초기화
 
     if customer_id:
         try:
             # CustomerID로 UserProfile 조회
             user = UserProfile.objects.get(CustomerID=customer_id)
             user_name = user.username  # 사용자 이름 설정
-
         except UserProfile.DoesNotExist:
             pass  # 사용자가 없을 경우 기본값 유지
-    final_recommend = request.session.get('final_recommend')
-    deposit_recommend = request.session.get('deposit_recommend')
+
+    # 세션에서 추천 데이터를 가져오기
+    final_recommend = request.session.get('final_recommend', [])
+    deposit_recommend = request.session.get('deposit_recommend', [])
+
+    # 은행 이름에 해당하는 로고 파일명을 매핑
+    final_recommend_with_logo = [
+        {**item, "logo": get_bank_logo(item.get("bank_name", ""))} for item in final_recommend
+    ]
+    deposit_recommend_with_logo = [
+        {**item, "logo": get_bank_logo(item.get("bank", ""))} for item in deposit_recommend
+    ]
+
+    # Context에 데이터 추가
     context = {
         'user_name': user_name,
-        'final_recommend': final_recommend,  # 적금 Top 3
-        'deposit_recommend': deposit_recommend  # 예금 Top 2
+        'final_recommend': final_recommend_with_logo,  # 적금 Top 3 (로고 포함)
+        'deposit_recommend': deposit_recommend_with_logo  # 예금 Top 2 (로고 포함)
     }
 
     return render(request, 'recommend_savings_top5.html', context)
@@ -1721,3 +1731,16 @@ def better_option(request):
 
 def ds_detail(request):
     return render(request, 'ds_detail.html')
+
+def get_bank_logo(bank_name):
+    """
+    주어진 은행 이름에 해당하는 로고 이미지 파일명을 반환합니다.
+    """
+    logo_filename = f"{bank_name}.PNG"
+    logo_path = os.path.join("img/", logo_filename)  # 로고 파일이 저장된 디렉토리
+
+    # 파일 존재 여부 확인
+    if os.path.exists(os.path.join("static", logo_path)):
+        return logo_path
+    else:
+        return "img/default_logo.png"
