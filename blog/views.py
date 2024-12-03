@@ -316,7 +316,6 @@ def extract_percentage_sentences(data, keywords):
                 result.extend(percentages)
     return result
 
-
 def card_top(keywords) :
     
     
@@ -393,7 +392,6 @@ def card_top(keywords) :
     print('max_card_datail_top1_json',max_card_datail_top1_json)
 
     return max_card_top1_json, max_card_datail_top1_json
-
 
 @login_required_session
 def spending_mbti(request):
@@ -1020,8 +1018,14 @@ def summary_view(request):
 
     top2 = final_recommendations_drop_duplicates.sort_values(by='maxir', ascending=False).head(5)
     deposit_recommend_dict = top2.to_dict(orient='records')
-    request.session['final_recommend'] = final_recommend_json[:5]  # 적금 Top 5
-    request.session['deposit_recommend'] = deposit_recommend_dict[:5]  # 예금 Top 5
+    final_recommend_json_with_type = [
+    {**item, "type": "sproduct"} for item in final_recommend_json[:5]
+    ]
+    deposit_recommend_dict_with_type = [
+    {**item, "type": "dproduct"} for item in deposit_recommend_dict[:5]
+    ]
+    request.session['final_recommend'] = final_recommend_json_with_type[:5]  # 적금 Top 5
+    request.session['deposit_recommend'] = deposit_recommend_dict_with_type[:5]  # 예금 Top 5
     final_recommend_display = final_recommend_json[:2]  # 적금 2개
     deposit_recommend_display = deposit_recommend_dict[:3]  # 예금 3개
     # 최종 데이터 전달
@@ -1114,18 +1118,12 @@ def top5(request):
             user = UserProfile.objects.get(CustomerID=customer_id)
             user_name = user.username  # 사용자 이름 설정
 
-            # Favorite 테이블에서 사용자와 관련된 DSID 가져오기
-            favorites = Favorite.objects.filter(CustomerID=user).select_related('content_type')
-
-            # Favorite에 등록된 상품 중 상위 5개 가져오기
-            top5_products = favorites[:5]  # 필요한 로직에 따라 상위 5개만 선택
         except UserProfile.DoesNotExist:
             pass  # 사용자가 없을 경우 기본값 유지
     final_recommend = request.session.get('final_recommend')
     deposit_recommend = request.session.get('deposit_recommend')
     context = {
         'user_name': user_name,
-        'top5_products': top5_products,
         'final_recommend': final_recommend,  # 적금 Top 3
         'deposit_recommend': deposit_recommend  # 예금 Top 2
     }
@@ -1163,87 +1161,6 @@ def log_click_event(request):
         es.index(index="django_logs", body=event_data)
         return JsonResponse({"status": "success"})
     return JsonResponse({"status": "failed"}, status=400)
-
-@login_required_session
-def favorite(request):
-    customer_id = request.session.get('user_id')
-    user_name = "사용자"
-    top5_products = []
-
-    if customer_id:
-        try:
-            # CustomerID로 UserProfile 조회
-            user = UserProfile.objects.get(CustomerID=customer_id)
-            user_name = user.username
-
-            # Favorite 테이블에서 사용자와 관련된 DSID 가져오기
-            top5_products = Favorite.objects.filter(CustomerID=user).select_related('DSID')[:5]
-        except UserProfile.DoesNotExist:
-            pass
-
-    context = {
-        'user_name': user_name,
-        'top5_products': top5_products,
-    }
-
-    return render(request, 'favorites.html', context)
-
-@csrf_exempt
-def add_favorite(request):
-    if request.method == "POST":
-        try:
-            data = json.loads(request.body)
-            product_id = data.get("product_id")  # 제품 ID
-            product_type = data.get("product_type")  # 제품 타입 (dproduct or sproduct)
-            customer_id = request.session.get('user_id')  # 세션에서 사용자 ID 가져오기
-
-            if customer_id and product_id and product_type:
-                user = UserProfile.objects.get(CustomerID=customer_id)
-
-                if product_type == "dproduct":  # 예금인 경우
-                    dproduct = DProduct.objects.get(dsid=product_id)
-                    Favorite.objects.get_or_create(CustomerID=user, dproduct=dproduct)
-                elif product_type == "sproduct":  # 적금인 경우
-                    sproduct = SProduct.objects.get(DSID=product_id)
-                    Favorite.objects.get_or_create(CustomerID=user, sproduct=sproduct)
-                else:
-                    return JsonResponse({"status": "error", "message": "Invalid product type"}, status=400)
-
-                return JsonResponse({"status": "success"})
-
-        except Exception as e:
-            return JsonResponse({"status": "error", "message": str(e)}, status=400)
-
-    return JsonResponse({"status": "error"}, status=400)
-
-@csrf_exempt
-def remove_favorite(request):
-    if request.method == "POST":
-        try:
-            data = json.loads(request.body)
-            product_id = data.get("product_id")  # 제품 ID
-            product_type = data.get("product_type")  # 제품 타입 (dproduct or sproduct)
-            customer_id = request.session.get('user_id')  # 세션에서 사용자 ID 가져오기
-
-            if customer_id and product_id and product_type:
-                user = UserProfile.objects.get(CustomerID=customer_id)
-
-                if product_type == "dproduct":  # 예금인 경우
-                    dproduct = DProduct.objects.get(dsid=product_id)
-                    Favorite.objects.filter(CustomerID=user, dproduct=dproduct).delete()
-                elif product_type == "sproduct":  # 적금인 경우
-                    sproduct = SProduct.objects.get(DSID=product_id)
-                    Favorite.objects.filter(CustomerID=user, sproduct=sproduct).delete()
-                else:
-                    return JsonResponse({"status": "error", "message": "Invalid product type"}, status=400)
-
-                return JsonResponse({"status": "success"})
-
-        except Exception as e:
-            return JsonResponse({"status": "error", "message": str(e)}, status=400)
-
-    return JsonResponse({"status": "error"}, status=400)
-
 @login_required_session
 def originreport_page(request):
     # 세션에서 사용자 ID 가져오기
@@ -1595,7 +1512,7 @@ def originreport_page(request):
         return render(request, 'report_origin.html', {'error': '사용자 정보를 찾을 수 없습니다.'})
 
 # 예,적금 로그 데이터 저장
-@login_required_session
+
 @csrf_exempt
 def log_to_elasticsearch(request):
     if request.method == 'POST':
@@ -1645,6 +1562,8 @@ def log_to_elasticsearch(request):
         except Exception as e:
             return JsonResponse({"status": "error", "message": str(e)}, status=500)
     return JsonResponse({"status": "error", "message": "Invalid request method"}, status=400)
+
+@login_required_session
 def better_option(request):
     customer_id = request.session.get('user_id')  
     user_name = "사용자"  # 기본값 설정
@@ -1656,18 +1575,12 @@ def better_option(request):
             user = UserProfile.objects.get(CustomerID=customer_id)
             user_name = user.username  # 사용자 이름 설정
 
-            # Favorite 테이블에서 사용자와 관련된 DSID 가져오기
-            favorites = Favorite.objects.filter(CustomerID=user).select_related('content_type')
-
-            # Favorite에 등록된 상품 중 상위 5개 가져오기
-            top5_products = favorites[:5]  # 필요한 로직에 따라 상위 5개만 선택
         except UserProfile.DoesNotExist:
             pass  # 사용자가 없을 경우 기본값 유지
     final_recommend = request.session.get('final_recommend')
     deposit_recommend = request.session.get('deposit_recommend')
     context = {
         'user_name': user_name,
-        'top5_products': top5_products,
         'final_recommend': final_recommend,  # 적금 Top 5
         'deposit_recommend': deposit_recommend  # 예금 Top 5
     }
