@@ -165,12 +165,17 @@ background-color: #f1f1f1;
     border-radius: 10px;
     margin: 20px auto;
     padding: 20px;
-    width: 90%;
+    /* width: 25%; */
     max-width: 1200px;
+    /* min-width: 50%; */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    /* display: flex; */
+    justify-content: center; /* 내부 내용 가운데 정렬 (수평) */
+    align-items: center; /* 내부 내용 가운데 정렬 (수직) */
+    text-align: center;
 }
 .score-summary {
-    font-size: 18px;
+    font-size: 100px;
     background-color: #ffffff;
     border-radius: 10px;
     border: 1px solid #ddd;
