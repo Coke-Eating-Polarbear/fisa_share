@@ -1135,10 +1135,8 @@ def summary_view(request):
         filtered_results.append(pd.DataFrame(filtered_deposits_query))
     request.session['clusters'] = top_clusters
     final_recommendations = pd.concat(filtered_results, ignore_index=True)
-    print('final_recommendations',final_recommendations)
     # 중복 제거
     final_recommendations_drop_duplicates = final_recommendations.drop_duplicates(subset=["name", "bank", "baser", "maxir", "method"])
-    print('final_recommendations_drop_duplicates',final_recommendations_drop_duplicates)
     top2 = final_recommendations_drop_duplicates.sort_values(by='maxir', ascending=False).head(5)
     deposit_recommend_dict = top2.to_dict(orient='records')
     request.session['final_recommend'] = final_recommend_json[:5]  # 적금 Top 5
@@ -1146,7 +1144,6 @@ def summary_view(request):
 
     final_recommend_display = final_recommend_json[:2]  # 적금 2개
     deposit_recommend_display = deposit_recommend_dict[:3]  # 예금 3개
-    print('final_recommend_display',final_recommend_display)
     
     
     # 로그 데이터 확인 
@@ -1230,11 +1227,14 @@ def info(request):
         # 추천 결과를 세션에 JSON 형식으로 저장
         request.session['deposit_recommend'] = json.dumps(list(deposit_recommend), cls=DjangoJSONEncoder)
         request.session['final_recommend'] = json.dumps(list(final_recommend), cls=DjangoJSONEncoder)
-        
-        return render(request, 'recommend_savings_top5.html', {
+        print("Serialized Deposit Recommendations:", deposit_recommend)
+        print("Serialized Final Recommendations:", final_recommend)
+        context = {
+            'user_name': user_name,
             'deposit_recommend': deposit_recommend,
             'final_recommend': final_recommend
-        })
+        }
+        return redirect('top5')
     
     # GET 요청일 경우 템플릿 렌더링
     return render(request, 'savings_info.html', context)
@@ -1253,8 +1253,16 @@ def top5(request):
             pass  # 사용자가 없을 경우 기본값 유지
 
     # 세션에서 추천 데이터를 가져오기
-    final_recommend = request.session.get('final_recommend', [])
-    deposit_recommend = request.session.get('deposit_recommend', [])
+    final_recommend = request.session.get('final_recommend', '[]')
+    deposit_recommend = request.session.get('deposit_recommend', '[]')
+
+    # JSON 역직렬화 (문자열일 경우)
+    try:
+        final_recommend = json.loads(final_recommend) if isinstance(final_recommend, str) else final_recommend
+        deposit_recommend = json.loads(deposit_recommend) if isinstance(deposit_recommend, str) else deposit_recommend
+    except json.JSONDecodeError:
+        final_recommend = []
+        deposit_recommend = []
 
     # 은행 이름에 해당하는 로고 파일명을 매핑
     final_recommend_with_logo = [
@@ -1272,6 +1280,7 @@ def top5(request):
     }
 
     return render(request, 'recommend_savings_top5.html', context)
+
 
 @login_required_session
 def main_view(request):
