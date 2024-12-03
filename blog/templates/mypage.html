@@ -56,13 +56,12 @@
         </div>
         </header>
 
-        <div class="container">
+        <div class="row-container">
             <!-- 목표 소비 상자 -->
             <div class="box-container">
                 <!-- 상단: 사용자 이름과 프로필 수정 버튼 -->
                 <div class="header-row">
                     <h2 class="user-name">{{ user_name }}님</h2>
-                    <a href="{% url 'update_profile' %}" class="edit-profile-button">프로필 수정</a>
                 </div>
         
                 <!-- 중앙: 목표 소비 정보 -->
@@ -74,52 +73,31 @@
                     </div>
                     <span id="result">목표 소비액보다 200,000원 덜 쓰셨어요! 잘하고 있어요~ 지금처럼만 ✨</span>
                 </div>
+                <a href="{% url 'update_profile' %}" class="edit-profile-button">프로필 수정</a>
             </div>
-            
         
-            <!-- Row for Right Box and Favorite List -->
-            <div class="row-container">
-                <!-- Right Box: 카드 결제 내역 분석 -->
-                <div class="right-box">
-                    <h2>카드 결제 내역 분석</h2>
-                    <p>- 카테고리별 카드 사용 비율 -</p>
-                    <div class="pie-chart">
-                        <canvas id="pieChart"></canvas>
-                    </div>
-                </div>
-        
-                <!-- Favorite Box: 찜한 상품 목록 -->
-                <div class="favorite-box">
-                    <h2>찜한 상품 목록</h2>
-                    <div class="favorite-list">
-                        {% if favorite_products %}
-                            {% for favorite in favorite_products %}
-                                <div class="favorite-item">
-                                    <h4>{{ favorite.name }}</h4>
-                                    <p>은행: {{ favorite.bank }}</p>
-                                    <p>우대금리: {{ favorite.preferential_rate }}%</p>
-                                </div>
-                            {% endfor %}
-                        {% else %}
-                            <p>찜한 상품이 없습니다.</p>
-                        {% endif %}
-                    </div>
+            <!-- 카드 결제 내역 분석 -->
+            <div class="right-box">
+                <h2>카드 결제 내역 분석</h2>
+                <p>- 카테고리별 카드 사용 비율 -</p>
+                <div class="pie-chart">
+                    <canvas id="pieChart"></canvas>
                 </div>
             </div>
-        </div>
-        
-        
-        <!-- 탭과 상품 정보 영역 -->
-<div class="tab-container">
-    <button class="tab-button active" onclick="showTab('all')">전체</button>
-    <button class="tab-button" onclick="showTab('deposit')">예금</button>
-    <button class="tab-button" onclick="showTab('savings')">적금</button>
-</div>
+        </div>       
+
 
 <div class="tab-box-container">
+
+        <!-- 탭과 상품 정보 영역 -->
+        <div class="tab-container">
+            <button class="tab-button active" onclick="showTab('all')">전체</button>
+            <button class="tab-button" onclick="showTab('deposit')">예금</button>
+            <button class="tab-button" onclick="showTab('savings')">적금</button>
+        </div>
+
     <!-- 전체 상품 정보 -->
     <div id="all" class="tab-content active">
-        <h2>전체 상품</h2>
         <div class="product-list">
             {% for product in accounts_list %}
             <div class="product-container hidden-product">
@@ -137,7 +115,6 @@
 
     <!-- 예금 상품 정보 -->
     <div id="deposit" class="tab-content">
-        <h2>예금 상품</h2>
         <div class="product-list">
             {% for deposit in d_list %}
             <div class="product-container hidden-product">
@@ -164,7 +141,6 @@
     
     <!-- 적금 상품 정보 -->
     <div id="savings" class="tab-content">
-        <h2>적금 상품</h2>
         <div class="product-list">
             {% for savings in s_list %}
             <div class="product-container hidden-product">

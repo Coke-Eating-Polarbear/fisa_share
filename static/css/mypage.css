@@ -1,17 +1,20 @@
+/* 전체 페이지의 상단 여백 설정 */
 body {
-    font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    background-color: #ffffff;
+    background-color: #F5F6F7;
+    font-family: Arial, sans-serif;
+    padding-top: 100px; /* header 높이만큼 여백 */
 }
+
 header, footer {
         /* background-color: #ffffff; */
         text-align: center;
         width: 100vw;
         }
         header {
-            background-color: #ffffff;
+            background-color: #F5F6F7;
             position: fixed;
             top: 0;
             z-index: 2; /* 헤더가 항상 위로 보이게 설정 */
@@ -48,7 +51,7 @@ header, footer {
             align-items: center;
             padding: 10px 20px;
             font-size: 0.3rem;
-            background-color: #ffffff;
+            background-color: #F5F6F7;
         }
         .nav-links {
             margin-right: 10px; /* 회원 정보와의 구분 */
@@ -111,6 +114,13 @@ header, footer {
             font-weight: bold;
         }
 
+/* 전체 페이지의 레이아웃 컨테이너 */
+.page-container {
+    max-width: 2000px; /* 페이지 전체 너비를 제한 */
+    margin: 0 auto; /* 페이지를 중앙 정렬 */
+    padding: 0 20px; /* 좌우 여백 추가 */
+    box-sizing: border-box; /* 테두리와 패딩 포함 */
+}
 
 .container {
     padding-top: 80px;
@@ -135,18 +145,69 @@ header, footer {
     width: 100%;
 }
 
-/* Right Box */
-.right-box {
-    background-color: #ffffff;
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    padding: 20px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    flex: 1; /* 동일한 비율로 확장 */
+
+/* Row Container: 두 상자를 좌우로 배치하고 중앙 정렬 */
+.row-container {
+    display: flex; /* Flexbox로 좌우 배치 */
+    justify-content: space-between; /* 좌우 간격 균등 배치 */
+    align-items: stretch; /* 두 상자의 높이 동일 */
+    gap: 20px; /* 두 상자 간 간격 */
+    max-width: 1000px; /* 부모 컨테이너의 최대 너비 설정 */
+    margin: 20px auto; /* 중앙 정렬 및 위아래 여백 추가 */
+    padding: 20; /* 좌우 여백 초기화 */
+    box-sizing: border-box; /* 내부 패딩과 테두리 포함 */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
+
+/* 목표 소비 상자 */
+.box-container {
+    background-color: #ffffff; /* 상자 배경 */
+    border: 1px solid #ddd; /* 테두리 */
+    border-radius: 10px; /* 둥근 모서리 */
+    padding: 20px; /* 내부 여백 */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* 그림자 */
+    flex: 1; /* 동일한 비율로 확장 */
+    display: flex;
+    flex-direction: column; /* 내부 요소를 세로 정렬 */
+    justify-content: center; /* 수직 중앙 정렬 */
+    text-align: center;
+    height: 370px; /* 높이를 콘텐츠에 맞춤 */
+    box-sizing: border-box; /* 테두리와 패딩 포함 */
+}
+
+/* 카드 결제 내역 분석 상자 */
+.right-box {
+    background-color: #ffffff; /* 상자 배경 */
+    border: 1px solid #ddd; /* 테두리 */
+    border-radius: 10px; /* 둥근 모서리 */
+    padding: 20px; /* 내부 여백 */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* 그림자 */
+    flex: 1; /* 동일한 비율로 확장 */
+    display: flex;
+    flex-direction: column; /* 내부 요소를 세로 정렬 */
+    justify-content: center; /* 수직 중앙 정렬 */
+    text-align: center;
+    height: 370px; /* 높이를 콘텐츠에 맞춤 */
+    box-sizing: border-box; /* 테두리와 패딩 포함 */
+}
+
+/* 공통 스타일: 내부 텍스트 정렬 */
+.box-container .info, .right-box .pie-chart {
+    display: flex;
+    flex-direction: column; /* 세로 정렬 */
+    justify-content: center; /* 수직 중앙 정렬 */
+    align-items: center; /* 가로 중앙 정렬 */
+    text-align: center;
+}
+.box-container p {
+    font-size: 14px;
+    color: #555;
+    margin-bottom: 20px;
+}
+
 .right-box h2 {
 font-size: 20px; /* 더 큰 폰트 크기 */
-margin-bottom: 15px; /* 아래쪽 간격 */
+margin-bottom: 0px; /* 아래쪽 간격 */
 font-weight: bold; /* 텍스트 굵게 */
 color: #333; /* 텍스트 색상 추가 */
 }
@@ -155,7 +216,7 @@ color: #333; /* 텍스트 색상 추가 */
 font-size: 14px; /* 글씨 크기 */
 text-align: center; /* 텍스트 중앙 정렬 */
 color: #000; /* 글씨 색상 검정색으로 변경 */
-margin-bottom: 20px; /* 아래쪽 간격 */
+margin-bottom: 0px; /* 아래쪽 간격 */
 }
 
 /* Left Box */
@@ -176,48 +237,46 @@ font-weight: bold; /* 텍스트 굵게 */
 color: #333; /* 텍스트 색상 추가 */
 }
 
-/* 목표 소비 상자 */
-.box-container {
-    background-color: #ffffff; /* 상자 배경 */
-    border: 1px solid #ddd; /* 테두리 */
-    border-radius: 10px; /* 둥근 모서리 */
-    padding: 20px; /* 내부 여백 */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 그림자 */
-    margin-bottom: 20px; /* 하단 여백 */
-    width: 100%; /* 상자 전체 너비 */
-}
 
 /* 헤더 행 스타일 */
 .header-row {
     display: flex;
-    justify-content: space-between; /* 좌우 정렬 */
+    justify-content: center; /* 좌우 정렬 */
     align-items: center; /* 수직 정렬 */
     margin-bottom: 20px; /* 아래 요소와 간격 */
     padding: 0 20px; /* 양쪽 패딩 */
+    text-align: center;
 }
 
 /* 사용자 이름 (왼쪽 위) */
 .user-name {
-    font-size: 20px;
+    font-size: 25px;
     font-weight: bold;
     color: #333;
     margin: 0;
+    text-align: center;
+    display: block; /* 블록 요소로 만들어서 가운데 정렬 적용 */
 }
 
-/* 프로필 수정 버튼 (오른쪽 위) */
+/* 프로필 수정 버튼 */
 .edit-profile-button {
     display: inline-block;
-    padding: 5px 10px; /* 내부 여백을 줄여 크기 축소 */
-    font-size: 0.9rem; /* 글씨 크기 축소 */
+    padding: 10px 20px; /* 버튼 크기 조정 */
+    font-size: 1rem; /* 글씨 크기 */
     background-color: #007bff;
     color: white;
     text-decoration: none;
     border-radius: 5px;
     font-weight: bold;
+    text-align: center;
+    margin-top: 20px; /* 버튼과 위 콘텐츠 간 간격 추가 */
+    line-height: 1.5rem; /* 텍스트 수직 정렬 */
 }
 
+/* 프로필 수정 버튼에 호버 효과 추가 */
 .edit-profile-button:hover {
-    background-color: #0056b3;
+    background-color: #0056b3; /* 호버 시 색상 변경 */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* 그림자 */
 }
   
 .info {
@@ -226,6 +285,11 @@ color: #333; /* 텍스트 색상 추가 */
     border-radius: 5px;
     font-size: 14px;
     line-height: 1.5;
+    font-weight: bold; /* 텍스트 굵게 */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* 그림자 */
+}
+.info p {
+    margin: 5px 0; /* 텍스트 간 간격을 줄임 */
 }
 .progress-bar {
     background-color: #ddd;
@@ -255,24 +319,32 @@ display: block; /* 블록 요소로 설정 */
 
 /* 탭과 박스 스타일 */
 .tab-container {
-display: flex;
-gap: 0px; /* 버튼 간 간격 */
-margin-bottom: 0px; /* 아래 콘텐츠와 간격 */
-margin-left: 240px;
+    display: flex; /* 플렉스 박스를 사용하여 정렬 */
+    justify-content: center; /* 탭들을 중앙 정렬 */
+    gap: 0px; /* 탭 간 간격 설정 */
+    margin: 20px auto; /* 상하 간격 및 중앙 정렬 */
+    max-width: 1000px; /* 최대 너비 제한 */
+    padding: 0; /* 내부 여백 제거 */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* 그림자 */
 }
+
 .tab-button {
-    background-color: #ddd;
-    padding: 13px 159px;
-    border: none;
-    margin: 0 ;
-    border-radius: 5px;
-    cursor: pointer;
-    font-weight: bold;
+    flex: 1; /* 모든 버튼이 동일한 너비를 가짐 */
+    max-width: 350px; /* 버튼의 최대 너비 */
+    text-align: center; /* 텍스트 중앙 정렬 */
+    padding: 15px 15px; /* 버튼 내부 여백 */
+    border: none; /* 버튼 테두리 제거 */
+    border-radius: 5px; /* 모서리 둥글게 */
+    cursor: pointer; /* 마우스 커서를 포인터로 변경 */
+    font-weight: bold; /* 텍스트 굵게 */
+    background-color: #ddd; /* 기본 배경색 */
 }
+
 .tab-button.active {
-    background-color: #007bff;
-    color: white;
+    background-color: #007bff; /* 활성화된 버튼 색상 */
+    color: white; /* 텍스트 색상 */
 }
+
 .tab-box-container {
     background-color: #ffffff;
     border: 1px solid #ddd;
@@ -280,8 +352,8 @@ margin-left: 240px;
     padding: 20px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     max-width: 1000px; /* 컨테이너 너비 제한 */
-    margin: 0 auto; /* 가운데 정렬 */
-    margin-bottom: 50px;
+    margin: 20px auto; /* 가운데 정렬 */
+    margin-bottom: border-box;
 }
 .tab-content {
     display: none;
@@ -345,7 +417,7 @@ font-size: 0.95rem;
     text-decoration: underline; /* 호버 시 밑줄 표시 */
 }
 .expiring-container {
-background-color: #f9f9f9;
+background-color: #fff;
 border: 1px solid #ddd;
 border-radius: 10px;
 padding: 20px;
@@ -375,49 +447,3 @@ text-decoration: underline; /* 호버 시 밑줄 표시 */
 color: #0056b3; /* 호버 시 약간 진한 파란색 */
 }
 
-/* Row Container: Right Box와 Favorite Box를 나란히 배치 */
-.row-container {
-    display: flex;
-    justify-content: space-between; /* 좌우로 나란히 배치 */
-    gap: 20px; /* 박스 간 간격 */
-}
-
-/* Favorite Box */
-.favorite-box {
-    background-color: #ffffff;
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    padding: 20px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    flex: 1; /* 동일한 비율로 확장 */
-}
-
-/* Right Box & Favorite Box 공통 스타일 */
-.right-box h2, .favorite-box h2 {
-    font-size: 20px;
-    font-weight: bold;
-    margin-bottom: 15px;
-    color: #333;
-}
-
-/* Favorite Item */
-.favorite-item {
-    padding: 15px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    background-color: #f9f9f9;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    margin-bottom: 10px;
-}
-
-.favorite-item h4 {
-    margin: 0;
-    font-size: 1.2rem;
-    font-weight: bold;
-}
-
-.favorite-item p {
-    margin: 5px 0;
-    font-size: 1rem;
-    color: #555;
-}
