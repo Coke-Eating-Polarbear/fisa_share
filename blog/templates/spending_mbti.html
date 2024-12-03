@@ -68,11 +68,11 @@
             <h2 style="margin: 0; margin-left: 1rem;">지출 빈도/금액별 소비</h2>
             <div class="date-selector" style="text-align: right;">
                 <label for="dateRangeSelect" style="font-size: 1rem; font-weight: bold; margin-right: 1rem;">기간 선택:</label>
-                <select id="dateRangeSelect" style="padding: 0.5rem; font-size: 1rem; padding: 0.5rem; font-size: 1rem;">
+                <select id="dateRangeSelect" onchange="filterData(this.value)" style="padding: 0.5rem; font-size: 1rem;">
                     <option value="1m">직전 1달</option>
                     <option value="6m">최근 6달</option>
                     <option value="1y">최근 1년</option>
-                </select>
+                </select>                
             </div>
         </div>
 
@@ -313,38 +313,56 @@
                     },
                 ],
             };
+            
+
         
+            // 필터링 데이터 함수
             function filterData(period) {
-                let startDate;
-        
-                // 현재 날짜를 기준으로 기간 계산
-                const today = new Date();
-                
-                if (period === '1m') {
-                    // 직전 1달
-                    startDate = new Date(today.setMonth(today.getMonth() - 1));
-                } else if (period === '6m') {
-                    // 최근 6달
-                    startDate = new Date(today.setMonth(today.getMonth() - 6));
-                } else if (period === '1y') {
-                    // 최근 1년
-                    startDate = new Date(today.setFullYear(today.getFullYear() - 1));
-                }
-        
-                // startDate를 기준으로 필터링된 데이터를 가져오거나 차트를 갱신하는 로직을 추가합니다.
-                console.log('Start Date:', startDate.toISOString().split('T')[0]); // 출력 형식: YYYY-MM-DD
-        
-                
-                // 현재 URL에 period를 쿼리 파라미터로 추가
+                // 현재 URL 가져오기
                 const url = new URL(window.location.href);
-                url.searchParams.set('period', period);  // 'period' 파라미터를 URL에 추가
-        
-                // 페이지를 리로드하여 쿼리 파라미터가 서버로 전달되도록 함
+
+                // 쿼리 매개변수 설정
+                url.searchParams.set('period', period);
+
+                // 페이지 리로드
                 window.location.href = url.toString();
-        
-        
-                // 여기에 차트 데이터 필터링 및 갱신하는 로직을 넣습니다.
             }
+
+            // 페이지 로드 시 `select` 박스 초기화
+            window.addEventListener('load', function () {
+                const urlParams = new URLSearchParams(window.location.search);
+                const selectedPeriod = urlParams.get('period'); // URL에서 `period` 파라미터 값 가져오기
+
+                if (selectedPeriod) {
+                    // `select` 박스 값 설정
+                    document.getElementById('dateRangeSelect').value = selectedPeriod;
+                }
+            });
+            
+        //     function filterData(period) {
+        //     let startDate;
+
+        //     // 현재 날짜 기준으로 기간 계산
+        //     const today = new Date();
+
+        //     if (period === '1m') {
+        //         startDate = new Date(today.setMonth(today.getMonth() - 1)); // 직전 1달
+        //     } else if (period === '6m') {
+        //         startDate = new Date(today.setMonth(today.getMonth() - 6)); // 최근 6달
+        //     } else if (period === '1y') {
+        //         startDate = new Date(today.setFullYear(today.getFullYear() - 1)); // 최근 1년
+        //     }
+
+        //     console.log('Start Date:', startDate.toISOString().split('T')[0]); // YYYY-MM-DD 출력
+
+        //     // URL에 `period` 파라미터 추가
+        //     const url = new URL(window.location.href);
+        //     url.searchParams.set('period', period); // `period` 값을 쿼리 파라미터로 설정
+
+        //     // 페이지를 리로드
+        //     window.location.href = url.toString();
+        // }
+
         
         
             //다음 달 예측 소비
