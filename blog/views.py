@@ -1253,8 +1253,14 @@ def summary_view(request):
     final_recommendations_drop_duplicates = final_recommendations.drop_duplicates(subset=["name", "bank", "baser", "maxir", "method"])
     top2 = final_recommendations_drop_duplicates.sort_values(by='maxir', ascending=False).head(5)
     deposit_recommend_dict = top2.to_dict(orient='records')
-    request.session['final_recommend'] = final_recommend_json[:5]  # 적금 Top 5
-    request.session['deposit_recommend'] = deposit_recommend_dict[:5]  # 예금 Top 5
+    final_recommend_with_logo = [
+        {**item, "logo": get_bank_logo(item.get("bank_name", ""))} for item in final_recommend_json
+    ]
+    deposit_recommend_with_logo = [
+        {**item, "logo": get_bank_logo(item.get("bank", ""))} for item in deposit_recommend_dict
+    ]
+    request.session['final_recommend'] = final_recommend_with_logo[:5]  # 적금 Top 5
+    request.session['deposit_recommend'] = deposit_recommend_with_logo[:5]  # 예금 Top 5
 
     final_recommend_display = final_recommend_json[:2]  # 적금 2개
     deposit_recommend_display = deposit_recommend_dict[:3]  # 예금 3개
@@ -1375,14 +1381,6 @@ def top5(request):
         final_recommend = []
         deposit_recommend = []
 
-    # 은행 이름에 해당하는 로고 파일명을 매핑
-    final_recommend_with_logo = [
-        {**item, "logo": get_bank_logo(item.get("bank_name", ""))} for item in final_recommend
-    ]
-    deposit_recommend_with_logo = [
-        {**item, "logo": get_bank_logo(item.get("bank", ""))} for item in deposit_recommend
-    ]
-
     # 로그 데이터 확인 
     log_cluster = get_top_data_by_customer_class(user.Stageclass, user.Inlevel)
     # "data" 부분만 추출
@@ -1410,8 +1408,8 @@ def top5(request):
     # Context에 데이터 추가
     context = {
         'user_name': user_name,
-        'final_recommend': final_recommend_with_logo,  # 적금 Top 3 (로고 포함)
-        'deposit_recommend': deposit_recommend_with_logo,  # 예금 Top 2 (로고 포함)
+        'final_recommend': final_recommend,  # 적금 Top 3 (로고 포함)
+        'deposit_recommend': deposit_recommend,  # 예금 Top 2 (로고 포함)
         'filtered_data' : filtered_data_with_logo,
     }
 
@@ -1885,14 +1883,32 @@ def better_option(request):
                 nearest_s = min(s_list, key=lambda x: x['days_remaining'])
         except UserProfile.DoesNotExist:
             pass  # 사용자가 없을 경우 기본값 유지
-    final_recommend = request.session.get('final_recommend')
-    deposit_recommend = request.session.get('deposit_recommend')
+    final_recommend = request.session.get('final_recommend', [])
+    deposit_recommend = request.session.get('deposit_recommend', [])
+
+    # 각 추천 데이터에 로고 추가
+    try:
+        final_recommend = json.loads(final_recommend) if isinstance(final_recommend, str) else final_recommend
+        deposit_recommend = json.loads(deposit_recommend) if isinstance(deposit_recommend, str) else deposit_recommend
+    except json.JSONDecodeError:
+        final_recommend = []
+        deposit_recommend = []
+    nearest_d_with_logo = (
+        {**nearest_d, "logo": get_bank_logo(nearest_d.get("bank_name", ""))} if nearest_d else None
+    )
+    nearest_s_with_logo = (
+        {**nearest_s, "logo": get_bank_logo(nearest_s.get("bank", ""))} if nearest_s else None
+    )
+    for item in deposit_recommend:
+        logger.debug(f"Item: {item}")
+        if 'dsid' not in item or not item['dsid']:
+            logger.error(f"Invalid dsid in item: {item}")
     context = {
         'user_name': user_name,
         'final_recommend': final_recommend,  # 적금 Top 5
         'deposit_recommend': deposit_recommend,  # 예금 Top 5
-        'nearest_d' : nearest_d,
-        'nearest_s' : nearest_s,
+        'nearest_d' : nearest_d_with_logo,
+        'nearest_s' : nearest_s_with_logo,
     }
 
     return render(request, 'better_options.html',context)

@@ -62,7 +62,7 @@
                     <a href="#" style=" font-weight: bold; color: #121212;">예/적금 추천</a>
                     <div class="dropdown-content">
                         <a href="{% url 'top5' %}" style="font-size: 0.8rem;">신규적금추천</a>
-                        <a href="compare_products" style="font-size: 0.8rem;">기존상품비교</a>
+                        <a href="{% url 'better' %}" style="font-size: 0.8rem;">기존상품비교</a>
                     </div>
                 </div> 
                 <a href="{% url 'spending_mbti' %}" style=" font-weight: bold; color: #121212;">소비MBTI</a>
@@ -119,7 +119,7 @@
                     <h2>🦆 곧 만기가 되는 상품이덕 🦆</h2>
                     {% if nearest_d %}
                         <div class="card">
-                            <img src="https://via.placeholder.com/50x70" alt="은행로고">
+                            <img src="{% static product.logo %}" alt="{{ product.bank }} 로고">
                             <div class="card-content_n">
                                 <span class="card-title">{{ nearest_d.pname }}</span><br>
                                 <p><strong>은행:</strong> {{ nearest_d.bank_name }}</p>
@@ -136,15 +136,20 @@
                 <h2>🦆 아래의 상품들을 추천한덕 🦆</h2>
                 {% for product in deposit_recommend %}
                 <div class="card">
-                    <img src="https://via.placeholder.com/50x70" alt="상품 이미지">
+                    <img src="{% static product.logo %}" alt="{{ product.bank }} 로고">
                     <div class="card-content">
                         <span class="card-title">{{ product.name }}</span><br>
                         <p><strong>은행:</strong> {{ product.bank }}</p>
                         <p><strong>기준 금리:</strong> {{ product.baser }}</p>
                         <p><strong>최대 금리:</strong> {{ product.maxir }}</p>
                         <p><strong>가입 방법:</strong> {{ product.method }}</p>
+                        <p><strong>상품 코드:</strong>{{ product.dsid }}</p>
                     </div>
-                    <a href="{% url 'ds-detail' %}" class="card-button">자세히보기</a>
+                    {% if product.dsid %}
+                    <a href="{% url 'd-detail' product.dsid %}" class="card-button">자세히보기</a>
+                    {% else %}
+                        <span>No Detail Available</span>
+                    {% endif %}
                 </div>
                 {% endfor %}
                 <a href="{% url 'info' %}" class="new-action-button">자세히 설정하기</a>
@@ -160,7 +165,7 @@
                     <h2>🦆 곧 만기가 되는 상품이덕 🦆</h2>
                     {% if nearest_s %}
                         <div class="card">
-                            <img src="https://via.placeholder.com/50x70" alt="{{ product.bank_name }} 로고">
+                            <img src="{% static product.logo %}" alt="{{ product.bank }} 로고">
                             <div class="card-content">
                                 <span class="card-title">{{ nearest_s.pname }}</span><br>
                                 <p><strong>은행:</strong> {{ nearest_s.bank_name }}</p>
@@ -177,15 +182,20 @@
                 <h2>🦆 아래의 상품들을 추천한덕 🦆</h2>
                 {% for product in final_recommend %}
                 <div class="card">
-                    <img src="https://via.placeholder.com/50x70" alt="상품 이미지">
+                    <img src="{% static product.logo %}" alt="{{ product.bank }} 로고">
                     <div class="card-content">
                         <span class="card-title">{{ product.product_name }}</span>
                         <p><strong>은행:</strong> {{ product.bank_name }}</p>
                         <p><strong>기준 금리:</strong> {{ product.base_rate }}</p>
                         <p><strong>최대 금리:</strong> {{ product.max_preferential_rate }}</p>
                         <p><strong>가입 방법:</strong> {{ product.signup_method }}</p>
+                        <p><strong>상품 코드:</strong>{{ product.DSID }}</p>
                     </div>
-                    <a href="{% url 'ds-detail' %}" class="card-button">자세히보기</a>
+                    {% if product.DSID %}
+                    <a href="{% url 's-detail' product.DSID %}" class="card-button">자세히보기</a>
+                    {% else %}
+                        <span>No Detail Available</span>
+                    {% endif %}
                 </div>
                 {% endfor %}
             </div>
