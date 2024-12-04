@@ -975,7 +975,6 @@ def spending_mbti(request):
         'top_card_list': top_card_list,
     }
 
-    print('context',context)
     return render(request, 'spending_mbti.html', context)
 
 def main(request):
@@ -1916,10 +1915,52 @@ def better_option(request):
 def d_detail(request,dsid):
     try:
         product = DProduct.objects.get(dsid=dsid)
+        index_name = "d_products"  # 인덱스 이름
+        index_name_2 = "d_products_tip"
+
+        # Elasticsearch 검색 쿼리
+        query = {
+            "_source": ["dsid", "context"],  # 필요한 필드만 가져옴
+            "query": {
+                "term": {
+                    "dsid": dsid  # dsid 값과 정확히 매칭
+                }
+            }
+        }
+
+        try:
+
+            # Elasticsearch 검색
+            response = es.search(index=index_name, body=query)
+            hits = response.get("hits", {}).get("hits", [])
+
+            if hits:
+                # context 값만 추출
+                context_value = hits[0]["_source"]["context"]
+
+            # Elasticsearch 검색
+            response = es.search(index=index_name_2, body=query)
+            hits = response.get("hits", {}).get("hits", [])
+
+            if hits:
+                # context 값만 추출
+                context_value_tip = hits[0]["_source"]["context"]
+
+                
+            else:
+                return JsonResponse({"status": "error", "message": "데이터를 찾을 수 없습니다."}, status=404)
+
+        except Exception as e:
+            # 에러 처리
+            return JsonResponse({"status": "error", "message": str(e)}, status=500)
     except DProduct.DoesNotExist:
         return render(request, 'error.html', {'message': '해당 상품을 찾을 수 없습니다.'})
+    
+ 
     context = {
         'product': product,
+        'context_value' : context_value,
+        'context_value_tip':context_value_tip,
     }
 
     return render(request, 'd_detail.html',context)
