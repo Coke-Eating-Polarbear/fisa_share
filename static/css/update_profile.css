@@ -21,7 +21,7 @@
 
 /* 이미지 섹션 */
 .accounts_image {
-    flex: 1; /* 이미지 영역 비율 */
+    flex: 1.1; /* 이미지 영역 비율 */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -45,7 +45,7 @@
 
 .accounts_forms h1 {
     margin-bottom: 20px;
-    font-size: 1.5rem;
+    font-size: 1.9rem;
     text-align: center;
     color: #333;
 }
