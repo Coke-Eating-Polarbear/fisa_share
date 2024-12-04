@@ -1,0 +1,165 @@
+/* 공통 스타일 */
+body {
+    font-family: Arial, sans-serif !important;
+    background-color: #F5F6F7 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+    padding-top: 100px !important;
+    overflow-x: hidden !important; /* 좌우 스크롤 제거 */
+}
+
+/* 헤더 및 푸터 */
+header, footer {
+    text-align: center !important;
+    width: 100vw !important;
+    background-color: #F5F6F7 !important;
+}
+
+header {
+    position: fixed !important;
+    top: 0 !important;
+    z-index: 1 !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+}
+
+footer {
+    height: 10% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 10px !important;
+    text-align: center !important;
+}
+
+/* 네비게이션 바 */
+.navbar {
+    max-width: 1200px !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: 0 120px !important; /* 좌우 여백 */
+    margin-top: 20px !important;
+    font-size: 1rem !important;
+    background-color: #F5F6F7 !important;
+}
+
+.logo {
+    margin-right: auto !important; /* 로고는 왼쪽으로 정렬 */
+}
+
+.user-info {
+    margin-right: -60px !important;
+}
+
+/* 로고 */
+.logo img {
+    vertical-align: middle !important;
+}
+
+/* 네비게이션 링크 */
+.nav-links {
+    flex-grow: 1 !important; /* 중앙에 위치하도록 공간을 차지 */
+    display: flex !important;
+    justify-content: center !important; /* 네비게이션 링크를 중앙 정렬 */
+    gap: 20px !important; /* 링크 간격 */
+}
+
+.navbar a {
+    font-size: 1.1rem !important;
+    font-weight: bold !important;
+    margin-left: 15px !important; /* 각 링크 사이의 간격 */
+    text-decoration: none !important;
+    color: #333 !important;
+}
+
+.navbar a:hover {
+    color: #555 !important; /* 호버 시 색상 변경 */
+}
+
+/* 드롭다운 메뉴 */
+.dropdown {
+    position: relative !important;
+    display: inline-block !important;
+}
+
+.dropdown-content {
+    display: none !important;
+    position: absolute !important;
+    top: 100% !important;
+    left: 0 !important;
+    background-color: #fff !important;
+    padding: 0 !important;
+    width: 150px !important;
+    z-index: 1000 !important;
+    border-top: 1px solid #ddd !important;
+    border-bottom: 1px solid #ddd !important;
+}
+
+.dropdown-content a {
+    padding: 10px 20px !important;
+    display: block !important;
+    text-align: left !important;
+    color: #333 !important;
+    text-decoration: none !important;
+    font-size: 0.8rem !important;
+}
+
+.dropdown-content a:hover {
+    background-color: #f1f1f1 !important;
+}
+
+.dropdown:hover .dropdown-content {
+    display: block !important;
+}
+
+/* 회원 정보 및 마이페이지 */
+.user-info {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+}
+
+.user-info span {
+    font-size: 1.1rem !important;
+}
+
+.user-info a {
+    margin-left: 15px !important;
+    font-size: 1.1rem !important;
+    font-weight: bold !important;
+    color: #121212 !important;
+    text-decoration: none !important;
+}
+
+.user-info form {
+    display: inline !important;
+}
+
+.user-info button {
+    margin-left: 10px !important;
+    padding: 5px 10px !important;
+    font-size: 0.9rem !important;
+    font-weight: bold !important;
+    background-color: #291e4ee5 !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 5px !important;
+    cursor: pointer !important;
+}
+
+.user-info button:hover {
+    background-color: #3a2f6f !important; /* 호버 시 색상 변경 */
+}
+
+.container {
+    max-width: 1200px !important;
+    margin: 0 auto !important;
+    background-color: #ffffff !important;
+    padding: 20px !important;
+    border: 1px solid #ddd !important;
+    border-radius: 10px !important;
+}

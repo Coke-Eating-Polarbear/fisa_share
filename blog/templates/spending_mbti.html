@@ -13,48 +13,41 @@
 <body>
     {% csrf_token %}
     <header>
-    <div class="navbar">
-        <div class="logo">
-            <a href="{% url 'loginmain' %}">
-                <img src="{% static 'img\header_logo.png' %}" style="vertical-align: middle; margin-left: 100px;" alt="로고">
+        <div class="navbar">
+            <!-- 로고 -->
+            <div class="logo">
+                <a href="{% url 'loginmain' %}">
+                    <img src="{% static 'img/header_logo.png' %}" alt="로고">
+                </a>
             </div>
-            <div class="nav-links" style="flex-grow: 1; text-align: center; margin-right: 220px;">
-                <a href="{% url 'originreport' %}" style=" font-weight: bold; color: #121212;">금융분석 리포트</a> 
+
+            <!-- 네비게이션 -->
+            <div class="nav-links">
+                <a href="{% url 'originreport' %}">내 금융 바로보기</a>
                 <div class="dropdown">
-                    <a href="#" style=" font-weight: bold; color: #121212;">예/적금 추천</a>
+                    <a href="#">내 예/적금 찾기</a>
                     <div class="dropdown-content">
-                        <a href="{% url 'top5' %}" style="font-size: 0.8rem;">신규적금추천</a>
-                        <a href="{% url 'better' %}" style="font-size: 0.8rem;">기존상품비교</a>
+                        <a href="{% url 'top5' %}">신규적금추천</a>
+                        <a href="{% url 'better' %}">기존상품비교</a>
                     </div>
-                </div> 
-                <a href="{% url 'spending_mbti' %}" style=" font-weight: bold; color: #121212;">소비MBTI</a>
+                </div>
+                <a href="{% url 'spending_mbti' %}">슬기로운 소비생활</a>
             </div>
-           <!-- 회원 정보 및 마이페이지 -->
-        <div class="user-info">
-            <span style="font-size: 1.1rem;">{{ user_name }}님</span> 
-            <a href="./mypage" style="margin-left: 15px; 
-            text-decoration: none; 
-            font-size: 1.1rem; 
-            font-weight: bold; 
-            color: #121212;">마이페이지</a> 
-            <form method="POST" action="{% url 'logout' %}" style="display: inline;">
-                {% csrf_token %}
-                <button name="logout" style="margin-left: 10px; 
-                margin-right: 100px; 
-                padding: 5px 10px; 
-                font-size: 0.9rem; 
-                font-weight: bold; 
-                background-color: #291e4ee5; 
-                color: white; 
-                border: none; 
-                border-radius: 5px; 
-                cursor: pointer;">
-                    로그아웃
-                </button>
-            </form>
+
+            <!-- 회원 정보 및 마이페이지 -->
+            <div class="user-info">
+                <span>{{ user_name }}님</span>
+                <a href="./mypage">마이페이지</a>
+                <form method="POST" action="{% url 'logout' %}">
+                    {% csrf_token %}
+                    <button name="logout">로그아웃</button>
+                </form>
+            </div>
         </div>
-    </div>
     </header>
+</body>
+</html>
+
 
 
 <!-- 메인 콘텐츠 -->
@@ -74,7 +67,7 @@
                     <option value="1y">최근 1년</option>
                 </select>                
             </div>
-        </div>
+        </div> 
 
         <!-- 그래프 섹션 -->
         <div class="charts-section" style="display: flex; justify-content: space-between; align-items: flex-start; gap: 2rem;">
@@ -450,9 +443,9 @@
         </script>
         
         <footer>
-            <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0;">서울특별시 마포구 월드컵북로 434 상암IT타워 6층</p> 
-            <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0;">고객지원 : 02-3151-7000 | 이메일: woorifis.lab44@gmail.com </p >
-            <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0;">COPYRIGHT©우리팀이름~</p >
+            <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0; font-size: 0.8rem;">서울특별시 마포구 월드컵북로 434 상암IT타워 6층</p> 
+            <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0; font-size: 0.8rem;">고객지원 : 02-3151-7000 | 이메일: woorifis.lab44@gmail.com </p >
+            <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0; font-size: 0.8rem;">COPYRIGHT©우리천만해요</p >
         </footer >
         
         </body>

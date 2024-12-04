@@ -8,6 +8,7 @@
     height: 100vh; /* 전체 화면 높이 */
     display: flex;
     flex-direction: column; /* Flexbox로 세로 정렬 */
+    overflow-x: hidden ; /* 좌우 스크롤 제거 */
 }
     .login_section {
         flex: 1; /* 남은 공간을 모두 차지 */
@@ -114,7 +115,7 @@
     }
 
     header, footer {
-        /* background-color: #ffffff; */
+        background-color: #ffffff;
         text-align: center;
         width: 100vw;
         }
@@ -126,7 +127,7 @@
             z-index: 1; 
         }
         footer {
-            background-color: #F5F6F7;
+            background-color: #ffffff;
             height: 10%; /* 화면 높이의 10% 차지 */
             display: flex;
             flex-direction: column;
