@@ -44,6 +44,7 @@ header, footer {
             text-align: center; /* 텍스트 중앙 정렬 */
             padding: 10px 0; /* 상하 여백 */
             z-index: 1000; /* 다른 콘텐츠 위에 표시되도록 설정 */
+            border-top: 1px solid #ddd; /* 위쪽 경계선 */
         }
 
         footer p {
@@ -97,18 +98,16 @@ header, footer {
         }
     
         .dropdown-content {
-            display: none;
-            position: absolute; /*부모요소 바로 아래에 위치*/
-            top: 100%;
-            left: 0;
-            background-color: #fff;
-            /* box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); */
-            padding: 0% ;
-            width: 150px; /*드롭다운이 전체 넓이를 차지*/
-            z-index: 1000;
-            border-top: 1px solid #ddd;
-            border-bottom: 1px solid #ddd;
-            /* border: 1px solid #ddd; */
+            position: absolute; /* 부모 요소를 기준으로 절대 위치 */
+            top: 100%; /* 부모 요소의 아래쪽에 위치 */
+            left: 0; /* 부모 요소의 왼쪽에 정렬 */
+            width: 100%; /* 부모 요소의 너비에 맞춤 */
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+            display: none; /* 기본 상태에서 숨김 */
+            z-index: 1000; /* 다른 요소 위에 표시되도록 설정 */
         }
     
         .dropdown-content a {
@@ -149,13 +148,15 @@ header, footer {
             background-color: #ffffff;
             margin: 20px auto;
             padding: 20px 20px 0px 20px; /* 상, 우, 하, 좌 */
+            gap: 20px;
             border: 1px solid #dee2e6;
             border-radius: 10px;
             box-sizing: border-box;
-            display: block; /* 다른 정렬 속성에 영향 미치지 않도록 */
+            display: flex; /* 다른 정렬 속성에 영향 미치지 않도록 */
+            flex-direction: column;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
         
-
 .checklist {
     background-color: white;
     border-radius: 10px;
@@ -222,21 +223,20 @@ header, footer {
 }
 
 .details-btn {
-    display: inline-block;
-    padding: 3px 8px;
     background-color: #291e4ee5;
     color: white;
-    text-decoration: none;
+    border: none;
     border-radius: 5px;
-    margin-top: 10px;
-    text-align: center;
+    padding: 3px 6px;
+    cursor: pointer;
+    font-size: 12px;
 }
 
 /* 빈 박스 가로 정렬 */
 .empty-box-row {
     display: flex;
     justify-content: space-between; /* 박스 간 동일 간격 */
-    margin-bottom: 30px; /* 아래 콘텐츠와 간격 */
+    margin-bottom: 10px; /* 아래 콘텐츠와 간격 */
 }
 
 .empty-box {
@@ -293,3 +293,177 @@ header, footer {
     font-size: 1rem; /* 텍스트 크기 */
     color: #333; /* 텍스트 색상 */
 }
+
+.row {
+    display: flex;
+    justify-content: center; /* 양쪽으로 배치 */
+    gap: 20px; /* 박스 간격 */
+    width: 100%; /* 너비를 부모 컨테이너에 맞춤 */
+    max-width: 100%; /* 부모보다 커지지 않도록 */
+    text-align: center; /* 내부 텍스트의 기본 정렬 */
+}
+
+/* 공통 스타일 */
+.left-box, .right-box {
+    flex: 1;
+    max-width: none; /* 박스의 너비를 더 넓게 설정 */
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 10px; /* 테두리와 내용 간 간격 */
+    min-height: 300px; /* 높이 설정 */
+    box-sizing: border-box; /* 패딩 포함 크기 계산 */
+    text-align: center; /* 텍스트 중앙 정렬 */
+    width: 48%; /* 두 박스가 전체 너비의 48%씩 차지 */
+}
+
+
+
+/* 텍스트 스타일 */
+h3 {
+    font-size: 18px;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+ul {
+    list-style-type: disc;
+    padding-left: 20px;
+}
+
+li {
+    margin-bottom: 8px;
+    font-size: 14px;
+    color: #555;
+}
+
+.details-btn:hover {
+    background-color: #0056b3;
+}
+
+/* 팝업 스타일 */
+.popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.popup.hidden {
+    display: none;
+}
+
+.popup-content {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    width: 600px;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.popup-content h4 {
+    margin-bottom: 16px;
+    font-size: 20px;
+    color: #333;
+}
+
+.popup-content p {
+    margin-bottom: 8px;
+    font-size: 14px;
+    color: #555;
+}
+
+.close-btn {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.close-btn:hover {
+    background-color: #c82333;
+}
+
+.dropdown-section {
+    position: relative; /* 드롭다운 내용을 부모 요소 기준으로 위치 */
+    flex: 1;
+    max-width: 48%; /* 너비 조정 */
+    min-width: 300px; /* 최소 너비 */
+    text-align: center; /* 텍스트를 박스 내부에서 중앙 정렬 */
+    margin: 0 auto; /* 박스를 부모 컨테이너에서 중앙 정렬 */
+    box-sizing: border-box; /* 패딩 포함 크기 계산 */
+}
+
+.dropdown-title {
+    display: block; /* 부모 너비에 맞게 블록 요소로 설정 */
+    cursor: pointer;
+    font-size: 18px;
+    padding: 10px;
+    background-color: #f5f5f5;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    color: #333;
+    width: 100%; /* 박스를 부모 컨테이너 너비에 맞게 확장 */
+    max-width: 100%; /* 최대 너비 설정 (부모보다 크지 않도록) */
+    text-align: center; /* 텍스트 중앙 정렬 */
+    box-sizing: border-box; /* 패딩 포함 크기 계산 */
+    margin: 0 auto; /* 가운데 정렬 */
+}
+
+.dropdown-title:hover {
+    background-color: #e9e9e9;
+}
+
+.dropdown-section h3 {
+    cursor: pointer;
+    background-color: #f9f9f9;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 18px;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+
+.dropdown-content.hidden {
+    display: none; /* 숨겨진 상태 */
+}
+
+.dropdown-content ul li {
+    padding: 5px 0;
+    text-align: left;
+    font-size: 14px;
+    color: #333;
+}
+
+/* 드롭다운이 보일 때 */
+.dropdown-content.show {
+    display: block; /* 드롭다운 내용을 표시 */
+}
+
+li {
+    margin-bottom: 8px;
+    font-size: 14px;
+    color: #555;
+}
+
+ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
