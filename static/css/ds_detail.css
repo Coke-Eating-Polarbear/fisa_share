@@ -1,115 +1,160 @@
+*  {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    }
+
 body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    background-color: #ffffff;
-    min-height: 100vh;
-    position: relative;
+    background-color: #F5F6F7;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; /* 화면 전체 높이를 차지하도록 설정 */
 }
-
 header, footer {
-    text-align: center;
-    width: 100%;
-}
+        /* background-color: #ffffff; */
+        text-align: center;
+        width: 100vw;
+        }
+        header {
+            background-color: #F5F6F7;
+            top: 0;
+            z-index: 2;
+            height: 80px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+        }
+        
+        
 
-header {
-    background-color: #ffffff;
-    position: fixed;
-    padding: 0px;
-    top: 0;
-    z-index: 1;
-}
+        footer {
+            background-color: #F5F6F7; /* 배경색 */
+            bottom: 0; /* 하단에 위치 */
+            left: 0; /* 화면 왼쪽 끝에서 시작 */
+            width: 100%; /* 화면 너비를 꽉 채움 */
+            display: flex; /* 플렉스 박스를 사용해 중앙 정렬 */
+            flex-direction: column;
+            align-items: center; /* 수평 중앙 정렬 */
+            justify-content: center; /* 수직 중앙 정렬 */
+            text-align: center; /* 텍스트 중앙 정렬 */
+            padding: 10px 0; /* 상하 여백 */
+            z-index: 1000; /* 다른 콘텐츠 위에 표시되도록 설정 */
+        }
 
-footer {
-    position: relative;
-    background-color: #291e4ee5;
-    padding: 10px;
-    bottom: 0;
-    left: 0;
-}
+        footer p {
+            margin: 5px; /* 텍스트 간격 */
+            line-height: 1.2; /* 줄 간격 */
+            text-decoration: none;
+            color: #000000; /* 텍스트 색상 */
+            font-size: 0.9rem; /* 텍스트 크기 */
+        }
 
-.dropdown {
-    position: relative;
-    display: inline-block;
-}
+        footer a {
+            color: #007bff; /* 링크 색상 */
+            text-decoration: none; /* 링크 밑줄 제거 */
+            font-weight: bold; /* 링크 글씨 굵게 */
+        }
 
-.navbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 20px;
-    font-size: 1rem;
-    background-color: #ffffff;
-}
+        footer a:hover {
+            text-decoration: underline; /* 호버 시 밑줄 추가 */
+            color: #0056b3; /* 호버 시 색상 */
+        }
+    
+            /* 드롭다운 메뉴 스타일 */
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        .navbar {
+            display: flex;
+            justify-content: space-between; /* 좌측 로고와 우측 버튼 배치 */
+            /* justify-content: flex-end; 오른쪽 정렬 */
+            align-items: center;
+            padding: 10px 20px;
+            font-size: 0.3rem;
+            background-color: #F5F6F7;
+        }
+        .nav-links {
+            margin-right: 10px; /* 회원 정보와의 구분 */
+            display: flex; 
+            justify-content: flex-end; 
+            align-items: center; 
+            flex-grow: 1; 
+            text-align: center;
+        }
+        .navbar a {
+            /* margin: 0 20px; 링크 간격 */
+            font-size: 1.1rem; /* 글씨 크기 */
+            font-weight: bold; /* 글씨 진하게 */
+            margin-left: 15px; /* 각 링크 사이의 간격 */
+            text-decoration: none;
+            color: #333;
+        }
+    
+        .dropdown-content {
+            display: none;
+            position: absolute; /*부모요소 바로 아래에 위치*/
+            top: 100%;
+            left: 0;
+            background-color: #fff;
+            /* box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); */
+            padding: 0% ;
+            width: 150px; /*드롭다운이 전체 넓이를 차지*/
+            z-index: 1000;
+            border-top: 1px solid #ddd;
+            border-bottom: 1px solid #ddd;
+            /* border: 1px solid #ddd; */
+        }
+    
+        .dropdown-content a {
+            padding: 10px 20px;
+            display: block;
+            text-align: left;
+            color: #333;
+            text-decoration: none;
+            /* white-space: nowrap; */
+        }
+    
+        .dropdown-content a:hover {
+            background-color: #f1f1f1;
+        }
+    
+        /* 마우스를 올렸을 때 드롭다운 표시 */
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+    
+        /* 링크 스타일 */
+        .nav-box nav a {
+            color: #333;
+            margin: 0 10px;
+            text-decoration: none;
+        }
+    
+        .nav-box nav a:hover {
+            font-weight: bold;
+        }
 
-.nav-links {
-    margin-right: 10px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-grow: 1;
-    text-align: center;
-}
-
-.navbar a {
-    font-size: 1.2rem;
-    font-weight: bold;
-    margin-left: 15px;
-    text-decoration: none;
-    color: #333;
-}
-
-.dropdown-content {
-    display: none;
-    position: absolute;
-    top: 100%;
-    left: 0;
-    background-color: #fff;
-    padding: 0%;
-    width: 150px;
-    z-index: 1000;
-    border-top: 1px solid #ddd;
-    border-bottom: 1px solid #ddd;
-}
-
-.dropdown-content a {
-    padding: 10px 20px;
-    display: block;
-    text-align: left;
-    color: #333;
-    text-decoration: none;
-}
-
-.dropdown-content a:hover {
-    background-color: #f1f1f1;
-}
-
-.dropdown:hover .dropdown-content {
-    display: block;
-}
-
-.nav-box nav a {
-    color: #333;
-    margin: 0 10px;
-    text-decoration: none;
-}
-
-.nav-box nav a:hover {
-    font-weight: bold;
-}
-
-.user-info span {
-    font-size: 1.1rem;
-    font-weight: bold;
-}
-
-.container {
-    padding-top: 150px; /* 상단 여백 추가 */
-    padding-bottom: 150px; /* 하단 여백 */
-    max-width: 900px; /* 전체 넓이 제한 */
-    margin: 0 auto; /* 중앙 정렬 */
-}
+        .container {
+            margin-top: 20px; /* 상단 여백 줄이기 */
+            margin-bottom: 20px; /* 하단 여백 */
+            flex: 1;
+            width: 70%;
+            max-width: none;
+            background-color: #ffffff;
+            margin: 20px auto;
+            padding: 20px 20px 0px 20px; /* 상, 우, 하, 좌 */
+            border: 1px solid #dee2e6;
+            border-radius: 10px;
+            box-sizing: border-box;
+            display: block; /* 다른 정렬 속성에 영향 미치지 않도록 */
+        }
+        
 
 .checklist {
     background-color: white;
@@ -141,7 +186,7 @@ footer {
     background-color: #e9e9e9;
     padding: 10px;
     border-radius: 5px;
-    margin-top: 10px;
+    margin-top: 7px;
 }
 
 .summary-box {
@@ -178,7 +223,7 @@ footer {
 
 .details-btn {
     display: inline-block;
-    padding: 8px 15px;
+    padding: 3px 8px;
     background-color: #291e4ee5;
     color: white;
     text-decoration: none;
@@ -198,7 +243,53 @@ footer {
     background-color: #ffffff;
     border-radius: 10px;
     border: 1px solid #ddd;
-    width: 30%; /* 세 박스를 동일 비율로 */
+    width: 100%; /* 세 박스를 동일 비율로 */
     height: 100px; /* 박스 높이 설정 */
     box-sizing: border-box;
+}
+
+.card {
+    display: flex;
+    align-items: flex-start;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+    background-color: #ffffff;
+}
+
+.card img {
+    margin-right: 20px;
+    border-radius: 5px;
+    object-fit: cover;
+}
+
+.card-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.card-title {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-bottom: 0px;
+    color: #333;
+}
+
+.card-content p {
+    margin: 5px 0;
+    font-size: 1rem;
+    color: #555;s
+}
+
+.inner-box {
+    background-color: #f9f9f9; /* 밝은 배경색 */
+    border: 1px solid #ddd; /* 얇은 테두리 */
+    border-radius: 10px; /* 둥근 모서리 */
+    padding: 15px; /* 내부 여백 */
+    margin-top: 10px; /* 상단 여백 */
+    /*text-align: center; /* 텍스트 중앙 정렬 */
+    font-weight: bold; /* 텍스트 굵게 */
+    font-size: 1rem; /* 텍스트 크기 */
+    color: #333; /* 텍스트 색상 */
 }

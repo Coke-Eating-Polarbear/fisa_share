@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>기존상품과 추천상품</title>
-    <link rel="stylesheet" href="{% static 'css/recommend_savings_top5.css' %}">
+    <link rel="stylesheet" href="{% static 'css/better_options.css' %}">
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
@@ -100,7 +100,7 @@
     <div class="main-content">
         <div class="main-title-box">
             <div class="main-title">
-                {{ user_name }}님 맞춤 예/적금 추천 상품 TOP 5
+                {{ user_name }}님 맞춤 기존 예/적금 비교추천 서비스 TOP 5
             </div>
         </div>
 
@@ -116,17 +116,24 @@
             <div class="recommendations">
                 <!-- 기존 상품 박스 -->
                 <div class="existing-product-container">
-                <div class="card">
-                   <img src="https://via.placeholder.com/50x70" alt="상품 이미지">
-                   <div class="card-content">
-                       <span class="card-title">기존 상품</span><br>
-                       <p><strong>은행:</strong> Sample Bank</p>
-                       <p><strong>기준 금리:</strong> %</p>
-                       <p><strong>최대 금리:</strong> %</p>
-                       <p><strong>가입 방법:</strong> 아무거나</p>
-                    </div>
+                    <h2>🦆 곧 만기가 되는 상품이덕 🦆</h2>
+                    {% if nearest_d %}
+                        <div class="card">
+                            <img src="https://via.placeholder.com/50x70" alt="은행로고">
+                            <div class="card-content_n">
+                                <span class="card-title">{{ nearest_d.pname }}</span><br>
+                                <p><strong>은행:</strong> {{ nearest_d.bank_name }}</p>
+                                <p><strong>기준 금리:</strong> {{ nearest_d.ds_rate }}%</p>
+                                <p><strong>만기일:</strong> {{ nearest_d.end_date }}</p>
+                                <p><strong>남은 일수:</strong> {{ nearest_d.days_remaining }}일</p>
+                            </div>
+                        </div>
+                        {% else %}
+                        <p>현재 만기가 가까운 예금 상품이 없습니다.</p>
+                        {% endif %}
                 </div>
-            </div>
+                <div class="existing-product-container">
+                <h2>🦆 아래의 상품들을 추천한덕 🦆</h2>
                 {% for product in deposit_recommend %}
                 <div class="card">
                     <img src="https://via.placeholder.com/50x70" alt="상품 이미지">
@@ -137,15 +144,11 @@
                         <p><strong>최대 금리:</strong> {{ product.maxir }}</p>
                         <p><strong>가입 방법:</strong> {{ product.method }}</p>
                     </div>
-                    <button class="card-button">자세히보기</button>
-                    <div class="details-box">
-                        <button class="close-button">✕</button>
-                        <p>이율 정보 및 상세 내용</p>
-                        <p>상품 설명...</p>
-                    </div>
+                    <a href="{% url 'ds-detail' %}" class="card-button">자세히보기</a>
                 </div>
                 {% endfor %}
                 <a href="{% url 'info' %}" class="new-action-button">자세히 설정하기</a>
+                </div>
             </div>
         </div>
 
@@ -154,38 +157,40 @@
             <div class="recommendations">
                 <!-- 기존 상품 박스 -->
                 <div class="existing-product-container">
-                    <div class="card">
-                       <img src="https://via.placeholder.com/50x70" alt="상품 이미지">
-                       <div class="card-content">
-                           <span class="card-title">기존 상품</span><br>
-                           <p><strong>은행:</strong> Sample Bank</p>
-                           <p><strong>기준 금리:</strong> %</p>
-                           <p><strong>최대 금리:</strong> %</p>
-                           <p><strong>가입 방법:</strong> 아무거나</p>
+                    <h2>🦆 곧 만기가 되는 상품이덕 🦆</h2>
+                    {% if nearest_s %}
+                        <div class="card">
+                            <img src="https://via.placeholder.com/50x70" alt="{{ product.bank_name }} 로고">
+                            <div class="card-content">
+                                <span class="card-title">{{ nearest_s.pname }}</span><br>
+                                <p><strong>은행:</strong> {{ nearest_s.bank_name }}</p>
+                                <p><strong>기준 금리:</strong> {{ nearest_s.ds_rate }}%</p>
+                                <p><strong>만기일:</strong> {{ nearest_s.end_date }}</p>
+                                <p><strong>남은 일수:</strong> {{ nearest_s.days_remaining }}일</p>
+                            </div>
                         </div>
-                    </div>
+                        {% else %}
+                        <p>현재 만기가 가까운 예금 상품이 없습니다.</p>
+                        {% endif %}
                 </div>
+                <div class="existing-product-container">
+                <h2>🦆 아래의 상품들을 추천한덕 🦆</h2>
                 {% for product in final_recommend %}
                 <div class="card">
                     <img src="https://via.placeholder.com/50x70" alt="상품 이미지">
                     <div class="card-content">
-                        <span class="card-title"></span>
-                        <p><strong>상품명:</strong> {{ product.product_name }}</p>
+                        <span class="card-title">{{ product.product_name }}</span>
                         <p><strong>은행:</strong> {{ product.bank_name }}</p>
                         <p><strong>기준 금리:</strong> {{ product.base_rate }}</p>
                         <p><strong>최대 금리:</strong> {{ product.max_preferential_rate }}</p>
                         <p><strong>가입 방법:</strong> {{ product.signup_method }}</p>
                     </div>
-                    <button class="card-button">자세히보기</button>
-                    <div class="details-box">
-                        <button class="close-button">✕</button>
-                        <p>이율 정보 및 상세 내용</p>
-                        <p>상품 설명...</p>
-                    </div>
+                    <a href="{% url 'ds-detail' %}" class="card-button">자세히보기</a>
                 </div>
                 {% endfor %}
             </div>
             <a href="{% url 'info' %}" class="new-action-button">자세히 설정하기</a>
+            </div>
         </div>
         
         </div>
@@ -193,7 +198,7 @@
 
     <footer>
         <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0;">서울특별시 마포구 월드컵북로 434 상암IT타워 6층</p> 
-        <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0;">고객지원 : 02-3151-7000 | 이메일: worifisa@worifisa.com </p >
+        <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0;">고객지원 : 02-3151-7000 | 이메일: woorifis.lab44@gmail.com </p >
         <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0;">COPYRIGHT©2024 우리 천만해요</p >
     </footer >
 

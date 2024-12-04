@@ -1,0 +1,104 @@
+/* 전체 화면 정렬 */
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f4f4f9;
+    font-family: 'Arial', sans-serif;
+}
+
+/* 메인 박스 스타일 */
+.accounts_container {
+    display: flex;
+    width: 1200px;
+    height: 700px; /* 전체 박스 높이 고정 */
+    background-color: white;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+/* 이미지 섹션 */
+.accounts_image {
+    flex: 1; /* 이미지 영역 비율 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #3e56a7;
+    height: 100%; /* 부모 박스 높이에 맞춤 */
+    padding: 0; /* 패딩 제거로 여백 없앰 */
+}
+
+.accounts_image img {
+    width: 100%; /* 부모 박스 너비에 맞춤 */
+    height: 100%; /* 부모 박스 높이에 맞춤 */
+    object-fit: cover; /* 박스 크기에 맞게 비율 조정, 잘리는 부분 최소화 */
+}
+
+/* 폼 섹션 */
+.accounts_forms {
+    flex: 2; /* 폼 영역 비율 */
+    padding: 20px;
+    overflow: auto; /* 폼이 길어질 경우 스크롤 가능 */
+}
+
+.accounts_forms h1 {
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+    text-align: center;
+    color: #333;
+}
+
+/* 폼 요소 스타일 */
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 0.9rem;
+    color: #555;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 0.9rem;
+}
+
+/* 버튼 스타일 */
+.login-button,
+.cancel-button {
+    width: 48%;
+    padding: 10px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    color: white;
+    background-color: #3e56a7;
+    transition: background-color 0.3s ease;
+}
+
+.cancel-button {
+    background-color: #d9534f;
+}
+
+.login-button:hover {
+    background-color: #2e418f;
+}
+
+.cancel-button:hover {
+    background-color: #c12e2a;
+}
+
+/* 버튼 정렬 */
+.form-group:last-child {
+    display: flex;
+    justify-content: space-between;
+}

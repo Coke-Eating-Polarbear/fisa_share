@@ -57,77 +57,58 @@
     </header>
 
 
-    <!-- 메인 콘텐츠 -->
-    <div class="container" style=" display: grid; grid-template-columns: 7fr 3fr; align-items: center;">
-        <div class="content-row">
-            <!-- 차트 1 -->
-            <div class="chart-container">
-                <div class="chart-header">
-                    <div class="date-range-buttons">
-                        <button onclick="filterData('1m')">직전 1달</button>
-                        <button onclick="filterData('6m')">최근 6달</button>
-                        <button onclick="filterData('1y')">최근 1년</button>
-                    </div>
-                    <div class="chart-title">지출 빈도별 소비</div>
-                    
-                </div>
-                <!-- 정렬 및 날짜 선택 -->
-                <!-- <div class="filter-section">
-                    <div class="sort-container">
-                    </div>
-                    <div class="date-container">
-                        <label for="dateFrequency">날짜:</label>
-                        <input type="date" id="dateFrequency" />
-                    </div>
-                </div> -->
-                <canvas id="frequencyChart" class="chart"></canvas>
-                
-            </div>
+<!-- 메인 콘텐츠 -->
+<div class="container" style="display: flex; flex-direction: column; gap: 2rem;">
     
-            <!-- 차트 2 -->
-            <div class="chart-container">
+    <!-- 큰 박스 -->
+    <div class="box" style="border: 1px solid #ccc; border-radius: 10px; padding: 1.5rem; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+        
+        <!-- 제목과 드롭다운 -->
+        <div class="title-and-selector" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <h2 style="margin: 0; margin-left: 1rem;">지출 빈도/금액별 소비</h2>
+            <div class="date-selector" style="text-align: right;">
+                <label for="dateRangeSelect" style="font-size: 1rem; font-weight: bold; margin-right: 1rem;">기간 선택:</label>
+                <select id="dateRangeSelect" onchange="filterData(this.value)" style="padding: 0.5rem; font-size: 1rem;">
+                    <option value="1m">직전 1달</option>
+                    <option value="6m">최근 6달</option>
+                    <option value="1y">최근 1년</option>
+                </select>                
+            </div>
+        </div>
+
+        <!-- 그래프 섹션 -->
+        <div class="charts-section" style="display: flex; justify-content: space-between; align-items: flex-start; gap: 2rem;">
+            
+            <!-- 지출 빈도별 소비 -->
+            <div class="chart-container" style="flex: 1; border: 1px solid #ccc; border-radius: 10px; padding: 1.5rem; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
                 <div class="chart-header">
-                    <div class="chart-title">지출 금액별 소비</div>
-                    <div class="date-range-buttons">
-                        <!-- <button onclick="filterData('1m')">직전 1달</button>
-                        <button onclick="filterData('6m')">최근 6달</button>
-                        <button onclick="filterData('1y')">최근 1년</button> -->
-                    </div>
+                    <div class="chart-title" style="text-align: center;">지출 빈도별 소비</div>
                 </div>
-                <!-- 정렬 및 날짜 선택 -->
-                <!-- <div class="filter-section">
-                    <div class="sort-container">
-                    </div>
-                    <div class="date-container">
-                        <label for="dateAmount">날짜:</label>
-                        <input type="date" id="dateAmount" />
-                    </div>
-                </div> -->
+                <canvas id="frequencyChart" class="chart"></canvas>
+            </div>
+
+            <!-- 지출 금액별 소비 -->
+            <div class="chart-container" style="flex: 1; border: 1px solid #ccc; border-radius: 10px; padding: 1.5rem; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+                <div class="chart-header">
+                    <div class="chart-title" style="text-align: center;">지출 금액별 소비</div>
+                </div>
                 <canvas id="amountChart" class="chart"></canvas>
             </div>
         </div>
-
-        <!-- 설명 섹션 -->
-        <div class="description">
-            <p>다음 달 예상 소비 금액은 <span id="predicted-total" class="highlight"></span>원 입니다.</p>
-            <p><span id="amount-top" class="highlight"></span>와 <span id="amount-top2" class="highlight"></span> 항목에서 가장 큰 소비가 예상됩니다.</p>
-            <p>이 분야에서 소비를 줄이려면, 혜택이 큰 카드를 사용해보세요!</p>
-            <p>예상 절감 금액: <span class="highlight">##원</span></p>
-        </div>
     </div>
 
-
-      <!-- 소비 예측 섹션 -->
-      <div class="prediction-section container">
-        <!-- 행으로 배치 -->
-        <div class="content-row">
-            <!-- 꺾은선 그래프 -->
-            <div class="chart-container">
+<!-- 2. 소비 예측 및 카드 추천 박스 -->
+<div class="box" style="border: 1px solid #ccc; border-radius: 10px; padding: 1rem; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+    <h2 style="margin-top: 15px; margin-bottom: 20px; text-align: center; line-height: 0.5;">소비 예측 및 카드 추천</h2>
+    <div class="prediction-and-cards-section" style="display: flex; gap: 2rem; align-items: flex-start; margin-top: 0.5rem;">
+        <!-- 소비 예측 섹션 -->
+        <div class="prediction-section" style="flex: 0.7;"> <!-- 예측 섹션 간격 설정 -->
+            <div class="chart-container" style="margin-bottom: 1rem;">
                 <div class="chart-header">
-                    <div class="chart-title">다음 달 예측 소비</div>
-                    <div class="filter-section">
+                    <div class="chart-title">다음 달 소비 예측</div>
+                    <div class="filter-section" style="justify-content: flex-end;">
                         <label for="categorySelect">항목 선택:</label>
-                        <select id="categorySelect" onchange="updatePredictionChart()">
+                        <select id="categorySelect" onchange="updatePredictionChart()" style="padding: 0.3rem;">
                             <option value="predicted_total">총합</option>
                             <option value="eat">식비</option>
                             <option value="transfer">교통비</option>
@@ -143,23 +124,32 @@
                         </select>
                     </div>
                 </div>
-                <canvas id="predictionLineChart" class="chart"></canvas>
+                <canvas id="predictionLineChart" class="chart" style="width: 100%; height: 250px;"></canvas>
             </div>
-    
-            <!-- 카드 추천 박스 -->
-            
+            <!-- 설명 -->
+            <div class="description" style="margin-top: 1rem; line-height: 1; font-size: 1rem; color: #555;">
+                <p>다음 달 예상 소비 금액은 <span id="predicted-total" class="highlight"></span>원 입니다.</p>
+                <p>💡<span style="font-weight: bold; color: blue;"> {{top_card_list.0}}</span>와 <span style="font-weight: bold; color: blue;"> {{top_card_list.1}}</span>에서 가장 큰 소비가 예상됩니다.</p>
+                <p>소비가 높은 항목에서 혜택이 높은 <span style="font-weight: bold; color: red;">오른쪽 카드</span>를 추천드려요!</p>
+                <!-- <p>💳예상 절감 금액: <span class="highlight">##원💳</span></p> -->
+                <p>카드 이미지를 클릭해서 정보를 확인해보세요 😊</p>
+            </div>
         </div>
-        <div id="card-container">
+
+        <!-- 카드 추천 박스 -->
+        <div id="card-container" style="flex: 1; display: flex; flex-direction: column; gap: 0.5rem; margin-right: 20px; margin-top: 10px">
             {% for key, card_list in card_detail_results.items %}
                 {% for card in card_list %}
-                    <div class="card-box">
-                        <a href="{{ card.Link }}" target="_blank" class="card-image-box">
-                            <img src="{{ card.image }}" alt="{{ card.Name }} 이미지">
-                            <div class="card-name">{{ card.corp }} - {{ card.Name }}</div>
+                    <div class="card-box" style="border: 1px solid #ccc; padding: 0.5rem; border-radius: 5px;">
+                        <a href="{{ card.Link }}" target="_blank" class="card-image-box" style="display: flex; align-items: center; gap: 1rem;">
+                            <img src="{{ card.image }}" alt="{{ card.Name }} 이미지" style="width: 90px; height: 100px;">
                         </a>
-                        <div class="card-description-box">
+                        <div class="card-description-box" style="margin-top: 0.5rem; display: flex; flex-direction: column; gap: 0.3rem;">
+                            <div class="card-name">{{ card.corp }} - {{ card.Name }}</div>
                             <div class="card-description">
-                                {{ card.Detail|safe }}
+                                <p>{{key}} 카테고리의 혜택이 가장 높은 카드입니다</p>
+                                <p>{{user_name}}님의 소비 성향을 바탕으로 다음 달 소비를 예측했을 때</p>
+                                <p>총 {{card.AmountNum}}원의 {{card.max_value}}%인 {{card.discount}}원을 할인 받을 수 있어요-!</p>
                             </div>
                         </div>
                     </div>
@@ -167,11 +157,12 @@
             {% endfor %}
         </div>
     </div>
+</div>
 
     
 
                 <!-- 설명 섹션 -->
-                <div class="container">
+                <div class="content-container">
                     <p>{{ user_name }}님은 전체적으로 <span class="highlight">1. 식비</span> 2. 쇼핑에서 가장 소비가 많은 행복추구형~!!</p>
                     <p>식비 분야가 가장 많은 빈도로 사용</p>
                     <p>쇼핑 분야가 가장 큰 금액 결제...?</p>
@@ -181,232 +172,310 @@
                     <p>⇒ 이건 뒤에 보여줄 카드 중 해당 분야 혜택이 가장 큰 카드 기준으로 계산해서 보여주기</p>
                 </div>
             </div>
-    <script>
+        </div>
 
-        // Django에서 전달된 JSON 데이터를 JavaScript 객체로 변환
-        const nextMonthPrediction = JSON.parse('{{ next_month_prediction_json|safe }}');
-
-        // predicted_total 값을 HTML에 삽입
-        const predictedTotal = nextMonthPrediction.predicted_total;
-
-        // 숫자를 3자리마다 쉼표로 포맷
-        const formattedPredictedTotal = predictedTotal.toLocaleString('ko-KR');
-        // HTML 업데이트
-        document.getElementById('predicted-total').textContent = formattedPredictedTotal;
-
-        // 데이터는 예시입니다. 필요에 따라 실제 데이터를 사용하세요.
-        // 데이터 받아와야함.
-        const FreqsortedCategories = JSON.parse('{{ Freq_sorted_categories_json|escapejs }}');
-        const freqTotal = JSON.parse('{{ Freq_total_json|escapejs }}');
-
-        // 프론트 친구들에게 부탁 : label별 컬러 설정해줄수 있는지?
-        const colors = [
-            '#ff6384', '#36a2eb', '#ffce56', '#4bc0c0', '#9966ff',  // 기존 5개 색상
-            '#ff9f40', '#c9cbcf', '#f66f0d', '#5c67f2', '#f2828b', '#63c5c1' // 추가한 6개 색상
-        ];
-        // console.log(FresortedCategories);  // 확인용
-        // console.log(freqTotal);  // 확인용
-        const freq_labels = Object.keys(FreqsortedCategories); // 키를 라벨로 사용
-        const freq_data = Object.values(FreqsortedCategories); // 값을 데이터로 사용
-
+        <script>
+            // Django에서 전달된 JSON 데이터를 JavaScript 객체로 변환
+            const nextMonthPrediction = JSON.parse('{{ next_month_prediction_json|safe }}');
         
-        const frequencyData = {
-            labels: freq_labels,
-            datasets: [{
-                data: freq_data,
-                backgroundColor: colors
-            }]
-        };
-
-        // sorted_categories 딕셔너리에서 labels와 data 추출
-        // Django에서 dict 형태를 JSON 형식으로 변환하여 JavaScript 객체로 전달
-        // Django에서 전달된 JSON 형식을 JavaScript 객체로 변환
+            // predicted_total 값을 HTML에 삽입
+            const predictedTotal = nextMonthPrediction.predicted_total;
         
-        const sortedCategories = JSON.parse('{{ sorted_categories_json|escapejs }}');
-        const amountTotal = JSON.parse('{{ amount_total_json|escapejs }}'); 
+            // 십원 단위로 반올림
+            const roundedPredictedTotal = Math.round(predictedTotal / 10) * 10;
         
-        const amount_labels = Object.keys(sortedCategories); // 키를 라벨로 사용
-        const amount_data = Object.values(sortedCategories); // 값을 데이터로 사용
-        const amount_top = amount_labels[0]
-        const amount_top2 = amount_labels[1]
-        document.getElementById('amount-top').textContent = amount_top;
-        document.getElementById('amount-top2').textContent = amount_top2;
+            // 숫자를 3자리마다 쉼표로 포맷
+            const formattedPredictedTotal = roundedPredictedTotal.toLocaleString('ko-KR');
         
-
-        const amountData = {
-            labels: amount_labels,
-            datasets: [{
-                data: amount_data,
-                backgroundColor: colors
-            }]
-        };
+            // HTML 업데이트
+            document.getElementById('predicted-total').textContent = formattedPredictedTotal;
         
-
-        // 차트 생성
-        new Chart(document.getElementById('frequencyChart'), {
-            type: 'pie',
-            data: frequencyData,
-            options: { 
-                responsive: true,
-                maintainAspectRatio: false,
-                aspectRatio: 1.5,
-                plugins: {
-                    legend: {
-                        display: true, // 범례 표시
-                        position: 'right', // 범례 위치
-                    },
-                },
-            }
-        });
-        
-        new Chart(document.getElementById('amountChart'), {
-            type: 'pie',
-            data: amountData,
-            options: { 
-                responsive: true,
-                maintainAspectRatio: false,
-                aspectRatio: 1.5,
-                plugins: {
-                    legend: {
-                        display: true, // 범례 표시
-                        position: 'right', // 범례 위치
-                    },
-                },
-            }
-        });
-        const predictionLineData = {
-            labels: ['9월', '10월', '11월', '12월'], // 월별 레이블
-            datasets: [
-                {
-                    label: '월별 소비 총합', // 데이터셋 이름
-                    data: [1200000, 1350000, 1280000, 1400000], // 각 월별 소비 총합 데이터
-                    borderColor: '#36a2eb',
-                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                    fill: false, // 꺾은선 아래 채우기
-                },
-            ],
-        };
-
-        function filterData(period) {
-            let startDate;
-
-            // 현재 날짜를 기준으로 기간 계산
-            const today = new Date();
             
-            if (period === '1m') {
-                // 직전 1달
-                startDate = new Date(today.setMonth(today.getMonth() - 1));
-            } else if (period === '6m') {
-                // 최근 6달
-                startDate = new Date(today.setMonth(today.getMonth() - 6));
-            } else if (period === '1y') {
-                // 최근 1년
-                startDate = new Date(today.setFullYear(today.getFullYear() - 1));
-            }
-
-            // startDate를 기준으로 필터링된 데이터를 가져오거나 차트를 갱신하는 로직을 추가합니다.
-            console.log('Start Date:', startDate.toISOString().split('T')[0]); // 출력 형식: YYYY-MM-DD
-
-            
-            // 현재 URL에 period를 쿼리 파라미터로 추가
-            const url = new URL(window.location.href);
-            url.searchParams.set('period', period);  // 'period' 파라미터를 URL에 추가
-
-            // 페이지를 리로드하여 쿼리 파라미터가 서버로 전달되도록 함
-            window.location.href = url.toString();
-
-
-            // 여기에 차트 데이터 필터링 및 갱신하는 로직을 넣습니다.
-        }
-
-
-        //다음 달 예측 소비
-        // 월별 소비 데이터
-        const month1 = JSON.parse('{{ month1_json|escapejs }}');
-        const month2 = JSON.parse('{{ month2_json|escapejs }}');
-        const month3 = JSON.parse('{{ month3_json|escapejs }}');
+            // 데이터 받아와야함.
+            const FreqsortedCategories = JSON.parse('{{ Freq_sorted_categories_json|escapejs }}');
+            const freqTotal = JSON.parse('{{ Freq_total_json|escapejs }}');
         
-        // 차트 객체 저장 변수
-        let predictionChart;
+            // 카테고리별 고유 색상 정의 (무지개 순서 파스텔톤)
+            const categoryColors = {
+                '식비': '#FFB3BA',       // 연한 빨강
+                '교통비': '#FFDFBA',    // 연한 주황
+                '모임회비': '#BAFFC9',  // 연한 연초록
+                '교육비': '#CAFFBF',    // 연한 초록
+                '주거비': '#BAE1FF',    // 연한 하늘색
+                '통신비': '#A0C4FF',    // 연한 파랑
+                '패션/잡화': '#BDB2FF', // 연한 보라
+                '의료비': '#FFC6FF',    // 연한 핑크
+                '여가/취미': '#FFB4E6', // 연한 핑크 퍼플
+                '경조사': '#c8babe',    // 연한 민트
+                '공과금': '#FFFFFC',    // 연한 크림
+            };
+        
+        
+        
+            // `frequencyData` 생성
+            const freq_labels = Object.keys(FreqsortedCategories); // 키를 라벨로 사용
+            const freq_data = Object.values(FreqsortedCategories); // 값을 데이터로 사용
+            const freq_backgroundColors = freq_labels.map(label => categoryColors[label] || '#DDDDDD'); // 기본 색상은 회색
+        
+            const frequencyData = {
+                labels: freq_labels,
+                datasets: [{
+                    data: freq_data,
+                    backgroundColor: freq_backgroundColors, // 카테고리별 색상 적용
+                }]
+            };
+        
+            // `amountData` 생성
+            const sortedCategories = JSON.parse('{{ sorted_categories_json|escapejs }}');
+            const amountTotal = JSON.parse('{{ amount_total_json|escapejs }}');
+        
+            const amount_labels = Object.keys(sortedCategories); // 키를 라벨로 사용
+            const amount_data = Object.values(sortedCategories); // 값을 데이터로 사용
+            const amount_backgroundColors = amount_labels.map(label => categoryColors[label] || '#DDDDDD'); // 기본 색상은 회색
+        
+            const amount_top1 = amount_labels[0];
+            const amount_top2 = amount_labels[1];
+            const amount_top3 = amount_labels[2];
 
-        // 꺾은선 그래프 생성/업데이트 함수
-        function renderPredictionChart(data, category) {
-            const ctx = document.getElementById('predictionLineChart').getContext('2d');
 
-            // 기존 차트가 있으면 삭제
-            if (predictionChart) {
-                predictionChart.destroy();
-            }
-            const months = JSON.parse('{{ months_json|escapejs }}');  // Django 데이터 JS로 전달
-            // 새로운 차트 생성
-            predictionChart = new Chart(ctx, {
-                type: 'line',
+
+            const amountData = {
+                labels: amount_labels,
+                datasets: [{
+                    data: amount_data,
+                    backgroundColor: amount_backgroundColors, // 카테고리별 색상 적용
+                }]
+            };
+        
+            // 차트 생성
+            new Chart(document.getElementById('frequencyChart'), {
+                type: 'pie',
                 data: {
-                    labels: months, // X축 레이블
-                    datasets: [
-                        {
-                            label: `소비 금액 (원)`, // 데이터셋 이름
-                            data: data, // 선택된 항목의 데이터
-                            borderColor: '#36a2eb',
-                            backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                            fill: false // 꺾은선 아래 채우기
+                    labels: frequencyData.labels,
+                    datasets: [{
+                        data: frequencyData.datasets[0].data,
+                        backgroundColor: freq_backgroundColors,
+                        offset: function(ctx) {
+                            return ctx.dataIndex === 0 || ctx.dataIndex === 1 ? 20 : 0; // 첫 번째와 두 번째 항목만 20px 튀어나오게
                         }
-                    ]
+                    }]
                 },
-                options: {
+                options: { 
                     responsive: true,
                     maintainAspectRatio: false,
+                    aspectRatio: 1.5,
                     plugins: {
                         legend: {
-                            display: true,
-                            position: 'top'
-                        }
-                    },
-                    scales: {
-                        x: {
-                            title: {
-                                display: true,
-                                text: '월'
+                            display: true, // 범례 표시
+                            position: 'right', // 범례 위치
+                            labels: {
+                                filter: function(legendItem, data) {
+                                    return legendItem.index < 5; // Top 5 항목만 표시
+                                }
                             }
-                        },
-                        y: {
-                            title: {
-                                display: true,
-                                text: '소비 금액 (원)'
-                            },
-                            beginAtZero: true
                         }
                     }
                 }
             });
-        }
-
-        // 드롭다운 선택값에 따라 차트 업데이트
-        function updatePredictionChart() {
-            const selectedCategory = document.getElementById('categorySelect').value;
-            const selectedData1 = month1[selectedCategory]; // JSON에서 선택된 키의 값 가져오기
-            const selectedData2 = month2[selectedCategory]; // JSON에서 선택된 키의 값 가져오기
-            const selectedData3 = month3[selectedCategory]; // JSON에서 선택된 키의 값 가져오기
-            const selectedData4 = nextMonthPrediction[selectedCategory];
-            const selectedData = [selectedData1,selectedData2,selectedData3,selectedData4];
-            renderPredictionChart(selectedData, selectedCategory);
-
+        
+            // Amount Chart
+            new Chart(document.getElementById('amountChart'), {
+                type: 'pie',
+                data: {
+                    labels: amountData.labels,
+                    datasets: [{
+                        data: amountData.datasets[0].data,
+                        backgroundColor: amount_backgroundColors,
+                        offset: function(ctx) {
+                            return ctx.dataIndex === 0 || ctx.dataIndex === 1 ? 20 : 0; // 첫 번째와 두 번째 항목만 20px 튀어나오게
+                        }
+                    }]
+                },
+                options: { 
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    aspectRatio: 1.5,
+                    plugins: {
+                        legend: {
+                            display: true, // 범례 표시
+                            position: 'right', // 범례 위치
+                            labels: {
+                                filter: function(legendItem, data) {
+                                    return legendItem.index < 5; // Top 5 항목만 표시
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        
+        
+        
+            const predictionLineData = {
+                labels: ['9월', '10월', '11월', '12월'], // 월별 레이블
+                datasets: [
+                    {
+                        label: '월별 소비 총합', // 데이터셋 이름
+                        data: [1200000, 1350000, 1280000, 1400000], // 각 월별 소비 총합 데이터
+                        borderColor: '#36a2eb',
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        fill: false, // 꺾은선 아래 채우기
+                    },
+                ],
+            };
             
-        }
 
-        // 초기화: 페이지 로드 시 기본 데이터로 차트 렌더링
-        window.onload = function () {
-            document.getElementById('categorySelect').value = 'predicted_total'; // 기본값 설정
-            updatePredictionChart(); // 차트 렌더링
-        };
+        
+            // 필터링 데이터 함수
+            function filterData(period) {
+                // 현재 URL 가져오기
+                const url = new URL(window.location.href);
 
-    </script>
-    
-    <footer>
-        <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0;">서울특별시 마포구 월드컵북로 434 상암IT타워 6층</p> 
-        <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0;">고객지원 : 02-3151-7000 | 이메일: worifisa@worifisa.com </p >
-        <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0;">COPYRIGHT©우리팀이름~</p >
-    </footer >
+                // 쿼리 매개변수 설정
+                url.searchParams.set('period', period);
 
-</body>
-</html>
+                // 페이지 리로드
+                window.location.href = url.toString();
+            }
+
+            // 페이지 로드 시 `select` 박스 초기화
+            window.addEventListener('load', function () {
+                const urlParams = new URLSearchParams(window.location.search);
+                const selectedPeriod = urlParams.get('period'); // URL에서 `period` 파라미터 값 가져오기
+
+                if (selectedPeriod) {
+                    // `select` 박스 값 설정
+                    document.getElementById('dateRangeSelect').value = selectedPeriod;
+                }
+            });
+            
+        //     function filterData(period) {
+        //     let startDate;
+
+        //     // 현재 날짜 기준으로 기간 계산
+        //     const today = new Date();
+
+        //     if (period === '1m') {
+        //         startDate = new Date(today.setMonth(today.getMonth() - 1)); // 직전 1달
+        //     } else if (period === '6m') {
+        //         startDate = new Date(today.setMonth(today.getMonth() - 6)); // 최근 6달
+        //     } else if (period === '1y') {
+        //         startDate = new Date(today.setFullYear(today.getFullYear() - 1)); // 최근 1년
+        //     }
+
+        //     console.log('Start Date:', startDate.toISOString().split('T')[0]); // YYYY-MM-DD 출력
+
+        //     // URL에 `period` 파라미터 추가
+        //     const url = new URL(window.location.href);
+        //     url.searchParams.set('period', period); // `period` 값을 쿼리 파라미터로 설정
+
+        //     // 페이지를 리로드
+        //     window.location.href = url.toString();
+        // }
+
+        
+        
+            //다음 달 예측 소비
+            // 월별 소비 데이터
+            const month1 = JSON.parse('{{ month1_json|escapejs }}');
+            const month2 = JSON.parse('{{ month2_json|escapejs }}');
+            const month3 = JSON.parse('{{ month3_json|escapejs }}');
+            
+            // 차트 객체 저장 변수
+            let predictionChart;
+        
+            // 꺾은선 그래프 생성/업데이트 함수
+            function renderPredictionChart(data, category) {
+                const ctx = document.getElementById('predictionLineChart').getContext('2d');
+        
+                // 기존 차트가 있으면 삭제
+                if (predictionChart) {
+                    predictionChart.destroy();
+                }
+                const months = JSON.parse('{{ months_json|escapejs }}');  // Django 데이터 JS로 전달
+                console.log(months);  // JavaScript에서 데이터 출력
+                // 새로운 차트 생성
+                predictionChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: months, // X축 레이블
+                        datasets: [
+                            {
+                                label: `소비 금액 (원)`, // 데이터셋 이름
+                                data: data, // 선택된 항목의 데이터
+                                borderColor: '#36a2eb',
+                                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                                fill: false // 꺾은선 아래 채우기
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'top'
+                            }
+                        },
+                        scales: {
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: '월'
+                                }
+                            },
+                            y: {
+                                title: {
+                                    display: true,
+                                    text: '소비 금액 (원)'
+                                },
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            }
+        
+            // 드롭다운 선택값에 따라 차트 업데이트
+            function updatePredictionChart() {
+                const selectedCategory = document.getElementById('categorySelect').value;
+                console.log('Selected Category:', selectedCategory);
+                const selectedData1 = month1[selectedCategory]; // JSON에서 선택된 키의 값 가져오기
+                const selectedData2 = month2[selectedCategory]; // JSON에서 선택된 키의 값 가져오기
+                const selectedData3 = month3[selectedCategory]; // JSON에서 선택된 키의 값 가져오기
+                const selectedData4 = nextMonthPrediction[selectedCategory];
+                const selectedData = [selectedData1,selectedData2,selectedData3,selectedData4];
+                renderPredictionChart(selectedData, selectedCategory);
+        
+                
+            }
+        
+            // 초기화: 페이지 로드 시 기본 데이터로 차트 렌더링
+            window.onload = function () {
+                document.getElementById('categorySelect').value = 'predicted_total'; // 기본값 설정
+                updatePredictionChart(); // 차트 렌더링
+            };
+
+
+            function filterData(period) {
+                console.log('Selected period:', period); // 선택된 값 출력
+                const url = new URL(window.location.href);
+                url.searchParams.set('period', period);
+                window.location.href = url.toString();
+            }
+
+
+        </script>
+        
+        <footer>
+            <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0;">서울특별시 마포구 월드컵북로 434 상암IT타워 6층</p> 
+            <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0;">고객지원 : 02-3151-7000 | 이메일: woorifis.lab44@gmail.com </p >
+            <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0;">COPYRIGHT©우리팀이름~</p >
+        </footer >
+        
+        
+
+        </body>
+        </html>
+        

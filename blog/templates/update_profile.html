@@ -3,49 +3,74 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>회원정보 수정</title>
     <link rel="stylesheet" href="{% static 'css/update_profile.css' %}">
-    <style></style>
 </head>
 <body>
-    <h1>회원정보 수정</h1>
-    <form method="post">
-        {% csrf_token %}
-        <label>아이디:</label> {{ user.CustomerID }}<br>
-        <label>비밀번호:</label>
-        <input type="password" name="Pw" ><br>
-        <label>이름:</label>
-        <input type="text" name="username" value="{{ user.username }}"><br>
-        <label>생년월일:</label>
-        <input type="text" name="userbirth" value="{{ user.Birth }}"><br>
-        <label>이메일:</label>
-        <input type="email" name="Email" value="{{ user.Email }}"><br>
-        <label>전화번호:</label>
-        <input type="text" name="Phone" value="{{ user.Phone }}"><br>
-    
-        <label>결혼 여부:</label>
-        <select name="marital_status">
-            <option value="미혼" {% if reverse_data.marriage_status == 'N' %}selected{% endif %}>미혼</option>
-            <option value="기혼" {% if reverse_data.marriage_status == 'Y' %}selected{% endif %}>기혼</option>
-        </select><br>
-    
-        <label>자녀 여부:</label>
-        <select name="children_status">
-            <option value="N" {% if reverse_data.children_status == 'N' %}selected{% endif %}>없음</option>
-            <option value="Y" {% if reverse_data.children_status == 'Y' %}selected{% endif %}>있음</option>
-        </select><br>
-    
-        <label>자녀 나이대:</label>
-        <select name="children_age">
-            <option value="" {% if not reverse_data.children_age %}selected{% endif %}>없음</option>
-            <option value="초등생" {% if reverse_data.children_age == '초등생' %}selected{% endif %}>초등생</option>
-            <option value="중고등생" {% if reverse_data.children_age == '중고등생' %}selected{% endif %}>중고등생</option>
-            <option value="성인자녀" {% if reverse_data.children_age == '성인자녀' %}selected{% endif %}>성인 자녀</option>
-        </select><br>
-    
-        <button type="submit">수정</button>
-        <button type="button" onclick="window.location.href='{% url 'mypage' %}'">취소</button>
-    </form>
-    
+    <div class="container">
+        <div class="accounts_container">
+            <div class="accounts_image">
+                <img src="{% static 'img/천냥만덕.png' %}" alt="회원정보 이미지">
+            </div>
+            <div class="accounts_forms">
+                <h1>회원정보 수정</h1>
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="form-group" style="margin-right: 20px;">
+                        <label for="username">아이디</label>
+                        <input type="text" id="username" name="username" value="admin" readonly>
+                    </div>
+                    <div class="form-group" style="margin-right: 20px;">
+                        <label for="password">비밀번호</label>
+                        <input type="password" id="password" name="password">
+                    </div>
+                    <div class="form-group" style="margin-right: 20px;">
+                        <label for="name">이름</label>
+                        <input type="text" id="name" name="name" value="김나경">
+                    </div>
+                    <div class="form-group" style="margin-right: 20px;">
+                        <label for="dob">생년월일</label>
+                        <input type="date" id="dob" name="dob" value="1999-09-28">
+                    </div>
+                    <div class="form-group" style="margin-right: 20px;">
+                        <label for="email">이메일</label>
+                        <input type="email" id="email" name="email" value="knkfisa@naver.com">
+                    </div>
+                    <div class="form-group" style="margin-right: 20px;">
+                        <label for="phone">전화번호</label>
+                        <input type="tel" id="phone" name="phone" value="01016270381">
+                    </div>
+                    <div class="form-group">
+                        <label for="marriage">결혼 여부</label>
+                        <select id="marriage" name="marriage">
+                            <option value="single">미혼</option>
+                            <option value="married">기혼</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="children">자녀 여부</label>
+                        <select id="children" name="children">
+                            <option value="none">없음</option>
+                            <option value="yes">있음</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="child_age">자녀 나이대</label>
+                        <select id="child_age" name="child_age">
+                            <option value="none">없음</option>
+                            <option value="young">0-5세</option>
+                            <option value="school">6-12세</option>
+                            <option value="teen">13-18세</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="login-button">수정</button>
+                        <button type="button" class="cancel-button">취소</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
