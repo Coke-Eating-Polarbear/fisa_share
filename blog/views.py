@@ -391,7 +391,6 @@ def extract_percentage_sentences(data, keywords):
     return result
 
 def card_top(keywords) :
-
     #card
     benefits = card.objects.values('benefits')
 
@@ -430,7 +429,21 @@ def card_top(keywords) :
 
     # 결과 확인
     result_dict = dict(final_result)
-    print('result_dict',result_dict)
+
+    # # 각 카드의 최대 할인값 추출
+    # max_discounts = {}
+
+    # for card_name, data in result_dict.items():
+    #     discounts = data.get('할인', [])
+    #     if isinstance(discounts, str):  # 할인 정보가 문자열이면 리스트로 변환
+    #         discounts = [discounts]
+    #     if discounts:  # 리스트가 비어 있지 않은 경우만 처리
+    #         numeric_discounts = [int(d.replace('%', '')) for d in discounts]
+    #         max_discounts[card_name] = max(numeric_discounts)
+    #     else:  # 비어 있는 경우 기본값 설정 (예: 0)
+    #         max_discounts[card_name] = 0
+
+    # print(max_discounts)
 
     # %의 숫자를 합산하고 가장 큰 값을 가진 딕셔너리 값 추출
 
@@ -451,13 +464,11 @@ def card_top(keywords) :
 
     max_card_detail_top1 = card.objects.filter(Name=max_card_name).values()
 
-
     # eat_max_card_detail_top1_dict = dict(eat_max_card_detail_top1)
 
     # 리스트를 JSON으로 변환
-    max_card_top1_json = json.dumps(max_card_top1)
+    max_card_top1_json = json.dumps(max_card_top1, ensure_ascii=False,)
     max_card_datail_top1_json = json.dumps(list(max_card_detail_top1.values()), ensure_ascii=False, indent=4)
-
 
     return max_card_top1_json, max_card_datail_top1_json
 
@@ -614,7 +625,7 @@ def spending_mbti(request):
             # 항목을 값 기준으로 내림차순 정렬하여 상위 7개 항목을 추출
             Freq_sorted_categories = sorted(Freq_category_dict.items(), key=lambda x: x[1] or 0, reverse=True)
 
-            # 상위 4개 항목을 구합니다.
+
             Freq_sorted_categories = dict(Freq_sorted_categories)
             Freq_total = dict(Freq_category_total_dict)
 
@@ -632,7 +643,29 @@ def spending_mbti(request):
             prediction= senter(mydata_pay)
             # JSON 형식으로 변환
             prediction_dict = prediction.to_dict()
+            # Sorting the dictionary by values in descending order
+            sorted_prediction = dict(sorted(prediction_dict.items(), key=lambda x: x[1], reverse=True))
             next_month_prediction_json = json.dumps(prediction_dict)
+
+            # 키 변경 매핑 정의
+            key_mapping = {
+                'allowance': '경조사비',
+                'eat': '식비',
+                'fashion': '패션/잡화',
+                'hobby': '여가/취미',
+                'home': '주거비',
+                'medical': '의료비',
+                'party': '모임회비',
+                'phone': '통신비',
+                'study': '교육비',
+                'transfer': '교통비',
+                'predicted_total': '총합'
+            }
+
+            # 키 변경을 적용한 새 딕셔너리 생성
+            new_prediction_dict = {key_mapping[k]: v for k, v in sorted_prediction.items()}
+
+
 
             # 소비 예측 차트를 위한 값 불러오기
             
@@ -740,31 +773,9 @@ def spending_mbti(request):
             # 카드 추천 만들기
             # 대부분이 식비이긴한데, 일단 소비 위주로 맞추는게 좋지 않을까?
 
-            amount_top1 = list(sorted_categories.keys())
-            freq_top1 = list(Freq_sorted_categories.keys())
-            # 결과 저장
-            top1 = None
-            top2 = None
-            top3 = None
-
-            # 첫 번째 자리 비교
-            if amount_top1[0] == freq_top1[0]:  # 첫 글자가 같다면
-                top1 = amount_top1[0]
-                # 두 번째 자리 비교
-                if amount_top1[1] == freq_top1[1]:
-                    top2 = amount_top1[1]
-                    # 세 번째 자리 비교
-                    if amount_top1[2] == freq_top1[2]:
-                        top3 = amount_top1[2]
-            else:  # 첫 글자가 다르면
-                top1 = amount_top1[0]
-                top2 = freq_top1[0]
-                # 두 번째 자리 비교
-                if amount_top1[1] == freq_top1[1]:
-                    top3 = freq_top1[1]
-
             # 결과 확인
-            top_card_list = [top1, top2, top3]
+            top_card_list = [key for key, _ in sorted(new_prediction_dict.items(), key=lambda x: x[1], reverse=True)[1:4]]
+
 
             # 식비 관련 키워드
             eat_keywords = ['푸드', '카페', '편의점', '레스토랑', '패밀리레스토랑','배달']
@@ -813,35 +824,112 @@ def spending_mbti(request):
             i = 0
             # for문과 if-elif 구조로 연결
             card_results = {}
+            card_list = {}
             card_detail_results = {}
+            card_list_detail ={}
+            max_card_json = None
+            max_card_detail_json = None
+            if isinstance(next_month_prediction_json, str):
+                    try:
+                        next_month_prediction_json = json.loads(next_month_prediction_json)  # 문자열을 딕셔너리로 변환
+                    except json.JSONDecodeError as e:
+                        print(f"JSON decoding error: {e}")
+                        next_month_prediction_json = {}  # 기본값 설정
             for i, keyword in enumerate(top_card_list):
                 if keyword == '식비':
                     max_card_json, max_card_detail_json = card_top(eat_keywords)
+                 
+                    # 값 가져오기
+                    AmountNum = next_month_prediction_json.get('eat', 0)  # 키가 없으면 기본값 0 반환
                 elif keyword == '교통비':
                     max_card_json, max_card_detail_json = card_top(transport_keywords)
+                    # 값 가져오기
+                    AmountNum = next_month_prediction_json.get('transport', 0)  # 키가 없으면 기본값 0 반환
+
                 elif keyword == '모임회비':
                     max_card_json, max_card_detail_json = card_top(allowance_keywords)
+
+                    AmountNum = next_month_prediction_json.get('allowance', 0)  # 키가 없으면 기본값 0 반환
                 elif keyword == '교육':
                     max_card_json, max_card_detail_json = card_top(study_keywords)
+
+                    # 값 가져오기
+                    AmountNum = next_month_prediction_json.get('study', 0)  # 키가 없으면 기본값 0 반환
                 elif keyword == '주거비':
                     max_card_json, max_card_detail_json = card_top(home_keywords)
+
+                    # 값 가져오기
+                    AmountNum = next_month_prediction_json.get('home', 0)  # 키가 없으면 기본값 0 반환
                 elif keyword == '공과금':
                     max_card_json, max_card_detail_json = card_top(utility_keywords)
+                    AmountNum = 0
                 elif keyword == '통신비':
                     max_card_json, max_card_detail_json = card_top(phone_keywords)
+
+                    # 값 가져오기
+                    AmountNum = next_month_prediction_json.get('phone', 0)  # 키가 없으면 기본값 0 반환
                 elif keyword == '여가/취미':
                     max_card_json, max_card_detail_json = card_top(hobby_keywords)
+
+                    # 값 가져오기
+                    AmountNum = next_month_prediction_json.get('hobby', 0)  # 키가 없으면 기본값 0 반환
                 elif keyword == '패션/잡화/쇼핑':
                     max_card_json, max_card_detail_json = card_top(fashion_keywords)
+
+                    # 값 가져오기
+                    AmountNum = next_month_prediction_json.get('fashion', 0)  # 키가 없으면 기본값 0 반환
                 elif keyword == '의료':
                     max_card_json, max_card_detail_json = card_top(medical_keywords)
+
+                    # 값 가져오기
+                    AmountNum = next_month_prediction_json.get('medical', 0)  # 키가 없으면 기본값 0 반환
                 else:
                     max_card_json, max_card_detail_json = None, None
-                    
-                
+                    print(f"{keyword}에 해당하는 카테고리가 없습니다.")
+
+                #여기서 할인률, Freq, ammount, discount(할인률 * amount * 0.01)
+                AmountNum = round(AmountNum, 2)
+                # 할인률
+                # max_card_json가 JSON 문자열일 경우 파싱
+                if isinstance(max_card_json, str):
+                    try:
+                        max_card_json = json.loads(max_card_json)  # JSON 문자열을 딕셔너리로 변환
+                    except json.JSONDecodeError as e:
+                        # JSON 파싱 오류 처리
+                        print(f"JSON decode error: {e}")
+                        max_card_json = {}  # 파싱 실패 시 기본값 설정
+                max_values = {}
+
+                for card_name, benefits in max_card_json.items():
+                    values = benefits.values()  # 모든 value 값 가져오기
+                    numeric_values = [int(value.replace('%', '')) for value in values if value.endswith('%')]
+                    max_values[card_name] = max(numeric_values) if numeric_values else 0  # 최대값 저장
+
+                # 값만 추출
+                max_value = list(max_values.values())[0]
+
+                # discount 값
+                discount = round(AmountNum * max_value * 0.01, 2)
+
+                # JSON 데이터가 문자열로 되어 있다면, 이를 변환
+                if isinstance(max_card_detail_json, str):
+                    max_card_detail_json = json.loads(max_card_detail_json)
+
+                # 데이터 추가
+                if isinstance(max_card_detail_json, list) and max_card_detail_json:
+                    max_card_detail_json[0]["AmountNum"] = AmountNum
+                    max_card_detail_json[0]["max_value"] = max_value
+                    max_card_detail_json[0]["discount"] = discount
+
+                # 필요하면 다시 JSON 문자열로 변환
+                max_card_detail_json = json.dumps(max_card_detail_json, ensure_ascii=False)
+
                 # 결과값 저장
-                card_results[f"max_card_top{i+1}_json"] = max_card_json
-                card_detail_results[f"max_card_detail_top{i+1}_json"] = max_card_detail_json
+                card_results[f"{keyword}"] = max_card_json
+                card_detail_results[f"{keyword}"] = max_card_detail_json
+
+
+       
 
             # JSON 문자열 여부를 확인 후 변환
             for key, value in card_detail_results.items():
@@ -866,9 +954,11 @@ def spending_mbti(request):
             # JSON으로 변환하여 템플릿에 전달
             card_results_json = json.dumps(card_results, ensure_ascii=False, indent=4)
             card_detail_results_json = json.dumps(card_detail_results, ensure_ascii=False)
+
         except UserProfile.DoesNotExist:
             pass  # 사용자가 없을 경우 기본값 유지
 
+    next_month_prediction_json = json.dumps(next_month_prediction_json, ensure_ascii = False)
     context = {
         'user_name': user_name,
         'sorted_categories_json' : sorted_categories_json, 
@@ -881,8 +971,11 @@ def spending_mbti(request):
         'month3_json' : month3_json,
         'months_json' : months_json,
         'card_results_json' : card_results_json,
-        'card_detail_results': card_detail_results
+        'card_detail_results': card_detail_results,
+        'top_card_list': top_card_list,
     }
+
+    print('context',context)
     return render(request, 'spending_mbti.html', context)
 
 def main(request):
@@ -1185,7 +1278,7 @@ def summary_view(request):
         'user_name': user_name,
         'final_recommend': final_recommend_display,  # 적금 Top 3
         'deposit_recommend': deposit_recommend_display,  # 예금 Top 2
-        'filtered_data_json' : filtered_data_json, # 로그로 뽑은 top3
+        
     }
 
     return render(request, 'loginmain.html', context)
@@ -1290,11 +1383,36 @@ def top5(request):
         {**item, "logo": get_bank_logo(item.get("bank", ""))} for item in deposit_recommend
     ]
 
+    # 로그 데이터 확인 
+    log_cluster = get_top_data_by_customer_class(user.Stageclass, user.Inlevel)
+    # "data" 부분만 추출
+    filtered_data = list([item['data'] for item in log_cluster])
+    # 은행 이름에 해당하는 로고 파일명을 매핑
+    filtered_data_with_logo = [
+        {**item, "logo": get_bank_logo(item.get("bank", ""))} for item in filtered_data
+    ]
+
+
+    # # JSON으로 변환
+    # # filtered_data_json = json.dumps(filtered_data, ensure_ascii=False)
+    # try:
+    #     filtered_data = json.loads(filtered_data) if isinstance(filtered_data, str) else filtered_data
+    
+    # except json.JSONDecodeError:
+    #     filtered_data = []
+    # print('filtered_data',filtered_data)
+
+    # request.session['filtered_data'] = filtered_data
+
+    # filtered_data_json = json.dumps(filtered_data, ensure_ascii=False)
+
+
     # Context에 데이터 추가
     context = {
         'user_name': user_name,
         'final_recommend': final_recommend_with_logo,  # 적금 Top 3 (로고 포함)
-        'deposit_recommend': deposit_recommend_with_logo  # 예금 Top 2 (로고 포함)
+        'deposit_recommend': deposit_recommend_with_logo,  # 예금 Top 2 (로고 포함)
+        'filtered_data' : filtered_data_with_logo,
     }
 
     return render(request, 'recommend_savings_top5.html', context)
@@ -1688,7 +1806,7 @@ def log_to_elasticsearch(request):
             data = json.loads(request.body)
             # 세션에서 사용자 ID 가져오기
             customer_id = request.session.get('user_id')
-            print('customer_class',customer_id)
+
             user_name = "사용자"  # 기본값 설정
             if customer_id:
                 try:
@@ -1699,11 +1817,9 @@ def log_to_elasticsearch(request):
                         "Stageclass": user.Stageclass,  
                         "Inlevel": user.Inlevel,        
                     }
-                    print('user_name',user_name)
-                    print('customer_class',customer_class)
-                    # print('user_id',user_id)
+
                     product_name = data.get('product_name')
-                    print('product_name',product_name)
+
                     timestamp = datetime.now().isoformat()
                 except UserProfile.DoesNotExist:
                     pass  # 사용자가 없을 경우 기본값 유지
