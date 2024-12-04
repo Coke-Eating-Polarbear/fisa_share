@@ -16,5 +16,6 @@ urlpatterns = [
     path('update', views.update_profile, name='update_profile'),
     path('log_click', views.log_to_elasticsearch, name='log_to_elasticsearch'),
     path('better', views.better_option, name='better'),
-    path('ds-detail', views.ds_detail, name='ds-detail'),
+    path('s-detail/<int:dsid>/', views.s_detail, name='s-detail'),
+    path('d-detail/<int:dsid>/', views.d_detail, name='d-detail'),
 ]

@@ -184,8 +184,9 @@
                         <p><strong>기준 금리:</strong> {{ product.baser }}</p>
                         <p><strong>최대 금리:</strong> {{ product.maxir }}</p>
                         <p><strong>가입 방법:</strong> {{ product.method }}</p>
+                        <p><strong>상품 코드:</strong>{{ product.dsid }}</p>
                     </div>
-                    <a href="{% url 'ds-detail' %}" class="card-button">자세히보기</a>
+                    <a href="{% url 'd-detail' product.dsid %}" class="card-button">자세히보기</a>
                 </div>
                 {% endfor %}
                
@@ -201,13 +202,15 @@
                     <div class="card">
                         <img src="{% static product.logo %}" alt="{{ product.bank }} 로고">
                         <div class="card-content">
+                            
                             <span class="card-title">{{ product.product_name }}</span><br>
                             <p><strong>은행:</strong> {{ product.bank_name }}</p>
                             <p><strong>기준 금리:</strong> {{ product.base_rate }}</p>
                             <p><strong>최대 금리:</strong> {{ product.max_preferential_rate }}</p>
                             <p><strong>가입 방법:</strong> {{ product.signup_method }}</p>
+                            <p><strong>상품 코드:</strong>{{ product.DSID }}</p>
                         </div>
-                        <a href="{% url 'ds-detail' %}" class="card-button">자세히보기</a>
+                        <a href="{% url 's-detail' product.DSID %}" class="card-button">자세히보기</a>
                     </div>
                     
                     {% endfor %}

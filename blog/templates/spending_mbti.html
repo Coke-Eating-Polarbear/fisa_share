@@ -456,7 +456,16 @@
                 document.getElementById('categorySelect').value = 'predicted_total'; // 기본값 설정
                 updatePredictionChart(); // 차트 렌더링
             };
-        
+
+
+            function filterData(period) {
+                console.log('Selected period:', period); // 선택된 값 출력
+                const url = new URL(window.location.href);
+                url.searchParams.set('period', period);
+                window.location.href = url.toString();
+            }
+
+
         </script>
         
         <footer>
@@ -465,6 +474,8 @@
             <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0;">COPYRIGHT©우리팀이름~</p >
         </footer >
         
+        
+
         </body>
         </html>
         

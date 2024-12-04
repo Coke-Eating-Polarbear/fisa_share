@@ -194,13 +194,42 @@ def mypage(request):
             # CustomerID로 UserProfile 조회
             user = UserProfile.objects.get(CustomerID=customer_id)
             user_name = user.username  # 사용자 이름 설정
-
+            category_totals = defaultdict(int)
             # MyDataDS 모델에서 해당 CustomerID에 연결된 계좌 정보 가져오기
             accounts = MyDataDS.objects.filter(CustomerID=customer_id).values('AccountID', 'balance','pname', 'ds_rate','end_date','dstype')
-
             # 오늘 날짜 계산
             today = timezone.now().date()
-
+            now = datetime.now()
+            current_year = now.year
+            current_month = now.month
+            mypay = MyDataPay.objects.filter(
+                CustomerID=customer_id,
+                pyear=current_year,
+                pmonth=current_month
+            ).values('pdate', 'bizcode', 'price', 'pyear', 'pmonth')
+            category_mapping = {
+                'eat': '식비',
+                'transfer': '교통비',
+                'utility': '공과금',
+                'phone': '통신비',
+                'home': '주거비',
+                'hobby': '여가/취미',
+                'fashion': '패션/잡화',
+                'party': '모임회비',
+                'allowance': '경조사',
+                'study': '교육비',
+                'medical': '의료비',
+            }
+            for item in mypay:
+                if item['bizcode'] in category_mapping:
+                    category_totals[category_mapping[item['bizcode']]] += item['price']
+            # 총 지출 계산
+            total_spent = sum(item['price'] for item in mypay)
+            category_percentages = {
+                category: round((amount / total_spent) * 100, 2)
+                for category, amount in category_totals.items()
+            }
+            sorted_category_percentages = dict(sorted(category_percentages.items(), key=lambda x: x[1], reverse=True))
             # 90일 이내 만기일 필터링
             expiring_accounts = [
                 {
@@ -242,6 +271,9 @@ def mypage(request):
         'accounts_list': accounts_list,
         'd_list' : d_list,
         's_list' : s_list,
+        'mypay' : mypay,
+        'total_spent' : total_spent,
+        'category_percentages':json.dumps(sorted_category_percentages),
     }
     return render(request, 'mypage.html', context)
 
@@ -432,8 +464,6 @@ def card_top(keywords) :
 
     max_card_detail_top1 = card.objects.filter(Name=max_card_name).values()
 
-    
-
     # eat_max_card_detail_top1_dict = dict(eat_max_card_detail_top1)
 
     # 리스트를 JSON으로 변환
@@ -615,7 +645,6 @@ def spending_mbti(request):
             prediction_dict = prediction.to_dict()
             # Sorting the dictionary by values in descending order
             sorted_prediction = dict(sorted(prediction_dict.items(), key=lambda x: x[1], reverse=True))
-            print('prediction_dict',prediction_dict)
             next_month_prediction_json = json.dumps(prediction_dict)
 
             # 키 변경 매핑 정의
@@ -635,7 +664,6 @@ def spending_mbti(request):
 
             # 키 변경을 적용한 새 딕셔너리 생성
             new_prediction_dict = {key_mapping[k]: v for k, v in sorted_prediction.items()}
-            print('new_prediction_dict',new_prediction_dict)
 
 
 
@@ -747,7 +775,6 @@ def spending_mbti(request):
 
             # 결과 확인
             top_card_list = [key for key, _ in sorted(new_prediction_dict.items(), key=lambda x: x[1], reverse=True)[1:4]]
-            print('top_card_list',top_card_list)
 
 
             # 식비 관련 키워드
@@ -814,7 +841,6 @@ def spending_mbti(request):
                  
                     # 값 가져오기
                     AmountNum = next_month_prediction_json.get('eat', 0)  # 키가 없으면 기본값 0 반환
-                    print("AmountNum:", AmountNum)
                 elif keyword == '교통비':
                     max_card_json, max_card_detail_json = card_top(transport_keywords)
                     # 값 가져오기
@@ -881,14 +907,9 @@ def spending_mbti(request):
 
                 # 값만 추출
                 max_value = list(max_values.values())[0]
-                print('max_value',max_value)
 
                 # discount 값
                 discount = round(AmountNum * max_value * 0.01, 2)
-                print('discount',discount)
-
-
-                print('max_card_detail_json',max_card_detail_json)
 
                 # JSON 데이터가 문자열로 되어 있다면, 이를 변환
                 if isinstance(max_card_detail_json, str):
@@ -902,7 +923,6 @@ def spending_mbti(request):
 
                 # 필요하면 다시 JSON 문자열로 변환
                 max_card_detail_json = json.dumps(max_card_detail_json, ensure_ascii=False)
-
 
                 # 결과값 저장
                 card_results[f"{keyword}"] = max_card_json
@@ -935,7 +955,6 @@ def spending_mbti(request):
             card_results_json = json.dumps(card_results, ensure_ascii=False, indent=4)
             card_detail_results_json = json.dumps(card_detail_results, ensure_ascii=False)
 
-            print('next_month_prediction_json ',next_month_prediction_json)
         except UserProfile.DoesNotExist:
             pass  # 사용자가 없을 경우 기본값 유지
 
@@ -1175,6 +1194,7 @@ def summary_view(request):
     unique_product_details = {p['dsname']: p for p in product_details if p['dsname']}.values()
     product_details = list(unique_product_details)[:5]
 
+
     ## 적금 추천 상품 top 3
     # Django ORM을 사용하여 데이터 가져오기
     cluster_savings = SProduct.objects.all()
@@ -1240,7 +1260,15 @@ def summary_view(request):
     deposit_recommend_display = deposit_recommend_dict[:3]  # 예금 3개
     
     
-    
+    # 로그 데이터 확인 
+    log_cluster = get_top_data_by_customer_class(user.Stageclass, user.Inlevel)
+
+    # "data" 부분만 추출
+    filtered_data = [item['data'] for item in log_cluster]
+
+    # JSON으로 변환
+    filtered_data_json = json.dumps(filtered_data, ensure_ascii=False)
+
 
     # 최종 데이터 전달
     context = {
@@ -1388,7 +1416,6 @@ def top5(request):
     }
 
     return render(request, 'recommend_savings_top5.html', context)
-
 
 @login_required_session
 def main_view(request):
@@ -1870,8 +1897,29 @@ def better_option(request):
 
     return render(request, 'better_options.html',context)
 
-def ds_detail(request):
-    return render(request, 'ds_detail.html')
+def d_detail(request,dsid):
+    try:
+        product = DProduct.objects.get(dsid=dsid)
+    except DProduct.DoesNotExist:
+        return render(request, 'error.html', {'message': '해당 상품을 찾을 수 없습니다.'})
+    context = {
+        'product': product,
+    }
+
+    return render(request, 'd_detail.html',context)
+
+def s_detail(request, dsid):
+    # s_product에서 먼저 검색
+    try:
+        product = SProduct.objects.get(DSID=dsid)
+    except SProduct.DoesNotExist:
+        return render(request, 'error.html', {'message': '해당 상품을 찾을 수 없습니다.'})
+
+    # 적절한 데이터를 템플릿으로 전달
+    context = {
+        'product': product,
+    }
+    return render(request, 's_detail.html', context)
 
 def get_bank_logo(bank_name):
     """
