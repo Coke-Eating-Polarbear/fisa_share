@@ -197,10 +197,16 @@ def mypage(request):
 
             # MyDataDS 모델에서 해당 CustomerID에 연결된 계좌 정보 가져오기
             accounts = MyDataDS.objects.filter(CustomerID=customer_id).values('AccountID', 'balance','pname', 'ds_rate','end_date','dstype')
-
             # 오늘 날짜 계산
             today = timezone.now().date()
-
+            now = datetime.now()
+            current_year = now.year
+            current_month = now.month
+            mypay = MyDataPay.objects.filter(
+                CustomerID=customer_id,
+                pyear=current_year,
+                pmonth=current_month
+            ).values('pdate', 'bizcode', 'price', 'pyear', 'pmonth')
             # 90일 이내 만기일 필터링
             expiring_accounts = [
                 {
@@ -242,6 +248,7 @@ def mypage(request):
         'accounts_list': accounts_list,
         'd_list' : d_list,
         's_list' : s_list,
+        'mypay' : mypay,
     }
     return render(request, 'mypage.html', context)
 
@@ -359,8 +366,6 @@ def extract_percentage_sentences(data, keywords):
     return result
 
 def card_top(keywords) :
-    
-    
 
     #card
     benefits = card.objects.values('benefits')
@@ -1269,7 +1274,6 @@ def top5(request):
 
     return render(request, 'recommend_savings_top5.html', context)
 
-
 @login_required_session
 def main_view(request):
     if request.user.is_authenticated:
@@ -1752,8 +1756,29 @@ def better_option(request):
 
     return render(request, 'better_options.html',context)
 
-def ds_detail(request):
-    return render(request, 'ds_detail.html')
+def d_detail(request,dsid):
+    try:
+        product = DProduct.objects.get(dsid=dsid)
+    except DProduct.DoesNotExist:
+        return render(request, 'error.html', {'message': '해당 상품을 찾을 수 없습니다.'})
+    context = {
+        'product': product,
+    }
+
+    return render(request, 'd_detail.html',context)
+
+def s_detail(request, dsid):
+    # s_product에서 먼저 검색
+    try:
+        product = SProduct.objects.get(DSID=dsid)
+    except SProduct.DoesNotExist:
+        return render(request, 'error.html', {'message': '해당 상품을 찾을 수 없습니다.'})
+
+    # 적절한 데이터를 템플릿으로 전달
+    context = {
+        'product': product,
+    }
+    return render(request, 's_detail.html', context)
 
 def get_bank_logo(bank_name):
     """
