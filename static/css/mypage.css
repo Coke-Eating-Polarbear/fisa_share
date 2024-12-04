@@ -263,7 +263,7 @@ color: #333; /* 텍스트 색상 추가 */
     display: inline-block;
     padding: 10px 20px; /* 버튼 크기 조정 */
     font-size: 1rem; /* 글씨 크기 */
-    background-color: #007bff;
+    background-color: #5c60e6;
     color: white;
     text-decoration: none;
     border-radius: 5px;
@@ -275,7 +275,7 @@ color: #333; /* 텍스트 색상 추가 */
 
 /* 프로필 수정 버튼에 호버 효과 추가 */
 .edit-profile-button:hover {
-    background-color: #0056b3; /* 호버 시 색상 변경 */
+    background-color: #05318f; /* 호버 시 색상 변경 */
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* 그림자 */
 }
   
@@ -305,7 +305,7 @@ color: #333; /* 텍스트 색상 추가 */
 .progress-bar-inner {
     height: 100%;
     border-radius: 13px;
-    background-color: #007bff;
+    background-color: #5c60e6;
     text-align: center;
     color: white;
     line-height: 20px;
@@ -341,7 +341,7 @@ display: block; /* 블록 요소로 설정 */
 }
 
 .tab-button.active {
-    background-color: #007bff; /* 활성화된 버튼 색상 */
+    background-color: #5c60e6; /* 활성화된 버튼 색상 */
     color: white; /* 텍스트 색상 */
 }
 
@@ -379,7 +379,7 @@ flex: 3; /* 왼쪽 영역 비율 */
 }
 .additional-box {
 flex: 3; /* 오른쪽 영역 비율 */
-background-color: #007bff; /* 강조된 배경 */
+background-color: #5c60e6; /* 강조된 배경 */
 color: white; /* 텍스트 색상 */
 padding: 30px; /* 내용 여백 */
 margin-left: 15px; /* 왼쪽 요소와 간격 */
@@ -436,7 +436,7 @@ color: #333; /* 강조 텍스트 색상 */
 
 /* 링크 스타일 */
 .expiring-container a {
-color: #007bff; /* 파란색 텍스트 */
+color: #5c60e6; /* 파란색 텍스트 */
 text-decoration: none; /* 밑줄 제거 */
 font-size: 1rem; /* 텍스트 크기 */
 font-weight: bold; /* 글씨 두껍게 */
@@ -447,3 +447,52 @@ text-decoration: underline; /* 호버 시 밑줄 표시 */
 color: #0056b3; /* 호버 시 약간 진한 파란색 */
 }
 
+.goal-container {
+    padding: 20px;
+    text-align: center;
+    background-color: #f5f5f5;
+    border-radius: 10px;
+    margin-top: 30px;
+}
+
+.progress-bar-container {
+    position: relative;
+    margin: 20px 0;
+    height: 30px;
+    width: 100%;
+}
+
+.progress-bar-background {
+    background-color: #e0e0e0;
+    height: 100%;
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 100%;
+    background-color: #76c7c0;
+    border-radius: 20px;
+    transition: width 0.5s ease;
+}
+
+.progress-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-weight: bold;
+}
+
+.result {
+    font-size: 1.2rem;
+    margin-top: 20px;
+}
+
+.result.success {
+    color: green;
+}
+
+.result.exceeded {
+    color: red;
+}

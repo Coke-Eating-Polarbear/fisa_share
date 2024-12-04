@@ -188,6 +188,9 @@ def mypage(request):
     user_name = "사용자"
     accounts = []  # 사용자 계좌 정보 저장
     expiring_accounts = []  # 만기일이 90일 이내로 남은 계좌
+    expiring_accounts_json = None
+    accounts_list, d_list, s_list, mypay = [], [], [], []
+    total_spent, goal_amount, comparison = 0, None, None  # 지출 금액, 목표 금액, 비교 결과 초기화
 
     if customer_id:
         try:
@@ -207,6 +210,10 @@ def mypage(request):
                 pyear=current_year,
                 pmonth=current_month
             ).values('pdate', 'bizcode', 'price', 'pyear', 'pmonth')
+
+            # 목표 금액 가져오기
+            goal_amount = user.goal_amount
+
             category_mapping = {
                 'eat': '식비',
                 'transfer': '교통비',
@@ -225,6 +232,18 @@ def mypage(request):
                     category_totals[category_mapping[item['bizcode']]] += item['price']
             # 총 지출 계산
             total_spent = sum(item['price'] for item in mypay)
+
+            # 목표 금액이 입력되지 않은 경우
+            if goal_amount is None:
+                if request.method == 'POST':
+                    # 목표 금액 입력 후 저장
+                    goal_amount = int(request.POST['goal_amount'])
+                    user.goal_amount = goal_amount  # DB에 저장할 목표 금액 설정
+                    user.save()  # 변경사항 DB에 저장
+                    return redirect('mypage')  # 저장 후 페이지 새로 고침
+            else:
+                comparison = "목표 금액 이내로 사용 중입니다." if total_spent <= goal_amount else "목표 금액을 초과했습니다."
+
             category_percentages = {
                 category: round((amount / total_spent) * 100, 2)
                 for category, amount in category_totals.items()
@@ -274,6 +293,8 @@ def mypage(request):
         'mypay' : mypay,
         'total_spent' : total_spent,
         'category_percentages':json.dumps(sorted_category_percentages),
+        'goal_amount' : goal_amount,
+        'comparison' : comparison,
     }
     return render(request, 'mypage.html', context)
 
