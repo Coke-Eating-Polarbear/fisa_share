@@ -364,7 +364,6 @@ def card_top(keywords) :
 
     #card
     benefits = card.objects.values('benefits')
-    print('benefits',benefits)
 
     # Q 객체를 사용하여 OR 조건 생성
     query = Q()
@@ -419,19 +418,16 @@ def card_top(keywords) :
             max_card_top1 = {card_name: benefits}
 
     max_card_name = list(max_card_top1.keys())[0]
-    print(' max_card_name',  max_card_name)
 
     max_card_detail_top1 = card.objects.filter(Name=max_card_name).values()
 
-    print('eat_max_card_detail_top1',max_card_detail_top1)
 
     # eat_max_card_detail_top1_dict = dict(eat_max_card_detail_top1)
 
     # 리스트를 JSON으로 변환
     max_card_top1_json = json.dumps(max_card_top1)
     max_card_datail_top1_json = json.dumps(list(max_card_detail_top1.values()), ensure_ascii=False, indent=4)
-    print('max_card_top1_json',max_card_top1_json)
-    print('max_card_datail_top1_json',max_card_datail_top1_json)
+
 
     return max_card_top1_json, max_card_datail_top1_json
 
@@ -811,7 +807,7 @@ def spending_mbti(request):
                     max_card_json, max_card_detail_json = card_top(medical_keywords)
                 else:
                     max_card_json, max_card_detail_json = None, None
-                    print(f"{keyword}_{i+1}에 해당하는 카테고리가 없습니다.")
+                    
                 
                 # 결과값 저장
                 card_results[f"max_card_top{i+1}_json"] = max_card_json
@@ -842,7 +838,6 @@ def spending_mbti(request):
             card_detail_results_json = json.dumps(card_detail_results, ensure_ascii=False)
         except UserProfile.DoesNotExist:
             pass  # 사용자가 없을 경우 기본값 유지
-    print("Card Detail Results JSON:", card_results_json)
 
     context = {
         'user_name': user_name,
@@ -924,7 +919,6 @@ def get_top_data_by_customer_class(stageclass, inlevel):
     
     stageclass = stageclass
     inlevel = inlevel
-    print("inlevel",inlevel)
     headers = {
         "Content-Type": "application/json"
     }
@@ -1031,7 +1025,6 @@ def summary_view(request):
     recommended_products = Recommend.objects.filter(CustomerID=customer_id)
     recommended_count = recommended_products.count()
     recommended_dsid_list = {'dproduct': [], 'sproduct': []}
-    print('recommended_dsid_list',recommended_dsid_list)
 
     if recommended_count > 0:
         # DProduct와 SProduct 각각 추천 가져오기
@@ -1052,7 +1045,6 @@ def summary_view(request):
         for sp in SProduct.objects.filter(DSID__in=recommended_dsid_list['sproduct']).values('DSID','product_name', 'bank_name', 'base_rate', 'max_preferential_rate')
     ]
 
-    print('recommended_product_details',recommended_product_details)
 
     # 랜덤 상품 추가
     if recommended_count < 5:
@@ -1079,7 +1071,6 @@ def summary_view(request):
     unique_product_details = {p['dsname']: p for p in product_details if p['dsname']}.values()
     product_details = list(unique_product_details)[:5]
 
-    print('product_details',product_details)
 
     ## 적금 추천 상품 top 3
     # Django ORM을 사용하여 데이터 가져오기
@@ -1154,7 +1145,6 @@ def summary_view(request):
 
     # JSON으로 변환
     filtered_data_json = json.dumps(filtered_data, ensure_ascii=False)
-    print('filtered_data_json',filtered_data_json)
 
 
     # 최종 데이터 전달
@@ -1227,8 +1217,6 @@ def info(request):
         # 추천 결과를 세션에 JSON 형식으로 저장
         request.session['deposit_recommend'] = json.dumps(list(deposit_recommend), cls=DjangoJSONEncoder)
         request.session['final_recommend'] = json.dumps(list(final_recommend), cls=DjangoJSONEncoder)
-        print("Serialized Deposit Recommendations:", deposit_recommend)
-        print("Serialized Final Recommendations:", final_recommend)
         context = {
             'user_name': user_name,
             'deposit_recommend': deposit_recommend,

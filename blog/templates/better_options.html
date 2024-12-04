@@ -116,15 +116,15 @@
             <div class="recommendations">
                 <!-- 기존 상품 박스 -->
                 <div class="existing-product-container">
-                    {% if nearest_s %}
+                    {% if nearest_d %}
                         <div class="card">
                             <img src="https://via.placeholder.com/50x70" alt="{{ product.bank_name }} 로고">
                             <div class="card-content">
-                                <p><strong>은행:</strong> {{ nearest_s.bank_name }}</p>
-                                <p><strong>상품 이름:</strong> {{ nearest_s.pname }}</p>
-                                <p><strong>기준 금리:</strong> {{ nearest_s.ds_rate }}%</p>
-                                <p><strong>만기일:</strong> {{ nearest_s.end_date }}</p>
-                                <p><strong>남은 일수:</strong> {{ nearest_s.days_remaining }}일</p>
+                                <p><strong>은행:</strong> {{ nearest_d.bank_name }}</p>
+                                <p><strong>상품 이름:</strong> {{ nearest_d.pname }}</p>
+                                <p><strong>기준 금리:</strong> {{ nearest_d.ds_rate }}%</p>
+                                <p><strong>만기일:</strong> {{ nearest_d.end_date }}</p>
+                                <p><strong>남은 일수:</strong> {{ nearest_d.days_remaining }}일</p>
                             </div>
                         </div>
                         {% else %}
@@ -158,15 +158,15 @@
             <div class="recommendations">
                 <!-- 기존 상품 박스 -->
                 <div class="existing-product-container">
-                    {% if nearest_d %}
+                    {% if nearest_s %}
                         <div class="card">
                             <img src="https://via.placeholder.com/50x70" alt="{{ product.bank_name }} 로고">
                             <div class="card-content">
-                                <p><strong>은행:</strong> {{ nearest_d.bank_name }}</p>
-                                <p><strong>상품 이름:</strong> {{ nearest_d.pname }}</p>
-                                <p><strong>기준 금리:</strong> {{ nearest_d.ds_rate }}%</p>
-                                <p><strong>만기일:</strong> {{ nearest_d.end_date }}</p>
-                                <p><strong>남은 일수:</strong> {{ nearest_d.days_remaining }}일</p>
+                                <p><strong>은행:</strong> {{ nearest_s.bank_name }}</p>
+                                <p><strong>상품 이름:</strong> {{ nearest_s.pname }}</p>
+                                <p><strong>기준 금리:</strong> {{ nearest_s.ds_rate }}%</p>
+                                <p><strong>만기일:</strong> {{ nearest_s.end_date }}</p>
+                                <p><strong>남은 일수:</strong> {{ nearest_s.days_remaining }}일</p>
                             </div>
                         </div>
                         {% else %}
