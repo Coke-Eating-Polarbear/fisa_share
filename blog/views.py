@@ -194,7 +194,7 @@ def mypage(request):
             # CustomerID로 UserProfile 조회
             user = UserProfile.objects.get(CustomerID=customer_id)
             user_name = user.username  # 사용자 이름 설정
-
+            category_totals = defaultdict(int)
             # MyDataDS 모델에서 해당 CustomerID에 연결된 계좌 정보 가져오기
             accounts = MyDataDS.objects.filter(CustomerID=customer_id).values('AccountID', 'balance','pname', 'ds_rate','end_date','dstype')
             # 오늘 날짜 계산
@@ -207,6 +207,29 @@ def mypage(request):
                 pyear=current_year,
                 pmonth=current_month
             ).values('pdate', 'bizcode', 'price', 'pyear', 'pmonth')
+            category_mapping = {
+                'eat': '식비',
+                'transfer': '교통비',
+                'utility': '공과금',
+                'phone': '통신비',
+                'home': '주거비',
+                'hobby': '여가/취미',
+                'fashion': '패션/잡화',
+                'party': '모임회비',
+                'allowance': '경조사',
+                'study': '교육비',
+                'medical': '의료비',
+            }
+            for item in mypay:
+                if item['bizcode'] in category_mapping:
+                    category_totals[category_mapping[item['bizcode']]] += item['price']
+            # 총 지출 계산
+            total_spent = sum(item['price'] for item in mypay)
+            category_percentages = {
+                category: round((amount / total_spent) * 100, 2)
+                for category, amount in category_totals.items()
+            }
+            sorted_category_percentages = dict(sorted(category_percentages.items(), key=lambda x: x[1], reverse=True))
             # 90일 이내 만기일 필터링
             expiring_accounts = [
                 {
@@ -249,6 +272,8 @@ def mypage(request):
         'd_list' : d_list,
         's_list' : s_list,
         'mypay' : mypay,
+        'total_spent' : total_spent,
+        'category_percentages':json.dumps(sorted_category_percentages),
     }
     return render(request, 'mypage.html', context)
 

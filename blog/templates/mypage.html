@@ -67,7 +67,7 @@
                 <!-- 중앙: 목표 소비 정보 -->
                 <div class="info">
                     <p>이번달 목표 소비액 : <span id="goalAmount">500,000</span>원</p>
-                    <p>실제 이번달 지출 총액 : <span id="spentAmount">200,000</span>원</p>
+                    <p>실제 이번달 지출 총액 : <span id="spentAmount">{{ total_spent|default:0 }}</span>원</p>
                     <div class="progress-bar">
                         <div class="progress-bar-inner" id="savingsProgressBar">50%</div>
                     </div>
@@ -194,26 +194,33 @@
         result.innerHTML = `목표 소비액보다 ${(goalAmount - spentAmount).toLocaleString()}원 덜 쓰셨어요<br>잘하고 있어요~ 지금처럼만 ✨<br>`;
     } else {
         result.innerHTML = `이번달 목표 예산을 초과했어요 😡`;
-    }
+    }})
 
     // 파이 차트 초기화
+    document.addEventListener('DOMContentLoaded', () => {
     const pieChartElement = document.getElementById('pieChart'); // canvas 요소 참조
+
     if (pieChartElement) {
         const ctx = pieChartElement.getContext('2d');
-        const cardData = {
-            categories: ['식비', '쇼핑', '교통', '유흥', '기타'],
-            amounts: [200000, 150000, 80000, 5000, 70000]
-        };
-        const totalAmount = cardData.amounts.reduce((acc, curr) => acc + curr, 0);
+
+        // Django에서 전달받은 데이터를 JavaScript로 변환
+        const categoryData = JSON.parse('{{ category_percentages|safe }}');
+        console.log("카테고리 데이터:", categoryData);
+
+        const labels = Object.keys(categoryData);  // 카테고리 이름
+        const data = Object.values(categoryData); // 백분율 데이터
 
         new Chart(ctx, {
             type: 'pie',
             data: {
-                labels: cardData.categories,
+                labels: labels,
                 datasets: [
                     {
-                        data: cardData.amounts,
-                        backgroundColor: ['#ff6384', '#36a2eb', '#ffce56', '#4caf50', '#ff9f40']
+                        data: data,
+                        backgroundColor: [
+                            '#ff6384', '#36a2eb', '#ffce56', '#4caf50', '#ff9f40',
+                            '#9966ff', '#ff7a79', '#a3e4d7', '#d68910', '#58d68d', '#f4d03f'
+                        ]
                     }
                 ]
             },
@@ -226,9 +233,8 @@
                     tooltip: {
                         callbacks: {
                             label: function (context) {
-                                const amount = context.raw;
-                                const percentage = ((amount / totalAmount) * 100).toFixed(2);
-                                return `${context.label}: ${amount.toLocaleString()}원 (${percentage}%)`;
+                                const percentage = context.raw.toFixed(2);
+                                return `${context.label}: ${percentage}%`;
                             }
                         }
                     }
