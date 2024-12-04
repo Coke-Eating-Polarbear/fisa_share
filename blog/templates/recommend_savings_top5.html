@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="{% static 'css/recommend_savings_top5.css' %}">
 
     <script>
+
         document.addEventListener("DOMContentLoaded", function () {
             // 탭 동작 설정
             const tabs = document.querySelectorAll(".tab");
@@ -223,11 +224,11 @@
 
             <!-- 왼쪽 상자 -->
             <div class="recommendations_2">
-                {% with recommend_log|first as product %}
+                {% with filtered_data|first as product %}
                 <div class="card">
                     <img src="{% static product.logo %}" alt="{{ product.bank }} 로고">
                     <div class="card-content">
-                        <span class="card-title">{{ product.name|default:"상품명 없음" }}</span><br>
+                        <span class="card-title">{{ product.product_name|default:"상품명 없음" }}</span><br>
                         <p><strong>은행:</strong> {{ product.bank|default:"은행 정보 없음" }}</p>
                         <p><strong>기준 금리:</strong> {{ product.baser|default:"-" }}</p>
                         <p><strong>최대 금리:</strong> {{ product.maxir|default:"-" }}</p>
@@ -239,15 +240,15 @@
 
             <!-- 오른쪽 상자 -->
             <div class="recommendations_2">
-                {% with recommend_log|slice:"1:2"|first as product %}
+                {% with filtered_data|slice:"1:2"|first as product %}
                 <div class="card">
                     <img src="{% static product.logo %}" alt="{{ product.bank }} 로고">
                     <div class="card-content">
                         <span class="card-title">{{ product.product_name|default:"상품명 없음" }}</span><br>
-                        <p><strong>은행:</strong> {{ product.bank_name|default:"은행 정보 없음" }}</p>
-                        <p><strong>기준 금리:</strong> {{ product.base_rate|default:"-" }}</p>
-                        <p><strong>최대 금리:</strong> {{ product.max_preferential_rate|default:"-" }}</p>
-                        <p><strong>가입 방법:</strong> {{ product.signup_method|default:"가입 방법 정보 없음" }}</p>
+                        <p><strong>은행:</strong> {{ product.bank|default:"은행 정보 없음" }}</p>
+                        <p><strong>기준 금리:</strong> {{ product.baser|default:"-" }}</p>
+                        <p><strong>최대 금리:</strong> {{ product.maxir|default:"-" }}</p>
+                        <p><strong>가입 방법:</strong> {{ product.method|default:"가입 방법 정보 없음" }}</p>
                     </div>
                 </div>
                 {% endwith %}

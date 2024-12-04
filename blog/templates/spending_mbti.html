@@ -129,7 +129,7 @@
             <!-- 설명 -->
             <div class="description" style="margin-top: 1rem; line-height: 1; font-size: 1rem; color: #555;">
                 <p>다음 달 예상 소비 금액은 <span id="predicted-total" class="highlight"></span>원 입니다.</p>
-                <p>💡<span style="font-weight: bold; color: blue;">식비</span>와 <span style="font-weight: bold; color: blue;">교통비</span>에서 가장 큰 소비가 예상됩니다.</p>
+                <p>💡<span style="font-weight: bold; color: blue;"> {{top_card_list.0}}</span>와 <span style="font-weight: bold; color: blue;"> {{top_card_list.1}}</span>에서 가장 큰 소비가 예상됩니다.</p>
                 <p>소비가 높은 항목에서 혜택이 높은 <span style="font-weight: bold; color: red;">오른쪽 카드</span>를 추천드려요!</p>
                 <!-- <p>💳예상 절감 금액: <span class="highlight">##원💳</span></p> -->
                 <p>카드 이미지를 클릭해서 정보를 확인해보세요 😊</p>
@@ -146,7 +146,11 @@
                         </a>
                         <div class="card-description-box" style="margin-top: 0.5rem; display: flex; flex-direction: column; gap: 0.3rem;">
                             <div class="card-name">{{ card.corp }} - {{ card.Name }}</div>
-                            <div class="card-description">{{ card.Detail|safe }}</div>
+                            <div class="card-description">
+                                <p>{{key}} 카테고리의 혜택이 가장 높은 카드입니다</p>
+                                <p>{{user_name}}님의 소비 성향을 바탕으로 다음 달 소비를 예측했을 때</p>
+                                <p>총 {{card.AmountNum}}원의 {{card.max_value}}%인 {{card.discount}}원을 할인 받을 수 있어요-!</p>
+                            </div>
                         </div>
                     </div>
                 {% endfor %}
@@ -229,6 +233,12 @@
             const amount_data = Object.values(sortedCategories); // 값을 데이터로 사용
             const amount_backgroundColors = amount_labels.map(label => categoryColors[label] || '#DDDDDD'); // 기본 색상은 회색
         
+            const amount_top1 = amount_labels[0];
+            const amount_top2 = amount_labels[1];
+            const amount_top3 = amount_labels[2];
+
+
+
             const amountData = {
                 labels: amount_labels,
                 datasets: [{
