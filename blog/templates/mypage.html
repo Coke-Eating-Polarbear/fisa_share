@@ -65,21 +65,34 @@
                 </div>
         
                 <!-- 중앙: 목표 소비 정보 -->
-                <div class="info">
-                    <p>이번달 목표 소비액 : <span id="goalAmount">500,000</span>원</p>
-                    <p>실제 이번달 지출 총액 : <span id="spentAmount">{{ total_spent|default:0 }}</span>원</p>
-                    <div class="progress-bar">
-                        <div class="progress-bar-inner" id="savingsProgressBar">50%</div>
+                <div style="background-color: #f2f2f783;border-radius: 10px;">
+                <!-- 목표 소비 정보 -->
+                {% if goal_amount %}
+                    <p>이번달 목표 소비액: <strong>{{ goal_amount }} 원</strong></p>
+                    <p>이번달 지출 총액: <strong>{{ total_spent }} 원</strong></p>
+                    <!-- 진행바 -->
+                    <div id="progress-bar" style="height: 20px; background-color: #e0e0e0; border-radius: 10px; margin-top: 10px;">
+                        <div id="progress-bar-inner" style="height: 100%; background-color: #5c60e6; text-align: center; color: white; border-radius: 10px;"></div>
                     </div>
-                    <span id="result">목표 소비액보다 200,000원 덜 쓰셨어요! 잘하고 있어요~ 지금처럼만 ✨</span>
+                    <p id="result"></p>
+
+                    <!-- <p class="result">{{ comparison }}</p> -->
+                {% else %}
+                    <form method="POST">
+                        {% csrf_token %}
+                        <label for="goal_amount">목표 금액을 설정하세요:</label>
+                        <input type="number" name="goal_amount" required>
+                        <button type="submit">저장</button>
+                    </form>
+                {% endif %}
                 </div>
                 <a href="{% url 'update_profile' %}" class="edit-profile-button">프로필 수정</a>
             </div>
         
             <!-- 카드 결제 내역 분석 -->
             <div class="right-box">
-                <h2>카드 결제 내역 분석</h2>
-                <p>- 카테고리별 카드 사용 비율 -</p>
+                <h2>이번 달 카드 사용 내역</h2>
+                <!-- <p>이번 달 카드 사용 내역</p> -->
                 <div class="pie-chart">
                     <canvas id="pieChart"></canvas>
                 </div>
@@ -166,7 +179,7 @@
         {% for account in expiring_accounts %}
             <p><strong>얼마 뒤면 <span class="expiring-product-name">{{ account.pname }}</span>이 만기에요!</strong></p>
         {% endfor %}
-        <p><a href="{% url 'better' %}" style="color: #007bff; text-decoration: none;">상품 둘러보러가기</a></p>
+        <p><a href="{% url 'better' %}" style="color: #5c60e6; text-decoration: none;">상품 둘러보러가기</a></p>
     {% endif %}
 </div>
 
@@ -174,12 +187,12 @@
 <div id="no-expiry-notification" class="expiring-container" style="display: none;">
     {% if not expiring_accounts %}
         <p>현재 만기가 가까운 상품이 없습니다. 
-        <a href="{% url 'top5' %}" style="color: #007bff; text-decoration: none;">상품 둘러보러가기</a></p>
+        <a href="{% url 'top5' %}" style="color: #5c60e6; text-decoration: none;">상품 둘러보러가기</a></p>
     {% endif %}
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', () => {
+    /*document.addEventListener('DOMContentLoaded', () => {
     // 소비 진행률 계산
     const goalAmount = parseFloat(document.getElementById('goalAmount').innerText.replace(/,/g, ''));
     const spentAmount = parseFloat(document.getElementById('spentAmount').innerText.replace(/,/g, ''));
@@ -194,7 +207,31 @@
         result.innerHTML = `목표 소비액보다 ${(goalAmount - spentAmount).toLocaleString()}원 덜 쓰셨어요<br>잘하고 있어요~ 지금처럼만 ✨<br>`;
     } else {
         result.innerHTML = `이번달 목표 예산을 초과했어요 😡`;
-    }})
+    }})*/
+
+    document.addEventListener('DOMContentLoaded', function () {
+        // Django 템플릿에서 전달된 데이터
+        const goalAmount = parseFloat("{{ goal_amount }}");
+        const totalSpent = parseFloat("{{ total_spent }}");
+        
+        // 진행률 계산
+        const progress = (totalSpent / goalAmount) * 100;
+        
+        // 진행바 스타일 및 텍스트 업데이트
+        const progressBarInner = document.getElementById('progress-bar-inner');
+        const resultText = document.getElementById('result');
+        
+        // 진행바와 텍스트 업데이트
+        if (progress < 100) {
+            progressBarInner.style.width = progress + '%';
+            progressBarInner.innerText = Math.floor(progress) + '%';
+            resultText.innerHTML = `<strong>목표 소비액보다 ${(goalAmount - totalSpent).toLocaleString()}원<strong> 덜 쓰셨어요-!<br>` + '잘하고 있어요~ 지금처럼만🤗';
+        } else {
+            progressBarInner.style.width = '100%';
+            progressBarInner.innerText = '100%';
+            resultText.innerText = `<strong>목표 소비액보다 ${(totalSpent - goalAmount).toLocaleString()}원</strong> 더 많이 썼어요-!<br>` + '조금 더 아껴야해요~😡';
+        }
+    });
 
     // 파이 차트 초기화
     document.addEventListener('DOMContentLoaded', () => {
