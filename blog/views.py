@@ -1958,7 +1958,18 @@ def better_option(request):
 
     return render(request, 'better_options.html',context)
 
+@login_required_session
 def d_detail(request,dsid):
+    customer_id = request.session.get('user_id')  
+    user_name = "사용자"  # 기본값 설정
+    if customer_id:
+        try:
+            # CustomerID로 UserProfile 조회
+            user = UserProfile.objects.get(CustomerID=customer_id)
+            user_name = user.username  # 사용자 이름 설정
+        except UserProfile.DoesNotExist:
+            pass  # 사용자가 없을 경우 기본값 유지
+
     try:
         product = DProduct.objects.get(dsid=dsid)
         index_name = "d_products"  # 인덱스 이름
@@ -2007,6 +2018,7 @@ def d_detail(request,dsid):
         'product': product,
         'context_value' : context_value,
         'context_value_tip':context_value_tip,
+        'user_name' : user_name
     }
 
     return render(request, 'd_detail.html',context)
