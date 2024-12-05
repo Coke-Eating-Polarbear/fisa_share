@@ -1163,6 +1163,29 @@ def summary_view(request):
 
     if not customer_id:  # 로그인되지 않은 사용자는 로그인 페이지로 리디렉션
         return redirect('login')
+    
+    # Average 테이블에서 고객 소득분위 기준 데이터 조회
+    average_data = Average.objects.filter(
+        stageclass=user.Stageclass,
+        inlevel=user.Inlevel
+    ).first()
+
+    user_asset_data = MyDataAsset.objects.filter(CustomerID=customer_id).first()
+
+    average_values = {
+    '총자산': (average_data.asset + average_data.finance),
+    '현금자산': average_data.finance,
+    '수입': average_data.income,
+    '지출': average_data.spend
+}
+    user_data = {
+    '총자산': user_asset_data.total,
+    '현금자산': user_asset_data.financial,
+    '수입': user_asset_data.monthly_income,
+    '지출': user_asset_data.expenses
+}
+    print('average_values',average_values)
+    print('user_data',user_data)
 
     # 추천 상품 처리
     recommended_products = Recommend.objects.filter(CustomerID=customer_id)
@@ -1304,6 +1327,8 @@ def summary_view(request):
         'user_name': user_name,
         'final_recommend': final_recommend_display,  # 적금 Top 3
         'deposit_recommend': deposit_recommend_display,  # 예금 Top 2
+        'average_data': json.dumps(average_values, ensure_ascii=False),
+        'user_data': json.dumps(user_data, ensure_ascii=False),
         
     }
 
