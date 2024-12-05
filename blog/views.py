@@ -188,6 +188,9 @@ def mypage(request):
     user_name = "사용자"
     accounts = []  # 사용자 계좌 정보 저장
     expiring_accounts = []  # 만기일이 90일 이내로 남은 계좌
+    expiring_accounts_json = None
+    accounts_list, d_list, s_list, mypay = [], [], [], []
+    total_spent, goal_amount, comparison = 0, None, None  # 지출 금액, 목표 금액, 비교 결과 초기화
 
     if customer_id:
         try:
@@ -207,6 +210,10 @@ def mypage(request):
                 pyear=current_year,
                 pmonth=current_month
             ).values('pdate', 'bizcode', 'price', 'pyear', 'pmonth')
+
+            # 목표 금액 가져오기
+            goal_amount = user.goal_amount
+
             category_mapping = {
                 'eat': '식비',
                 'transfer': '교통비',
@@ -225,6 +232,18 @@ def mypage(request):
                     category_totals[category_mapping[item['bizcode']]] += item['price']
             # 총 지출 계산
             total_spent = sum(item['price'] for item in mypay)
+
+            # 목표 금액이 입력되지 않은 경우
+            if goal_amount is None:
+                if request.method == 'POST':
+                    # 목표 금액 입력 후 저장
+                    goal_amount = int(request.POST['goal_amount'])
+                    user.goal_amount = goal_amount  # DB에 저장할 목표 금액 설정
+                    user.save()  # 변경사항 DB에 저장
+                    return redirect('mypage')  # 저장 후 페이지 새로 고침
+            else:
+                comparison = "목표 금액 이내로 사용 중입니다." if total_spent <= goal_amount else "목표 금액을 초과했습니다."
+
             category_percentages = {
                 category: round((amount / total_spent) * 100, 2)
                 for category, amount in category_totals.items()
@@ -274,6 +293,8 @@ def mypage(request):
         'mypay' : mypay,
         'total_spent' : total_spent,
         'category_percentages':json.dumps(sorted_category_percentages),
+        'goal_amount' : goal_amount,
+        'comparison' : comparison,
     }
     return render(request, 'mypage.html', context)
 
@@ -975,7 +996,6 @@ def spending_mbti(request):
         'top_card_list': top_card_list,
     }
 
-    print('context',context)
     return render(request, 'spending_mbti.html', context)
 
 def main(request):
@@ -1253,8 +1273,14 @@ def summary_view(request):
     final_recommendations_drop_duplicates = final_recommendations.drop_duplicates(subset=["name", "bank", "baser", "maxir", "method"])
     top2 = final_recommendations_drop_duplicates.sort_values(by='maxir', ascending=False).head(5)
     deposit_recommend_dict = top2.to_dict(orient='records')
-    request.session['final_recommend'] = final_recommend_json[:5]  # 적금 Top 5
-    request.session['deposit_recommend'] = deposit_recommend_dict[:5]  # 예금 Top 5
+    final_recommend_with_logo = [
+        {**item, "logo": get_bank_logo(item.get("bank_name", ""))} for item in final_recommend_json
+    ]
+    deposit_recommend_with_logo = [
+        {**item, "logo": get_bank_logo(item.get("bank", ""))} for item in deposit_recommend_dict
+    ]
+    request.session['final_recommend'] = final_recommend_with_logo[:5]  # 적금 Top 5
+    request.session['deposit_recommend'] = deposit_recommend_with_logo[:5]  # 예금 Top 5
 
     final_recommend_display = final_recommend_json[:2]  # 적금 2개
     deposit_recommend_display = deposit_recommend_dict[:3]  # 예금 3개
@@ -1375,14 +1401,6 @@ def top5(request):
         final_recommend = []
         deposit_recommend = []
 
-    # 은행 이름에 해당하는 로고 파일명을 매핑
-    final_recommend_with_logo = [
-        {**item, "logo": get_bank_logo(item.get("bank_name", ""))} for item in final_recommend
-    ]
-    deposit_recommend_with_logo = [
-        {**item, "logo": get_bank_logo(item.get("bank", ""))} for item in deposit_recommend
-    ]
-
     # 로그 데이터 확인 
     log_cluster = get_top_data_by_customer_class(user.Stageclass, user.Inlevel)
     # "data" 부분만 추출
@@ -1410,8 +1428,8 @@ def top5(request):
     # Context에 데이터 추가
     context = {
         'user_name': user_name,
-        'final_recommend': final_recommend_with_logo,  # 적금 Top 3 (로고 포함)
-        'deposit_recommend': deposit_recommend_with_logo,  # 예금 Top 2 (로고 포함)
+        'final_recommend': final_recommend,  # 적금 Top 3 (로고 포함)
+        'deposit_recommend': deposit_recommend,  # 예금 Top 2 (로고 포함)
         'filtered_data' : filtered_data_with_logo,
     }
 
@@ -1885,14 +1903,32 @@ def better_option(request):
                 nearest_s = min(s_list, key=lambda x: x['days_remaining'])
         except UserProfile.DoesNotExist:
             pass  # 사용자가 없을 경우 기본값 유지
-    final_recommend = request.session.get('final_recommend')
-    deposit_recommend = request.session.get('deposit_recommend')
+    final_recommend = request.session.get('final_recommend', [])
+    deposit_recommend = request.session.get('deposit_recommend', [])
+
+    # 각 추천 데이터에 로고 추가
+    try:
+        final_recommend = json.loads(final_recommend) if isinstance(final_recommend, str) else final_recommend
+        deposit_recommend = json.loads(deposit_recommend) if isinstance(deposit_recommend, str) else deposit_recommend
+    except json.JSONDecodeError:
+        final_recommend = []
+        deposit_recommend = []
+    nearest_d_with_logo = (
+        {**nearest_d, "logo": get_bank_logo(nearest_d.get("bank_name", ""))} if nearest_d else None
+    )
+    nearest_s_with_logo = (
+        {**nearest_s, "logo": get_bank_logo(nearest_s.get("bank", ""))} if nearest_s else None
+    )
+    for item in deposit_recommend:
+        logger.debug(f"Item: {item}")
+        if 'dsid' not in item or not item['dsid']:
+            logger.error(f"Invalid dsid in item: {item}")
     context = {
         'user_name': user_name,
         'final_recommend': final_recommend,  # 적금 Top 5
         'deposit_recommend': deposit_recommend,  # 예금 Top 5
-        'nearest_d' : nearest_d,
-        'nearest_s' : nearest_s,
+        'nearest_d' : nearest_d_with_logo,
+        'nearest_s' : nearest_s_with_logo,
     }
 
     return render(request, 'better_options.html',context)
@@ -1900,10 +1936,52 @@ def better_option(request):
 def d_detail(request,dsid):
     try:
         product = DProduct.objects.get(dsid=dsid)
+        index_name = "d_products"  # 인덱스 이름
+        index_name_2 = "d_products_tip"
+
+        # Elasticsearch 검색 쿼리
+        query = {
+            "_source": ["dsid", "context"],  # 필요한 필드만 가져옴
+            "query": {
+                "term": {
+                    "dsid": dsid  # dsid 값과 정확히 매칭
+                }
+            }
+        }
+
+        try:
+
+            # Elasticsearch 검색
+            response = es.search(index=index_name, body=query)
+            hits = response.get("hits", {}).get("hits", [])
+
+            if hits:
+                # context 값만 추출
+                context_value = hits[0]["_source"]["context"]
+
+            # Elasticsearch 검색
+            response = es.search(index=index_name_2, body=query)
+            hits = response.get("hits", {}).get("hits", [])
+
+            if hits:
+                # context 값만 추출
+                context_value_tip = hits[0]["_source"]["context"]
+
+                
+            else:
+                return JsonResponse({"status": "error", "message": "데이터를 찾을 수 없습니다."}, status=404)
+
+        except Exception as e:
+            # 에러 처리
+            return JsonResponse({"status": "error", "message": str(e)}, status=500)
     except DProduct.DoesNotExist:
         return render(request, 'error.html', {'message': '해당 상품을 찾을 수 없습니다.'})
+    
+ 
     context = {
         'product': product,
+        'context_value' : context_value,
+        'context_value_tip':context_value_tip,
     }
 
     return render(request, 'd_detail.html',context)

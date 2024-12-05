@@ -16,6 +16,7 @@ class UserProfile(models.Model):
     sex = models.CharField(max_length=1, blank=True)  # 성별 (M, F)
     Stageclass = models.CharField(max_length=1) 
     Inlevel = models.SmallIntegerField()
+    goal_amount = models.BigIntegerField()
 
     def save(self, *args, **kwargs):
         # 비밀번호가 이미 해시되지 않은 경우에만 해시화
@@ -163,6 +164,7 @@ class MyDataAsset(models.Model):
     repayment = models.BigIntegerField()
     saving = models.BigIntegerField()
     rent = models.BigIntegerField()
+    
 
     def __str__(self):
         return self.CustomerID

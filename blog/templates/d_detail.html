@@ -55,38 +55,110 @@
         </div>
         </header>
     
-    
-    <div class="container">
-    
-        <div class="checklist">
-       <h2>예적금 가입 전 체크했덕? 🦆</h2>
-       <div class="inner-box">
-       <ul>
-           <li>상품의 가입대상, 가입금액(최소금액 및 한도), 계약기간 등 주요 거래조건을 확인하세요.</li>
-           <li>비과세 상품 또는 세율 우대 가입가능한지 알아보세요.
-           <!-- 자세히보기 버튼 -->
-           <button class="details-btn" onclick="openDetailsWindow('/details-page-url')">자세히보기</button></li>
-                    <!-- 숨겨진 세부 정보 -->
-                    <div id="details-content" class="details-content">
-                    <!-- 상품1 -->
-                    <h4>상품명 : 상품1</h4>
-                    <p>은행명 : OO은행</p>
+        <div class="container">
+            <div class="checklist">
+                <h2>예적금 가입 전/후 체크했덕? 🦆</h2>
+                <div class="row">
+                    <div class="dropdown-section">
+                        <!-- 상자 제목 -->
+                        <h3 class="dropdown-title" onclick="toggleDropdown('dropdown-before')" style="text-align: center;">[가입 전] 알아야 할 사항</h3>
+                        <!-- 상자 본문 -->
+                        <div id="dropdown-before" class="dropdown-content hidden">
+                            <ul>
+                                <li><strong>주요 거래 조건 확인</strong>
+                                    <ul>
+                                        <li>가입 대상, 가입금액(최소 및 한도), 계약기간 확인</li>
+                                        <li>비과세/세금우대 가능 여부 확인</li>
+                                        <li>
+                                            예금자보호 대상 여부 확인:
+                                            <button class="details-btn" onclick="showPopup('popup-before')">자세히 보기</button>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li><strong>금리 조건과 이자 지급 방식</strong>
+                                    <ul>
+                                        <li>금리 유형(고정금리, 금리연동형 등) 및 가입 채널(온라인 가입 우대 등)에 따른 조건 확인</li>
+                                        <li>우대금리 조건(지급 기간, 기준 등) 확인</li>
+                                        <li>이자 지급 방식(월 지급식, 만기 지급식 등) 확인</li>
+                                    </ul>
+                                </li>
+                                <li><strong>해지 및 만기 관련 조건</strong>
+                                    <ul>
+                                        <li>중도해지 시 약정 금리보다 낮은 중도해지 금리가 적용</li>
+                                        <li>만기 후 이자율도 낮아질 수 있으니 확인 필요</li>
+                                        <li>만기일 임의 지정 가능(자금 필요 날짜로 설정 가능)</li>
+                                        <li>만기시 자동재예치 및 일부해지가 가능한지 확인</li>
+                                    </ul>
+                                </li>
+                                <li><strong>계약 및 약관</strong>
+                                    <ul>
+                                        <li>상품 설명서를 참고하되, 실제 계약 시 약관과 계약서류를 반드시 꼼꼼히 읽기</li>
+                                        <li>이해가 안 되는 부분은 반드시 은행 직원에게 질문 후 서명하거나 녹음 기록 남기기</li>
+                                        <li>* 추후 권리 구제가 어려울 수 있습니다 *</li>
+                                    </ul>
+                                </li>
+                                <p><strong>이 내용을 기반으로 예·적금 가입 및 관리를 철저히 할 수 있도록 준비하세요! 🚀</strong></p>
+                            </ul>
+                        </div>
                     </div>
-           <li>예금자보호 대상이 되는지 확인하세요.</li>
-       </ul>
-        </div>
-        </div>
-       
-       <!-- 상품 세부 정보 -->
-        <div class="card">
-            <img src="{% static product.logo|default:'path/to/default_logo.png' %}" alt="{{ product.bank|default:'은행 정보 없음' }} 로고" style="width: 100px; height: auto;">
-            <div class="card-content">
-                <span class="card-title">{{ product.name|default:"상품 이름 없음" }}</span><br>
-                <p><strong>은행:</strong> {{ product.bank|default:"은행 정보 없음" }}</p>
-                <p><strong>기준 금리:</strong> {{ product.baser|default:"기준 금리 정보 없음" }}</p>
-                <p><strong>최대 금리:</strong> {{ product.maxir|default:"최대 금리 정보 없음" }}</p>
-                <p><strong>가입 방법:</strong> {{ product.method|default:"가입 방법 정보 없음" }}</p>
+                    
+                    <div class="dropdown-section">
+                        <!-- 상자 제목 -->
+                        <h3 class="dropdown-title" onclick="toggleDropdown('dropdown-after')" style="text-align: center;" >[가입 후] 알아야 할 사항</h3>
+                        <!-- 상자 본문 -->
+                        <div id="dropdown-after" class="dropdown-content hidden">
+                            <ul>
+                                <li><strong>긴급 자금 필요 시 대출 활용</strong>
+                                    <ul>
+                                        <li>예·적금을 담보로 대출 가능(금리: 예금 금리 + 1.0~1.5%)</li>
+                                        <li>인터넷/모바일뱅킹으로도 신청 가능</li>
+                                    </ul>
+                                </li>
+                                <li><strong>금리 변동기에 유의</strong>
+                                    <ul>
+                                        <li>금리 상승기에는 짧은 만기의 상품을 선택하거나 회전식 정기예금을 고려</li>
+                                        <li>
+                                            회전식 정기예금은 금리가 낮을 수 있으니 확인 후 선택
+                                            <button class="details-btn" onclick="showPopup('popup-before_2')">회전식 정기예금이란?</button>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li><strong>우대혜택 및 자동재예치 서비스</strong>
+                                    <ul>
+                                        <li>우대금리 조건 충족 여부를 주기적으로 확인(충족되지 않으면 혜택 상실 가능)</li>
+                                        <li>만기 시 원금과 이자를 자동으로 재예치 가능(단, 일부 상품 제외)</li>
+                                    </ul>
+                                </li>
+                                <li><strong>만기일 휴일 전·후 선택 가능</strong>
+                                    <ul>
+                                        <li>만기일이 휴일인 경우, 휴일 전·후 영업일 중 유리한 날을 선택하여 해지 가능</li>
+                                    </ul>
+                                </li>
+                                <li><strong>중도 해지 및 일부 해지 서비스</strong>
+                                    <ul>
+                                        <li>중도 해지 시 약정 금리보다 낮은 중도해지 금리가 적용</li>
+                                        <li>일부해지 서비스로 긴급 자금만 인출 가능(담보대출과 비교하여 유리한 방법 선택)</li>
+                                    </ul>
+                                </li>
+                                <li><strong>계좌 관련 제한 사항</strong>
+                                    <ul>
+                                        <li>압류, 가압류, 질권설정 등으로 원금 및 이자 지급이 제한될 수 있음</li>
+                                        <li>최저생계비 이하 계좌는 법원 신청으로 압류 해제 가능</li>
+                                    </ul>
+                                </li>
+                                <li><strong>휴면예금 조회 및 복구</strong>
+                                    <ul>
+                                        <li>5년간 거래 없는 예금은 서민금융진흥원에 출연될 수 있음</li>
+                                        <li>휴면예금통합조회서비스(www.sleepmoney.or.kr)**를 통해 조회 가능</li>
+                                    </ul>
+                                </li>
+                                <p><strong>이 내용을 기반으로 예·적금 가입 및 관리를 철저히 할 수 있도록 준비하세요! 🚀</strong></p>
+                            </ul>
+                        </div>
+                    </div>                    
+                </div>
             </div>
+
         </div>
 
         <!-- 만덕이가 알기 쉽게 정리했덕-!!! 요약 설명 -->
@@ -94,21 +166,35 @@
        <h3>만덕이가 알기 쉽게 정리했덕-!!!🦆</h3>
     
             <div class="inner-box">
-                <p>## 경은언니 상품설명 프롬포트 들어갈자리 ##</p>
+                <pre style="white-space: pre-wrap;">{{ context_value|linebreaks }}</pre>
+
             </div>
 
-        </div>
-           <!-- 빈 박스 영역 -->
-           <div class="empty-box-row">
-            <!-- 빈 박스 1 -->
+            <!-- 상품 세부 정보 -->
+            <div class="card">
+                <img src="{% static product.logo|default:'path/to/default_logo.png' %}" 
+                     alt="{{ product.bank|default:'은행 정보 없음' }} 로고" 
+                     style="width: 100px; height: auto;">
+                <div class="card-content">
+                    <span class="card-title">{{ product.name|default:"상품 이름 없음" }}</span><br>
+                    <p><strong>은행:</strong> {{ product.bank|default:"은행 정보 없음" }}</p>
+                    <p><strong>기준 금리:</strong> {{ product.baser|default:"기준 금리 정보 없음" }}</p>
+                    <p><strong>최대 금리:</strong> {{ product.maxir|default:"최대 금리 정보 없음" }}</p>
+                    <p><strong>가입 방법:</strong> {{ product.method|default:"가입 방법 정보 없음" }}</p>
+                </div>
+            </div>
+        
+            <!-- 만덕이가 알기 쉽게 정리했덕-!!! 요약 설명 -->
             <div class="checklist">
-                <h3>만덕이가 주의를 준덕 (*￣3￣)╭ 🦆</h3>
+                <h3>만덕이가 알기 쉽게 정리했덕-!!!🦆</h3>
                 <div class="inner-box">
-                    <p>## 경은언니 프롬포트 들어갈자리 ##</p>
+                    <pre style="white-space: pre-wrap;">{{ context_value_tip|linebreaks }}</pre>
+
                 </div>
             </div>
         </div>
-    </div>
+        
+    
     <footer>
         <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0;">서울특별시 마포구 월드컵북로 434 상암IT타워 6층</p> 
         <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0;">고객지원 : 02-3151-7000 | 이메일: woorifis.lab44@gmail.com </p >
@@ -117,10 +203,28 @@
 
 
     <script>
-        // "자세히보기" 버튼 클릭 시 새 창으로 상세 설명 표시
-        function openDetailsWindow(url) {
-            window.open(url, '_blank', 'width=600,height=400,scrollbars=yes,resizable=yes');
+        function showPopup(popupId) {
+            document.getElementById(popupId).classList.remove('hidden');
         }
+
+        function closePopup(popupId) {
+            document.getElementById(popupId).classList.add('hidden');
+        }
+
+        function toggleDropdown(id) {
+            const dropdown = document.getElementById(id);
+            dropdown.classList.toggle('show'); // show 클래스를 추가/제거
+        }
+
+
+        function showPopup(popupId) {
+            document.getElementById(popupId).classList.remove('hidden');
+        }
+
+        function closePopup(popupId) {
+            document.getElementById(popupId).classList.add('hidden');
+        }
+
      </script>
 
 

@@ -1,92 +1,147 @@
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>메인 페이지</title>
-    <link rel="stylesheet" href="{% static 'css/main.css' %}">
-    <style>
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Do+Hyeon&family=Jua&family=Nanum+Gothic&display=swap');
     </style>
-</head>
-<body>
-    {% csrf_token %}
+    
+  <!DOCTYPE html>
+  <html lang="ko">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>개인화 금융 에이전트</title>
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Do+Hyeon&family=Jua&family=Noto+Sans+KR:wght@400;700&family=Roboto:wght@400;700&display=swap">
+  </head>
+  <body>
     <header>
-    <div class="navbar">
+      <div class="navbar">
         <div class="logo">
-            <a href="{% url 'main' %}">
-                <img src="{% static 'img\header_logo.png' %}" style="vertical-align: middle; margin-left: 220px;" alt="로고">
-            </div>
-            <div class="nav-links" style="flex-grow: 1; text-align: center; margin-right: 220px;">
-                <a href="{% url 'originreport' %}" style=" font-weight: bold; color: #121212;">금융분석 리포트</a> 
-                <div class="dropdown">
-                    <a href="#" style=" font-weight: bold; color: #121212;">예/적금 추천</a>
-                    <div class="dropdown-content">
-                        <a href="savings_info1" style="font-size: 0.8rem;">신규적금추천</a>
-                        <a href="{% url 'top5' %}" style="font-size: 0.8rem;">기존상품비교</a>
-                    </div>
-                </div> 
-                <a href="spending_mbti" style=" font-weight: bold; color: #121212;">소비MBTI</a>
-            </div>
+          <a href="#">
+            <img src="{% static 'img/header_logo.png' %}" alt="로고">
+          </a>
         </div>
-        </header>
-
-    <div class="container" style="display: flex; align-items: center; justify-content: space-between; padding: 20px; background-color: #3e56a7f0; height: 60vh; width: 100%;">
-        <!-- 텍스트와 버튼 섹션 -->
-        <div class="text-section" style="flex: 1; text-align: left; padding: 20px; color: white; margin-left: 220px;">
-            <div class="text-overlay" style="font-size: 32px; font-weight: bold; line-height: 1.5; margin-bottom: 20px;">
-                천냥이, 만덕이와 <br> 함께 하는 <br> 똑똑한 금융생활-!
-            </div>
-            <div class="button-container" style="margin-left: 200x;">
-                <a href="{% url 'accounts:login' %}" style="
-                    color: #fff; 
-                    text-decoration: none; 
-                    background-color: rgba(44, 5, 142, 0.8); 
-                    padding: 10px 20px; 
-                    border-radius: 10px; 
-                    font-weight: bold; 
-                    font-size: 14px;">시작하기</a>
-            </div>
+        <div class="nav-message">
+          금융 비서 <span style="color: #007bff;">천냥이</span>, <span style="color: #ff9900;">만덕이</span>와 똑똑한 금융 생활해요 🌞
         </div>
-    
-        <!-- 이미지 섹션 -->
-        <div class="image-section" style="flex: 1; display: flex; justify-content: flex-end; align-items: center; gap: 20px; margin-right: 220px;">
-            <img src="{% static 'img/만덕_돋보기.png' %}" alt="만덕" style="max-width: 150px; height: auto;">
-            <img src="{% static 'img/천냥_책.png' %}" alt="천냥" style="max-width: 150px; height: auto;">
+      </div>
+    </header>
+    <div class="main-container">
+      <div class="hero-section">
+        <h1 style="font-family: 'Jua', sans-serif;">
+        🔊 생활맞춤형 금융 에이전트 서비스를 만나보세요 !
+        </h1>
+        <p>고객님의 금융 데이터를 기반으로 맞춤형 서비스를 제공합니다.<br> 지금 가입하셔서 가장 적합한 금융 솔루션을 확인해보세요!🌈</p>
+        <a href="{% url 'accounts:login' %}" class="btn">ALL SERVICES</a>
+      </div>
+      <div class="services-section">
+        <div class="service-card" onclick="showDetails('finance')">
+          <img src="{% static 'img/내금융보기.png' %}" alt="아이콘">
+          <h3>📊 내 금융 보기</h3>
         </div>
+        <div class="service-card" onclick="showDetails('saving')">
+          <img src="{% static 'img/예적금찾기.png' %}" alt="아이콘">
+          <h3>🏦 내 예적금 찾기</h3>
+        </div>
+        <div class="service-card" onclick="showDetails('spending')">
+          <img src="{% static 'img/슬기로운소비생활.png' %}" alt="아이콘">
+          <h3>💳 슬기로운 소비생활</h3>
+        </div>
+        <div class="service-card" onclick="showDetails('news')">
+          <img src="{% static 'img/뉴스.png' %}" alt="아이콘">
+          <h3>📰 금융 카테고리 뉴스</h3>
+        </div>
+      </div>
+      <div id="details-box" class="details-box" style="display: none;">
+        <h3 id="details-title"></h3>
+        <p id="details-content"></p>
+      </div>
     </div>
-    
-    
-    <div class="container_news">
-        <div class="news-summary">
-            {% if news_entries %}
-                {% for news in news_entries %}
-                <a href="{{ news.url }}" target="_blank" class="summary-box">
-                    <div class="title">{{ news.title }}</div>
-                    <div class="summary">{{ news.summary }}</div>
-                </a>
-                {% endfor %}
-            {% else %}
-                <p>뉴스가 없습니다.</p>
-            {% endif %}
-        </div>
-
-        <div class="word-cloud">
-            <h2 style="font-weight: bold;">오늘의 뉴스 키워드</h2>
-            {% if image_base64 %}
-                <img src="data:image/png;base64,{{ image_base64 }}" alt="Word Cloud Image">
-            {% else %}
-                <p>워드클라우드 이미지가 없습니다.</p>
-            {% endif %}
-        </div>
-    </div>
-
     <footer>
-        <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #000000;">서울특별시 마포구 월드컵북로 434 상암IT타워 6층</p> 
-        <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #000000;">고객지원 : 02-3151-7000 | 이메일: woorifis.lab44@gmail.com </p >
-        <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #000000;">COPYRIGHT©2024 우리 천만해요</p >
-    </footer >
-
-</body>
-</html>
+      <p>서울특별시 마포구 월드컵북로 434 상암IT타워 6층</p>
+      <p>고객지원 : 02-3151-7000 | 이메일: worifisa@worifisa.com</p>
+      <p>COPYRIGHT©2024 우리 천만해요</p>
+    </footer>
+  </body>
+  </html>
+  
+  
+  
+  <script>
+      const details = {
+      finance: {
+        title: "📊 내 금융 보기",
+        content: `
+            마이데이터를 기반으로 자신의 금융 상태를 한눈에 파악할 수 있는 서비스입니다.<br><br>
+            금융 점수를 확인하여 자신의 재정 상태를 객관적으로 평가할 수 있으며,<br>
+            같은 생애주기를 가진 고객들의 평균 자산, 수입, 지출과 비교하여 현재 나의 위치를 시각적인 그래프로 확인할 수 있습니다.<br>
+            또한, 자산과 지출의 구성 비율을 파악해 재무 계획을 더욱 구체적으로 설계할 수 있습니다.<br>
+            마지막으로, 생성형 AI가 위의 정보를 종합하여 개인 맞춤형 금융 리포트를 만들어 드립니다.
+        `
+      },
+      saving: {
+        title: "🏦 내 예적금 찾기",
+        content: `
+            고객의 마이데이터를 기반으로 개개인에게 최적화된 예적금 상품을 추천해드립니다.<br><br>
+            단순 추천에 그치지 않고, 원하는 조건(목적, 방식, 기간 등)을 선택하면 더욱 정교하게 최적화된 상품을 제안합니다.<br>
+            추천된 상품에 대한 핵심 정보와 상품 설명서를 요약하여 제공하며, 가입 과정에서 알아두면 좋은 팁도 안내합니다.<br>
+            또한, 기존 상품보다 더 나은 조건의 상품이 있다면 이를 제안하여 최선의 금융 결정을 돕습니다.
+        `
+      },
+      spending: {
+        title: "💳 슬기로운 소비생활",
+        content: `
+            고객님의 지출 데이터를 기반으로 슬기로운 소비생활을 돕는 서비스입니다.<br><br>
+            기간별 지출 금액과 빈도를 카테고리별로 시각화하여 소비 패턴을 명확히 파악할 수 있습니다.<br>
+            이를 통해 고객은 자신의 소비 습관을 객관적으로 이해하고 개선 방향을 찾을 수 있습니다.<br>
+            또한, AI 모델을 활용해 다음 달 예상 소비 금액을 예측하고,<br>
+            가장 많은 소비가 발생할 것으로 예상되는 카테고리에 적합한 혜택을 제공하는 카드를 추천해드립니다.<br>
+            예를 들어, 식비와 교통비 지출이 많은 고객에게는 관련 혜택이 풍부한 카드를 제안하여 실제 소비 절감을 실현할 수 있도록 돕습니다.<br><br>
+            마지막으로, 생성형 AI를 활용해 소비 패턴과 카드 혜택을 종합적으로 분석하고,<br>
+            고객이 선택한 카드를 통해 절약할 수 있는 예상 금액을 구체적으로 제시합니다.<br>
+            이를 통해 소비의 효율성을 높이고, 합리적인 소비생활을 실현할 수 있는 실질적인 가이드를 제공합니다.<br><br>
+            슬기로운 소비생활 서비스를 통해 재정을 효율적으로 관리하고, 더 나은 금융 습관을 만들어보세요!
+        `
+      },
+      news: {
+        title: "📰 금융 카테고리 뉴스",
+        content: `
+            매일 업데이트되는 예/적금 상품과 금융 관련 핫한 뉴스를 실시간으로 요약해 제공합니다.<br><br> 
+            주요 뉴스를 클릭하면 해당 기사의 자세한 내용을 바로 확인할 수 있으며,<br>
+            매일 주요 뉴스의 핵심 키워드를 시각적으로 보여주는 워드클라우드도 함께 제공합니다.<br>
+            이를 통해 빠르게 변화하는 금융 시장의 트렌드를 쉽게 파악하고, 현명한 금융 결정을 내릴 수 있도록 돕습니다.<br> 
+            이 서비스를 활용해 최신 금융 정보를 손쉽게 확인해보세요!
+        `
+      }
+    };
+  
+    // 상세 정보를 보여주는 함수
+    function showDetails(key) {
+      const detailBox = document.getElementById("details-box");
+      const titleElement = document.getElementById("details-title");
+      const contentElement = document.getElementById("details-content");
+  
+      if (details[key]) {
+        titleElement.innerHTML = details[key].title;
+        contentElement.innerHTML = details[key].content;
+        detailBox.style.display = "block"; // 박스를 보이도록 설정
+      }
+    }
+  
+    // 모든 카드를 선택
+    const cards = document.querySelectorAll(".service-card");
+  
+    // 카드 클릭 이벤트 처리
+    cards.forEach((card) => {
+      card.addEventListener("click", () => {
+        // 모든 카드에서 'active' 클래스 제거
+        cards.forEach((c) => c.classList.remove("active"));
+  
+        // 클릭된 카드에만 'active' 클래스 추가
+        card.classList.add("active");
+      });
+    });
+  
+  
+  </script>
+  
+  
