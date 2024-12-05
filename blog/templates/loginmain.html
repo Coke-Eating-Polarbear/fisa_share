@@ -1,4 +1,8 @@
 {% load static %}
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Do+Hyeon&family=Jua&family=Nanum+Gothic&display=swap');
+    </style>
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -56,41 +60,139 @@
     </div>
     </header>
 
-    <!-- 중앙 금융 리포트 내용 -->
-    <div class="container" style="margin-left: 10px; margin-right: 10px;">
-        <div class="summary">
-            <h2>금융리포트 요약</h2>
-            <!-- <p>자세히 보기를 누르면 금융리포트 창으로 넘어갑니다.</p> -->
-            <div style="display: grid; grid-template-columns: 2fr 2fr 6fr;">
-                <div class="box" id="analysis-score" style="color: #5950d6;"></div>
-                <div class="score-summary"><span class="score-summary"></span></div>
-                <div class="box" id="summary" ></div>
+    <div class="carousel">
+            <!-- 슬라이드 컨테이너 -->
+            <div class="slides">
+                <!-- 첫 번째 슬라이더 -->
+                <div class="slide active">
+                    <div class="container">
+                        <div class="summary" style="background: #DCF0FD; display: flex; align-items: center;">
+                            <!-- 왼쪽 섹션 -->
+                            <div style="flex: 1.5; padding: 20px;">
+                                <h2>
+                                    <span class="text">내 금융생활 한눈에 체크하기 💰</span><br>
+                                </h2>
+        
+                                <!-- 점수 및 요약 -->
+                                <p class="finance-score">
+                                    <strong class="lighter-heading">고객님의 금융점수:</strong> 
+                                    <span id="analysis-score"></span> 
+                                    <span class="score-summary"></span>
+                                </p>
+                                <p class="finance-summary">
+                                    <strong class="lighter-heading">현재 금융 상황 요약:</strong> 
+                                    <span id="summary"></span>
+                                </p>
+        
+                                <!-- 자세히 보기 버튼 -->
+                                <a href="{% url 'originreport' %}" class="details-button">🍀 금융 리포트 보러가기</a>
+                            </div>
+        
+                            <!-- 오른쪽 섹션 -->
+                            <div style="flex: 1; text-align: center;">
+                                <img src="{% static 'img/메인로고1.png' %}" alt="메인 로고" style="max-width: 80%; max-height: 100%;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        
+                <!-- 두 번째 슬라이더 -->
+                <div class="slide">
+                    <div class="container">
+                        <div class="summary" style="display: flex; align-items: center; background-color: #eff5ff;">
+                            <!-- 왼쪽 섹션 -->
+                            <div style="flex: 1.5; padding: 20px;">
+                                <h2 style="margin-bottom: 20px; letter-spacing: 0.8px;">
+                                    <span class="text">나에게 딱 맞는 금융 상품 찾기</span>
+                                </h2>
+        
+                                <!-- 설명 -->
+                                <p class="lighter-heading">
+                                    1. 나에게 딱 맞는 신규 예/적금 상품 추천<br>
+                                    2. 기존보다 더 좋은 우대 금리를 갖는 예/적금 상품 추천
+                                </p>
+
+                                <!-- 버튼 -->
+                                <div class="button-group" style="margin-top: 20px;">
+                                    <a href="#" class="details-button" style="border-radius: 41px; background-color: #eff5ff; color: #09a56f;">😺 신규 상품 추천</a><br>
+                                    <a href="#" class="details-button" style="border-radius: 41px; background-color: #eff5ff; color: #09a56f;">🦢 기존 상품 비교</a>
+                                </div>
+                            </div>
+
+                            <!-- 오른쪽 섹션 -->
+                            <div style="flex: 1; text-align: center;">
+                                <img src="{% static 'img/메인로고2.png' %}" alt="예적금 상품 이미지" style="max-width: 90%; max-height: 100%;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        
+                <!-- 세 번째 슬라이더 -->
+                <div class="slide">
+                    <div class="container">
+                        <div class="summary" style="display: flex; align-items: center; background-color: #EAE8FF;">
+                            <!-- 왼쪽 섹션 -->
+                            <div style="flex: 1.5; padding: 20px;">
+                                <h2 style="margin-bottom: 20px;">
+                                    <span class="text">슬기로운 소비생활 도우미</span>
+                                </h2>
+                
+                                <!-- 설명 -->
+                                <p class="lighter-heading">
+                                    1. 나의 소비 패턴 한눈에 확인하기<br>
+                                    2. 내 소비를 줄여주는 혜택 높은 카드 추천받기
+                                </p>
+                
+                                <!-- 버튼 -->
+                                <div class="button-group" style="margin-top: 20px;">
+                                    <a href="#" class="details-button" style="background-color: #6356DA; color: #eff5ff;">🔎 자세히 보러가기</a>
+                                </div>
+                            </div>
+                
+                            <!-- 오른쪽 섹션 -->
+                            <div style="flex: 1; text-align: center;">
+                                <img src="{% static 'img/메인로고3.png' %}" alt="메인 로고" style="max-width: 90%; max-height: 100%;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <a href="{% url 'originreport' %}"class="details-button">자세히 보기</a>
+        
+            <!-- 네비게이션 -->
+            <div class="carousel-navigation">
+                <button class="nav-dot active" data-index="0"></button>
+                <button class="nav-dot" data-index="1"></button>
+                <button class="nav-dot" data-index="2"></button>
+            </div>
         </div>
+    </div>
     
         <!-- 맞춤 예측 상품 TOP 5 섹션 -->
         <div class="product-section">
-            <h2 style="margin-bottom: 1rem;">{{ user_name }}님 맞춤 예/적금 상품 TOP 5!</h2>
+                <!-- 안내 문구 -->
+            <p class="section-intro" style="font-size: 14px; color: #666; text-align: center; margin-bottom: 10px;">
+                나에게 맞는 예/적금 상품, 찾기 힘드셨죠?<br>마이데이터를 기반으로 쉽고 정확하게 비교해드립니다.
+            </p>
+            <h2 style="margin-bottom: 1rem; color:#121212; font-family: 'Jua', sans-serif; font-weight: 400; font-size: 38px;">{{ user_name }}님 맞춤 예/적금 상품 TOP 5!</h2>
     
             <div class="product-list">
                 {% for product in final_recommend %}
                     <div class="product-card">
-                        <p><strong>상품명:</strong> {{ product.product_name }}</p>
-                        <p><strong>은행:</strong> {{ product.bank_name }}</p>
+                        <p class="product-name">✔ {{ product.product_name }}</p>
+                        <p class="bank-name">{{ product.bank_name }}</p>
                         <p><strong>기준 금리:</strong> {{ product.base_rate }}</p>
                         <p><strong>최대 금리:</strong> {{ product.max_preferential_rate }}</p>
-                        <p><strong>가입 방법:</strong> {{ product.signup_method }}</p>
+                        <!-- <p><strong>가입 방법:</strong> {{ product.signup_method }}</p> -->
                     </div>
                 {% endfor %}
             
                 {% for product in deposit_recommend %}
                     <div class="product-card">
-                        <p><strong>상품명:</strong> {{ product.name }}</p>
-                        <p><strong>은행:</strong> {{ product.bank }}</p>
+                        <p class="product-name">✔ {{ product.name }}</p>
+                        <p class="bank-name">{{ product.bank }}</p>
                         <p><strong>기준 금리:</strong> {{ product.baser }}</p>
                         <p><strong>최대 금리:</strong> {{ product.maxir }}</p>
-                        <p><strong>가입 방법:</strong> {{ product.method }}</p>
+                        <!-- <p><strong>가입 방법:</strong> {{ product.method }}</p> -->
                     </div>
                 {% endfor %}
             </div>
@@ -158,40 +260,71 @@
             if (aStatus === "좋음" && bStatus === "높음") {
                 score = 100;
                 condition = "Excellent";
-                summary = "모든 조건이 이상적이며, 재정 상태가 매우 좋습니다.\n" + "수입 대비 지출 비율이 좋고 평균 이상으로 안정적이며\n" +"장기적인 재정 관리가 매우 양호한 편입니다.";
+                summary = "모든 조건이 이상적이며, 재정 상태가 매우 좋습니다.<br>" + "수입 대비 지출 비율이 좋고 평균 이상으로 안정적이며<br>" +"장기적인 재정 관리가 매우 양호한 편입니다.";
                 emoji = "😎";
             } else if (aStatus === "좋음" && bStatus === "낮음") {
                 score = 90;
                 condition = "VeryGood";
-                summary = "수입 대비 지출 비율이 좋지만 평균에 비해 살짝 낮은 편입니다.\n" + "재정적으로 안정적이지만 조금 더 관리가 필요합니다.";
+                summary = "수입 대비 지출 비율이 좋지만 평균에 비해 살짝 낮은 편입니다.<br>" + "재정적으로 안정적이지만 조금 더 관리가 필요합니다.";
                 emoji = "🥰";
             } else if (aStatus === "보통" && bStatus === "높음") {
                 score = 80;
                 condition = "Good";
-                summary = "평균보다 수입이 높고, 재정상태가 무난하지만 수입 대비 지출이 높은 편입니다.\n" +"지출 부분을 약간 개선한다면 더 좋은 재정상태가 될 수 있습니다. ";
+                summary = "평균보다 수입이 높고, 재정상태가 무난하지만 수입 대비 지출이 높은 편입니다.<br>" +"지출 부분을 약간 개선한다면 더 좋은 재정상태가 될 수 있습니다. ";
                 emoji = "😀";
             } else if (aStatus === "보통" && bStatus === "낮음") {
                 score = 70;
                 condition = "Soso";
-                summary = "수입 대비 지출의 비중이 높은편은 아니지만\n"+"평균 수입을 고려한다면 조금 더 관리와 주의가 필요합니다.";
+                summary = "수입 대비 지출의 비중이 높은편은 아니지만<br>"+"평균 수입을 고려한다면 조금 더 관리와 주의가 필요합니다.";
                 emoji = "😊";
             } else if (aStatus === "나쁨" && bStatus === "높음") {
                 score = 60;
                 condition = "NotBad";
-                summary = "평균보다 소득이 높은 편이지만 수입 대비 지출이 많습니다.\n" + "장기적으로 안정적인 재정 상태를 유지하기 위해선 추가적인 관리와 주의가 필요합니다.";
+                summary = "평균보다 소득이 높은 편이지만 수입 대비 지출이 많습니다.<br>" + "장기적으로 안정적인 재정 상태를 유지하기 위해선 추가적인 관리와 주의가 필요합니다.";
                 emoji = "🥲";
             } else {
                 score = 50;
                 condition = "Bad";
-                summary = "수입 대비 지출이 높아 재정 상태가 좋지않은 위험한 상태입니다.\n" + "즉각적인 재정 관리와 개선 조치가 필요한 상황입니다.";
+                summary = "수입 대비 지출이 높아 재정 상태가 좋지않은 위험한 상태입니다.<br>" + "즉각적인 재정 관리와 개선 조치가 필요한 상황입니다.";
                 emoji = "😢";
             }
 
             // 데이터 화면에 출력
             document.getElementById('analysis-score').textContent = `${score}점`;
-            document.getElementById('summary').textContent = summary;
+            document.getElementById('summary').innerHTML = summary;
             document.querySelector('.score-summary').textContent = emoji;
             });
+        
+        document.addEventListener("DOMContentLoaded", function () {
+            const slides = document.querySelectorAll(".slide");
+            const dots = document.querySelectorAll(".nav-dot");
+
+            // 슬라이드 변경 함수
+            function changeSlide(index) {
+                slides.forEach((slide, i) => {
+                    slide.classList.toggle("active", i === index);
+                });
+                dots.forEach((dot, i) => {
+                    dot.classList.toggle("active", i === index);
+                });
+            }
+
+            // 네비게이션 버튼 클릭 이벤트
+            dots.forEach((dot) => {
+                dot.addEventListener("click", () => {
+                    const index = parseInt(dot.getAttribute("data-index"), 10);
+                    changeSlide(index);
+                });
+            });
+
+            // 자동 슬라이드 (5초마다)
+            let currentIndex = 0;
+            setInterval(() => {
+                currentIndex = (currentIndex + 1) % slides.length;
+                changeSlide(currentIndex);
+            }, 5000);
+        });
+
     </script>
 
     <footer>
