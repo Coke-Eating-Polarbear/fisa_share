@@ -150,3 +150,26 @@
     border-radius: 8px; /* 선택적: 모서리 둥글게 */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 선택적: 그림자 */
 }
+
+.new-action-button {
+    display: inline-block;
+    justify-items: center;
+    margin-top: 20px;
+    padding: 12px 25px;
+    font-size: 16px;
+    color: white;
+    background-color: #4747c5; /* 녹색 */
+    border: none;
+    border-radius: 25px;
+    text-decoration: none;
+    text-align: center;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.new-action-button:hover {
+    background-color: #1b1c76; /* 호버 시 밝은 녹색 */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+    transform: scale(1.05);
+    text-decoration: underline;
+}
