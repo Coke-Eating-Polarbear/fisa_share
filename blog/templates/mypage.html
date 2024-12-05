@@ -150,11 +150,24 @@
                     </p>
                 </div>
                 <div class="additional-box">
-                    <strong>
+                    <!-- <strong>
                     {% if deposit.maturity_amount %}
                         만기일에 받을 수 있는 예상 금액은 {{ deposit.maturity_amount }}원입니다!
                     {% else %}
                         현재 잔액은 {{ deposit.balance }}원입니다.
+                    {% endif %}
+                    </strong> -->
+                    <strong>
+                    {% if deposit.end_date == "2999-12-31" %}
+                    만기일이 없는 자유저축예탁금 상품입니다.<br>    
+                    현재 예금 잔액은 {{ deposit.balance }}원 입니다.<br>   
+                    {% else %}
+                        {% if deposit.days_remaining %}
+                            예금 만기까지 {{ deposit.days_remaining }}일 남았습니다!<br>
+                            아자아자 ~ 조금만 더 힘내봐요!<br> 만기까지 만덕이가 응원할게요!!🤗<br>
+                        {% else %}
+                            현재 적금액은 {{ deposit.balance }}원입니다.
+                        {% endif %}
                     {% endif %}
                     </strong>
                 </div>
@@ -185,7 +198,19 @@
                     </p>
                 </div>
                 <div class="additional-box">
-                    <strong>목표 금액 달성까지 {{ savings.days_remaining }}일 남았습니다!</strong>
+                    <strong>
+                    {% if savings.end_date == "2999-12-31" %}
+                    현재 적금액은 {{ savings.balance }}원입니다.<br>    
+                    목표를 향해 열심히 저축 중이에요!<br> 꾸준히 하시면 큰 성과를 얻을 거예요. 💪   
+                    {% else %}
+                        {% if savings.days_remaining %}
+                            적금 만기까지 {{ savings.days_remaining }}일 남았습니다!<br>
+                            아자아자 ~ 조금만 더 힘내봐요!<br> 만기까지 만덕이가 응원할게요!!🤗<br>
+                        {% else %}
+                            현재 적금액은 {{ savings.balance }}원입니다.
+                        {% endif %}
+                    {% endif %}
+                    </strong>
                 </div>
             </div>
             {% endfor %}
