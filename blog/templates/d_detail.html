@@ -30,7 +30,7 @@
                 </div>
                <!-- 회원 정보 및 마이페이지 -->
             <div class="user-info">
-                <span style="font-size: 1.1rem;">{{ user_name }}님</span> 
+                <span style="font-size: 1.1rem;" class="user-name">{{ user_name }}님</span> 
                 <a href="./mypage" style="margin-left: 15px; 
                 text-decoration: none; 
                 font-size: 1.1rem; 
@@ -97,7 +97,9 @@
                                         <li>* 추후 권리 구제가 어려울 수 있습니다 *</li>
                                     </ul>
                                 </li>
-                                <p><strong>이 내용을 기반으로 예·적금 가입 및 관리를 철저히 할 수 있도록 준비하세요! 🚀</strong></p>
+                                <li style="list-style: none; margin-left: 10px;">
+                                    <strong>이 내용을 기반으로 예·적금 가입 및 관리를 철저히 할 수 있도록 준비하세요! 🚀</strong>
+                                </li>
                             </ul>
                         </div>
                     </div>
@@ -152,15 +154,48 @@
                                         <li>휴면예금통합조회서비스(www.sleepmoney.or.kr)**를 통해 조회 가능</li>
                                     </ul>
                                 </li>
-                                <p><strong>이 내용을 기반으로 예·적금 가입 및 관리를 철저히 할 수 있도록 준비하세요! 🚀</strong></p>
+                                <li style="list-style: none; margin-left: 0px;">
+                                    <strong>이 내용을 기반으로 예·적금 가입 및 관리를 철저히 할 수 있도록 준비하세요! 🚀</strong>
+                                </li>
                             </ul>
                         </div>
                     </div>                    
                 </div>
             </div>
 
-        </div>
+                    <!-- 팝업 박스 -->
+                    <div id="popup-before" class="popup hidden">
+                        <div class="popup-content">
+                            <h4>🔎 자세히 보기</h4>
+                            <p>보호대상 상품인지 상품설명서의 예금보호 로고 확인</p>
+                            <p>- 예금자보호법에 따라 원금과 이자를 합쳐 1인당 5천만 원까지 보호</p>
+                            <p>- 금융기관별로 산정되므로 은행 또는 저축은행당 분산 가입 필요</p>
+                            <button class="close-btn" onclick="closePopup('popup-before')">닫기</button>
+                        </div>
+                    </div>
+                
+                    <div id="popup-before_2" class="popup hidden">
+                        <div class="popup-content">
+                            <h4>🔎 회전식 정기예금이란?</h4>
+                            <p>예금만기 이내에서 회전주기(1,3,6,12개월 등 이자율이 변동 적용되는 기간) 단위로 예금 금리가 시중금리에 따라 바뀌는 예금</p>
+                            <button class="close-btn" onclick="closePopup('popup-before_2')">닫기</button>
+                        </div>
+                    </div>
 
+        <!-- 상품 세부 정보 -->
+        <div class="card">
+            <img src="{% static product.logo %}" alt="{{ product.bank }} 로고" 
+                 alt="{{ product.bank|default:'은행 정보 없음' }} 로고" 
+                 style="width: 100px; height: auto;">
+            <div class="card-content">
+                <span class="card-title">{{ product.name|default:"상품 이름 없음" }}</span><br>
+                <p><strong>은행:</strong> {{ product.bank|default:"은행 정보 없음" }}</p>
+                <p><strong>기준 금리:</strong> {{ product.baser|default:"기준 금리 정보 없음" }}</p>
+                <p><strong>최대 금리:</strong> {{ product.maxir|default:"최대 금리 정보 없음" }}</p>
+                <p><strong>가입 방법:</strong> {{ product.method|default:"가입 방법 정보 없음" }}</p>
+            </div>
+        </div>
+        
         <!-- 만덕이가 알기 쉽게 정리했덕-!!! 요약 설명 -->
         <div class="checklist">
        <h3>만덕이가 알기 쉽게 정리했덕-!!!🦆</h3>
@@ -169,20 +204,8 @@
                 <pre style="white-space: pre-wrap;">{{ context_value|linebreaks }}</pre>
 
             </div>
-
-            <!-- 상품 세부 정보 -->
-            <div class="card">
-                <img src="{% static product.logo|default:'path/to/default_logo.png' %}" 
-                     alt="{{ product.bank|default:'은행 정보 없음' }} 로고" 
-                     style="width: 100px; height: auto;">
-                <div class="card-content">
-                    <span class="card-title">{{ product.name|default:"상품 이름 없음" }}</span><br>
-                    <p><strong>은행:</strong> {{ product.bank|default:"은행 정보 없음" }}</p>
-                    <p><strong>기준 금리:</strong> {{ product.baser|default:"기준 금리 정보 없음" }}</p>
-                    <p><strong>최대 금리:</strong> {{ product.maxir|default:"최대 금리 정보 없음" }}</p>
-                    <p><strong>가입 방법:</strong> {{ product.method|default:"가입 방법 정보 없음" }}</p>
-                </div>
-            </div>
+        </div>
+            
         
             <!-- 만덕이가 알기 쉽게 정리했덕-!!! 요약 설명 -->
             <div class="checklist">
