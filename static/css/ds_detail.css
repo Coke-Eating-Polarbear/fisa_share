@@ -192,10 +192,14 @@ li {
     width: 100%;
     height: 100%;
     background: rgba(0, 0, 0, 0.5);
-    display: flex;
+    display: none;
     align-items: center;
     justify-content: center;
     z-index: 1000;
+}
+
+.popup.show {
+    display: flex; /* show 클래스가 추가되었을 때 보이도록 설정 */
 }
 
 .popup.hidden {
@@ -237,17 +241,14 @@ li {
 }
 
 .dropdown-section {
-    position: relative; /* 드롭다운 내용을 부모 요소 기준으로 위치 */
-    flex: 1;
-    max-width: 48%; /* 너비 조정 */
-    min-width: 300px; /* 최소 너비 */
-    text-align: center; /* 텍스트를 박스 내부에서 중앙 정렬 */
-    margin: 0 auto; /* 박스를 부모 컨테이너에서 중앙 정렬 */
-    box-sizing: border-box; /* 패딩 포함 크기 계산 */
+    position: relative; /* 드롭다운 위치 설정 기준 */
+    overflow: visible; /* 드롭다운이 부모를 벗어나도 보이도록 설정 */
+    width: 100%; /* 부모 컨테이너 너비에 맞추기 */
 }
 
+
 .dropdown-title {
-    display: block; /* 부모 너비에 맞게 블록 요소로 설정 */
+    display: block;
     cursor: pointer;
     font-size: 18px;
     padding: 10px;
@@ -255,11 +256,11 @@ li {
     border: 1px solid #ddd;
     border-radius: 8px;
     color: #333;
-    width: 100%; /* 박스를 부모 컨테이너 너비에 맞게 확장 */
-    max-width: 100%; /* 최대 너비 설정 (부모보다 크지 않도록) */
-    text-align: center; /* 텍스트 중앙 정렬 */
-    box-sizing: border-box; /* 패딩 포함 크기 계산 */
-    margin: 0 auto; /* 가운데 정렬 */
+    width: 100%; /* 부모 컨테이너 너비에 맞춤 */
+    max-width: 100%;
+    text-align: center;
+    box-sizing: border-box;
+    margin: 0 auto;
 }
 
 .dropdown-title:hover {
@@ -277,9 +278,23 @@ li {
     margin-bottom: 1px;
 }
 
+.dropdown-content {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%; /* 부모와 동일한 너비 */
+    max-width: none; /* 최대 너비 제한 해제 */
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    z-index: 1000;
+    box-sizing: border-box;
+    padding: 10px;
+}
 
 .dropdown-content.hidden {
-    display: none; /* 숨겨진 상태 */
+    display: none !important ; /* 숨겨진 상태 */
 }
 
 .dropdown-content ul li {
@@ -292,8 +307,9 @@ li {
 
 /* 드롭다운이 보일 때 */
 .dropdown-content.show {
-    display: block; /* 드롭다운 내용을 표시 */
+    display: block !important; /* 드롭다운 내용을 표시 */
 }
+
 
 li {
     margin-bottom: 0px;

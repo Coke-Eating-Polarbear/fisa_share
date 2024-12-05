@@ -39,7 +39,7 @@
                 <a href="./mypage">마이페이지</a>
                 <form method="POST" action="{% url 'logout' %}">
                     {% csrf_token %}
-                    <button name="logout">로그아웃</button>
+                    <button type="button" name="logout">로그아웃</button>
                 </form>
             </div>
         </div>
@@ -63,7 +63,7 @@
                                         <li>비과세/세금우대 가능 여부 확인</li>
                                         <li>
                                             예금자보호 대상 여부 확인:
-                                            <button class="details-btn" onclick="showPopup('popup-before')">자세히 보기</button>
+                                            <button type="button" class="details-btn" onclick="showPopup('popup-before')">자세히 보기</button>
                                         </li>
                                     </ul>
                                 </li>
@@ -113,7 +113,7 @@
                                         <li>금리 상승기에는 짧은 만기의 상품을 선택하거나 회전식 정기예금을 고려</li>
                                         <li>
                                             회전식 정기예금은 금리가 낮을 수 있으니 확인 후 선택
-                                            <button class="details-btn" onclick="showPopup('popup-before_2')">회전식 정기예금이란?</button>
+                                            <button type="button" class="details-btn" onclick="showPopup('popup-before_2')">회전식 정기예금이란?</button>
                                         </li>
                                     </ul>
                                 </li>
@@ -156,21 +156,21 @@
             </div>
 
                     <!-- 팝업 박스 -->
-                    <div id="popup-before" class="popup hidden">
+                    <div id="popup-before" class="popup">
                         <div class="popup-content">
                             <h4>🔎 자세히 보기</h4>
                             <p>보호대상 상품인지 상품설명서의 예금보호 로고 확인</p>
                             <p>- 예금자보호법에 따라 원금과 이자를 합쳐 1인당 5천만 원까지 보호</p>
                             <p>- 금융기관별로 산정되므로 은행 또는 저축은행당 분산 가입 필요</p>
-                            <button class="close-btn" onclick="closePopup('popup-before')">닫기</button>
+                            <button type="button" class="close-btn" onclick="closePopup('popup-before')">닫기</button>
                         </div>
                     </div>
                 
-                    <div id="popup-before_2" class="popup hidden">
+                    <div id="popup-before_2" class="popup">
                         <div class="popup-content">
                             <h4>🔎 회전식 정기예금이란?</h4>
                             <p>예금만기 이내에서 회전주기(1,3,6,12개월 등 이자율이 변동 적용되는 기간) 단위로 예금 금리가 시중금리에 따라 바뀌는 예금</p>
-                            <button class="close-btn" onclick="closePopup('popup-before_2')">닫기</button>
+                            <button type="button" class="close-btn" onclick="closePopup('popup-before_2')">닫기</button>
                         </div>
                     </div>
 
@@ -219,26 +219,33 @@
 
     <script>
         function showPopup(popupId) {
+            document.getElementById(popupId).classList.add('show');
             document.getElementById(popupId).classList.remove('hidden');
         }
 
         function closePopup(popupId) {
+            document.getElementById(popupId).classList.remove('show');
             document.getElementById(popupId).classList.add('hidden');
         }
 
         function toggleDropdown(id) {
             const dropdown = document.getElementById(id);
-            dropdown.classList.toggle('show'); // show 클래스를 추가/제거
+            const button = dropdown.previousElementSibling; // 버튼 요소 가져오기
+
+            if (dropdown) {
+                if (dropdown.classList.contains('hidden')) {
+                    dropdown.style.width = `${button.offsetWidth}px`; // 버튼 넓이를 동적으로 설정
+                    dropdown.classList.remove('hidden');
+                    dropdown.classList.add('show');
+                } else {
+                    dropdown.classList.add('hidden');
+                    dropdown.classList.remove('show');
+                }
+            }
         }
 
 
-        function showPopup(popupId) {
-            document.getElementById(popupId).classList.remove('hidden');
-        }
 
-        function closePopup(popupId) {
-            document.getElementById(popupId).classList.add('hidden');
-        }
 
      </script>
 
