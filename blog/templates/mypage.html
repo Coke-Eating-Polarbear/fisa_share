@@ -80,7 +80,7 @@
                 {% else %}
                     <form method="POST">
                         {% csrf_token %}
-                        <label for="goal_amount">목표 금액을 설정하세요:</label>
+                        <label for="goal_amount">목표 소비액을 설정하세요:</label>
                         <input type="number" name="goal_amount" required>
                         <button type="submit">저장</button>
                     </form>
@@ -91,7 +91,7 @@
         
             <!-- 카드 결제 내역 분석 -->
             <div class="right-box">
-                <h2>이번 달 카드 사용 내역</h2>
+                <h2 class="user-name">이번 달 {{ user_name }}님의 지출 현황</h2>
                 <!-- <p>이번 달 카드 사용 내역</p> -->
                 <div class="pie-chart">
                     <canvas id="pieChart"></canvas>

@@ -60,7 +60,12 @@
     <div class="container" style="margin-left: 10px; margin-right: 10px;">
         <div class="summary">
             <h2>금융리포트 요약</h2>
-            <p>자세히 보기를 누르면 금융리포트 창으로 넘어갑니다.</p>
+            <!-- <p>자세히 보기를 누르면 금융리포트 창으로 넘어갑니다.</p> -->
+            <div style="display: grid; grid-template-columns: 2fr 2fr 6fr;">
+                <div class="box" id="analysis-score" style="color: #5950d6;"></div>
+                <div class="score-summary"><span class="score-summary"></span></div>
+                <div class="box" id="summary" ></div>
+            </div>
             <a href="{% url 'originreport' %}"class="details-button">자세히 보기</a>
         </div>
     
@@ -117,6 +122,77 @@
             {% endif %}
         </div>
     </div>
+
+    <script>
+        const user_data = JSON.parse('{{ user_data|safe|escapejs }}');
+        const average_data = JSON.parse('{{ average_data|safe|escapejs }}');
+        const userValues = Object.values(user_data);
+        const averageValues = Object.values(average_data);
+
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const totalIncome = userValues[2]; // 총수입
+            const totalSpending = userValues[3]; // 총지출
+            const averageIncome = averageValues[2]; // 평균수입
+
+            console.log('totalIncome',totalIncome);
+            console.log('totalSpending',totalSpending);
+            console.log('averageIncome',averageIncome);
+
+            // A 계산 (지출/수입 비율)
+            const spendingRatio = (totalSpending / totalIncome) * 100;
+            let aStatus;
+            if (spendingRatio <= 50) {
+                aStatus = "좋음";
+            } else if (spendingRatio <= 70) {
+                aStatus = "보통";
+            } else {
+                aStatus = "나쁨";
+            }
+
+            // B 계산 (평균 수입과 비교)
+            const bStatus = totalIncome > averageIncome ? "높음" : "낮음";
+
+            // 점수와 금융 날씨 결정
+            let score, condition, summary, emoji;
+            if (aStatus === "좋음" && bStatus === "높음") {
+                score = 100;
+                condition = "Excellent";
+                summary = "모든 조건이 이상적이며, 재정 상태가 매우 좋습니다.\n" + "수입 대비 지출 비율이 좋고 평균 이상으로 안정적이며\n" +"장기적인 재정 관리가 매우 양호한 편입니다.";
+                emoji = "😎";
+            } else if (aStatus === "좋음" && bStatus === "낮음") {
+                score = 90;
+                condition = "VeryGood";
+                summary = "수입 대비 지출 비율이 좋지만 평균에 비해 살짝 낮은 편입니다.\n" + "재정적으로 안정적이지만 조금 더 관리가 필요합니다.";
+                emoji = "🥰";
+            } else if (aStatus === "보통" && bStatus === "높음") {
+                score = 80;
+                condition = "Good";
+                summary = "평균보다 수입이 높고, 재정상태가 무난하지만 수입 대비 지출이 높은 편입니다.\n" +"지출 부분을 약간 개선한다면 더 좋은 재정상태가 될 수 있습니다. ";
+                emoji = "😀";
+            } else if (aStatus === "보통" && bStatus === "낮음") {
+                score = 70;
+                condition = "Soso";
+                summary = "수입 대비 지출의 비중이 높은편은 아니지만\n"+"평균 수입을 고려한다면 조금 더 관리와 주의가 필요합니다.";
+                emoji = "😊";
+            } else if (aStatus === "나쁨" && bStatus === "높음") {
+                score = 60;
+                condition = "NotBad";
+                summary = "평균보다 소득이 높은 편이지만 수입 대비 지출이 많습니다.\n" + "장기적으로 안정적인 재정 상태를 유지하기 위해선 추가적인 관리와 주의가 필요합니다.";
+                emoji = "🥲";
+            } else {
+                score = 50;
+                condition = "Bad";
+                summary = "수입 대비 지출이 높아 재정 상태가 좋지않은 위험한 상태입니다.\n" + "즉각적인 재정 관리와 개선 조치가 필요한 상황입니다.";
+                emoji = "😢";
+            }
+
+            // 데이터 화면에 출력
+            document.getElementById('analysis-score').textContent = `${score}점`;
+            document.getElementById('summary').textContent = summary;
+            document.querySelector('.score-summary').textContent = emoji;
+            });
+    </script>
 
     <footer>
         <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0;">서울특별시 마포구 월드컵북로 434 상암IT타워 6층</p> 
