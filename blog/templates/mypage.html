@@ -116,9 +116,17 @@
             <div class="product-container hidden-product">
                 <div class="product-details">
                     <h3>{{ product.pname }}</h3>
-                    <p>잔액: {{ product.balance }}원</p>
-                    <p>금리: {{ product.ds_rate }}%</p>
-                    <p>만기일: {{ product.end_date }}</p>
+                    <p>잔고: {{ product.balance }}원</p>
+                    <p>적용 금리: {{ product.ds_rate }}%</p>
+                    <!-- <p>만기일: {{ product.end_date }}</p> -->
+                    <p>
+                        만기일: 
+                        {% if product.end_date == "2999-12-31" %}
+                            없음
+                        {% else %}
+                            {{ product.end_date }}
+                        {% endif %}
+                    </p>
                 </div>
             </div>
             {% endfor %}
@@ -133,9 +141,18 @@
             <div class="product-container hidden-product">
                 <div class="product-details">
                     <h3>{{ deposit.pname }}</h3>
-                    <p>잔액: {{ deposit.balance }}원</p>
-                    <p>금리: {{ deposit.ds_rate }}%</p>
-                    <p>만기일: {{ deposit.end_date }}</p>
+                    <p>총 예금액: {{ deposit.balance }}원</p>
+                    <p>적용 금리: {{ deposit.ds_rate }}%</p>
+                    <!-- <p>만기일: {{ deposit.end_date }}</p> -->
+                     <!-- 만기일 조건에 따른 처리 -->
+                    <p>
+                        만기일: 
+                        {% if deposit.end_date == "2999-12-31" %}
+                            없음
+                        {% else %}
+                            {{ deposit.end_date }}
+                        {% endif %}
+                    </p>
                 </div>
                 <div class="additional-box">
                     <strong>
@@ -159,9 +176,18 @@
             <div class="product-container hidden-product">
                 <div class="product-details">
                     <h3>{{ savings.pname }}</h3>
-                    <p>잔액: {{ savings.balance }}원</p>
-                    <p>금리: {{ savings.ds_rate }}%</p>
-                    <p>만기일: {{ savings.end_date }}</p>
+                    <p>총 적금액: {{ savings.balance }}원</p>
+                    <p>적용 금리: {{ savings.ds_rate }}%</p>
+                    <!-- <p>만기일: {{ savings.end_date }}</p> -->
+                     <!-- 만기일 조건에 따른 처리 -->
+                    <p>
+                        만기일: 
+                        {% if savings.end_date == "2999-12-31" %}
+                            없음
+                        {% else %}
+                            {{ savings.end_date }}
+                        {% endif %}
+                    </p>
                 </div>
                 <div class="additional-box">
                     <strong>목표 금액 달성까지 {{ savings.days_remaining }}일 남았습니다!</strong>
