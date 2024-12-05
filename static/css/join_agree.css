@@ -4,8 +4,6 @@ body {
     width: 100%;
     position: relative;
     background-color: #ffffff ; /* 원하는 색상으로 변경 */
-    overflow-x: hidden !important; /* 좌우 스크롤 제거 */
-
 }
 .terms-container {
     margin: 20px auto;
