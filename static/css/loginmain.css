@@ -1,4 +1,3 @@
-
     /* 기본 스타일 */
     body {
         /* background-color: #f8f9fa; */
@@ -14,6 +13,7 @@
         /* width : 100% ; */
         max-width: 95%;
     }
+
 /* 헤더 및 푸터 */
 header, footer {
     text-align: center !important;
@@ -139,36 +139,88 @@ footer {
 .user-info button:hover {
     background-color: #3a2f6f !important; /* 호버 시 색상 변경 */
 }
+
     .summary {
-        background-color: #ffffff;
         border: 1px solid #dee2e6;
-        border-radius: 5px;
         padding: 20px;
-        margin: 20px 0;
-        position: relative;
-        margin-bottom: 5px;
+        margin-bottom: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
     }
+
+    .summary h2 {
+        color: #111; /* 텍스트 색상 */
+        line-height: 1.2; /* 줄 간격 */
+        letter-spacing: 1px; /* 글자 간격 */
+        margin-bottom: 10px; /* 아래 여백 */
+        margin-top: 0; /* 위쪽 여백 제거 */
+        font-family: 'Jua', sans-serif;
+    }
+
+    .text {
+        font-size: 52px;
+        font-weight: 400; /* 얇은 텍스트 */
+        color: #111;
+    }
+
+    .lighter-heading {
+        font-weight: 400; /* 얇은 텍스트 */
+        font-size: 18px;
+        color: #333;
+    }
+
+    .finance-score,
+    .finance-summary {
+        font-size: 18px; /* 텍스트 크기 */
+        color: #333; /* 텍스트 색상 */
+        margin-bottom: 10px; /* 요소 간 여백 */
+        line-height: 1.5; /* 줄 간격 */
+    }
+
+    .info-row {
+        display: flex; /* 가로 정렬 */
+        gap: 10px; /* 요소 간 간격 */
+    }
+
+    .info-item {
+        background-color: #f9f9f9; /* 아이템 배경색 */
+        border: 1px solid #ddd; /* 테두리 */
+        border-radius: 5px; /* 모서리 둥글게 */
+        padding: 10px 15px; /* 내부 여백 */
+        margin-bottom: 10px; /* 아이템 간 간격 */
+        font-size: 16px; /* 글씨 크기 */
+        color: #333; /* 글씨 색상 */
+    }
+
+
+    
     /* 요약 섹션 자세히 보기 버튼 */
-    .summary .details-button {
-        position: absolute;
-        bottom: 10px;
-        right: 10px;
-        padding: 5px 15px;
-        background-color: #44cfe8;
+    .details-button {
+        display: inline-block;
+        padding: 10px 20px;
+        background-color: #4a88e5;
         color: white;
         text-decoration: none;
-        border-radius: 5px;
-        margin-bottom: 10px;
+        border-radius: 41px;
+        font-size: 18px;
+        font-weight: 700;
+        font-style: normal;
+        text-align: center;
+        letter-spacing: -0.09px;
+        transition: background-color 0.3s;
+        box-shadow: 0px 2px 8px rgba(0, 0, 0, .1);
+        margin-top: 10px;
     }
+
     .summary .details-button:hover {
         background-color: #34a8c5;
     }
     /* 맞춤 상품 섹션 */
     .product-section {
         position: relative;
-        background-color: #3e56a7f0;
+        background: #fcffec;
         padding: 20px;
-        border-radius: 10px;
         text-align: center;
         color: white;
         overflow: hidden;
@@ -181,15 +233,21 @@ footer {
         position: relative;
     }
     .product-card {
-    background-color: #ffffff;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    padding: 15px;
-    width: calc(20% - 10px); /* 5개의 카드가 한 줄에 채워지도록 설정 */
-    min-width: 150px; /* 최소 너비 설정 */
-    color: #333;
-    box-sizing: border-box;
+        background-color: #ffffff;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        padding: 15px;
+        width: calc(20% - 10px); /* 5개의 카드가 한 줄에 채워지도록 설정 */
+        min-width: 150px; /* 최소 너비 설정 */
+        color: #333;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center; /* 텍스트 가운데 정렬 */
     }
+
     /* 그라데이션 블러 효과 */
     .product-overlay {
         position: absolute;
@@ -286,34 +344,94 @@ footer {
         text-decoration: none;
     }
 
-.summary-box:hover {
-    transform: translateY(-5px);
+    .summary-box:hover {
+        transform: translateY(-5px);
+        }
+
+    .title {
+            color: #291e4e;
+            margin-bottom: 10px;
+            font-weight: bold;
+            font-size: 1.2em;
+            line-height: 1.4;
+        }
+
+    .user-info span {
+    font-size: 1.1rem;
+    font-weight: bold;
+    }
+    .news-analyze {
+    margin-top: 10px; /* 위쪽 요소와 10px 간격 */
+    padding: 15px; /* 내부 여백 */
+    background-color: #f9f9f9; /* 배경색 */
+    border: 1px solid #ddd; /* 테두리 */
+    border-radius: 5px; /* 둥근 모서리 */
+    color: #000000; /* 텍스트 색상 */
+    line-height: 1.5; /* 텍스트 간격 조정 */
     }
 
-.title {
-        color: #291e4e;
-        margin-bottom: 10px;
-        font-weight: bold;
-        font-size: 1.2em;
-        line-height: 1.4;
+    .carousel {
+        position: relative;
+        width: 100%;
+        overflow: hidden;
+    }
+    
+    .slides {
+        display: flex;
+        transition: transform 0.5s ease-in-out;
+    }
+    
+    .slide {
+        flex: 1 0 100%;
+        display: none;
+        margin: 0; /* 외부 여백 제거 */
+        padding: 0; /* 내부 여백 제거 */
+    }
+    
+    .slide.active {
+        display: block;
     }
 
-.summary {
-    font-size: 1em;
-    color: #666;
-    line-height: 1.5;
-}
+    .container {
+        width: 100%; /* 전체 화면 너비에 맞춤 */
+        margin: 0; /* 외부 여백 제거 */
+        padding: 0; /* 내부 여백 제거 */
+    }
+    
+    .carousel-navigation {
+        position: absolute; /* 슬라이더 안에 고정 */
+        bottom: 30px; /* 슬라이더의 아래쪽 */
+        left: 50%; /* 가로 중앙 정렬 기준점 */
+        transform: translateX(-50%); /* 정확히 중앙에 위치하도록 이동 */
+        display: flex;
+        justify-content: center;
+        gap: 10px; /* 버튼 간격 */
+    }
+    
+    .nav-dot {
+        width: 10px;
+        height: 10px;
+        background-color: #ccc;
+        border: none;
+        border-radius: 50%;
+        margin: 0 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+    
+    .nav-dot.active {
+        background-color: #007bff;
+    }
 
-.user-info span {
-font-size: 1.1rem;
-font-weight: bold;
-}
-.news-analyze {
-margin-top: 10px; /* 위쪽 요소와 10px 간격 */
-padding: 15px; /* 내부 여백 */
-background-color: #f9f9f9; /* 배경색 */
-border: 1px solid #ddd; /* 테두리 */
-border-radius: 5px; /* 둥근 모서리 */
-color: #000000; /* 텍스트 색상 */
-line-height: 1.5; /* 텍스트 간격 조정 */
-}
+    .product-name {
+        font-size: 18px; /* 글씨 크기 조정 */
+        font-weight: bold; /* 굵게 표시 */
+        margin-bottom: 8px; /* 아래 여백 */
+        color: #650000; /* 텍스트 색상 (선택 사항) */
+    }
+
+    .bank-name {
+        font-weight: bold; /* 글씨를 진하게 설정 */
+        color: #000097; /* 색상 변경 (필요한 색상 코드로 교체) */
+        font-size: 16px; /* 글씨 크기 (선택 사항) */
+    }
