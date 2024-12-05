@@ -1,117 +1,143 @@
+/* 공통 스타일 */
 body {
-    background-color: #F5F6F7;
     font-family: Arial, sans-serif;
-    width: 100vw;
-    padding-top: 120px;
-    /* margin: 0;
-    padding: 0; */
+    background-color: #F5F6F7;
+    margin: 0;
+    padding: 0;
     box-sizing: border-box;
-    min-height: 100%;
-    position: relative;
+    padding-top: 100px;
     overflow-x: hidden; /* 좌우 스크롤 제거 */
-    max-width: 100%;
 }
-header, footer {
-    /* background-color: #F5F6F7; */
+.container {
+    max-width: 800px; /* 메인 콘텐츠의 최대 너비 */
+    margin: 0 auto; /* 화면 가운데 정렬 */
+    padding: 0 20px; /* 양쪽 간격 조정 (옵션) */
+}
+/* 헤더 및 푸터 */
+header, footer { 
     text-align: center;
     width: 100vw;
-    }
-    header {
-        background-color: #F5F6F7;
-        position: fixed; 
-        padding: 0px;
-        top: 0; 
-        z-index: 1; 
-    }
-    footer {
-        background-color: #F5F6F7;
-        height: 10%; /* 화면 높이의 10% 차지 */
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
-        padding: 10px;
-    }
-        /* .nav-box {
-            border: 1px solid #ccc;
-            padding: 10px;
-        } */
-
-        /* 드롭다운 메뉴 스타일 */
-    .dropdown {
-        position: relative;
-        display: inline-block;
-    }
-    .navbar {
-        display: flex;
-        justify-content: space-between; /* 좌측 로고와 우측 버튼 배치 */
-        /* justify-content: flex-end; 오른쪽 정렬 */
-        align-items: center;
-        padding: 10px 20px;
-        font-size: 0.3rem;
-        background-color: #F5F6F7;
-    }
-    .nav-links {
-        margin-right: 10px; /* 회원 정보와의 구분 */
-        display: flex; 
-        justify-content: flex-end; 
-        align-items: center; 
-        flex-grow: 1; 
-        text-align: center;
-    }
-    .navbar a {
-        /* margin: 0 20px; 링크 간격 */
-        font-size: 1.1rem; /* 글씨 크기 */
-        font-weight: bold; /* 글씨 진하게 */
-        margin-left: 15px; /* 각 링크 사이의 간격 */
-        text-decoration: none;
-        color: #333;
-    }
-
-    .dropdown-content {
-        display: none;
-        position: absolute; /*부모요소 바로 아래에 위치*/
-        top: 100%;
-        left: 0;
-        background-color: #fff;
-        /* box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); */
-        padding: 0% ;
-        width: 150px; /*드롭다운이 전체 넓이를 차지*/
-        z-index: 1000;
-        border-top: 1px solid #ddd;
-        border-bottom: 1px solid #ddd;
-        /* border: 1px solid #ddd; */
-    }
-
-    .dropdown-content a {
-        padding: 10px 20px;
-        display: block;
-        text-align: left;
-        color: #333;
-        text-decoration: none;
-        /* white-space: nowrap; */
-    }
-
-    .dropdown-content a:hover {
-        background-color: #f1f1f1;
-    }
-
-    /* 마우스를 올렸을 때 드롭다운 표시 */
-    .dropdown:hover .dropdown-content {
-        display: block;
-    }
-
-    /* 링크 스타일 */
-    .nav-box nav a {
-        color: #333;
-        margin: 0 10px;
-        text-decoration: none;
-    }
-
-    .nav-box nav a:hover {
-        font-weight: bold;
-    }
+    background-color: #F5F6F7;
+}
+header {
+    position: fixed;
+    top: 0;
+    z-index: 1;
+    padding: 0;
+    box-sizing: border-box;
+    width: 100%;
+}
+footer {
+    height: 10%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    text-align: center;
+}
+/* 네비게이션 바 */
+.navbar {
+    max-width: 1200px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 120px; /* 좌우 여백 */
+    margin-top: 20px;
+    font-size: 1rem;
+    background-color: #F5F6F7;
+}
+.logo {
+    margin-right: auto; /* 로고는 왼쪽으로 정렬 */
+}
+.user-info {
+    margin-right: -60px;
+}
+/* 로고 */
+.logo img {
+    vertical-align: middle;
+}
+/* 네비게이션 링크 */
+.nav-links {
+    flex-grow: 1; /* 중앙에 위치하도록 공간을 차지 */
+    display: flex;
+    justify-content: center; /* 네비게이션 링크를 중앙 정렬 */
+    gap: 20px; /* 링크 간격 */
+}
+.navbar a {
+    font-size: 1.1rem;
+    font-weight: bold;
+    margin-left: 15px; /* 각 링크 사이의 간격 */
+    text-decoration: none;
+    color: #333;
+}
+.navbar a:hover {
+    color: #555; /* 호버 시 색상 변경 */
+}
+/* 드롭다운 메뉴 */
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+.dropdown-content {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: #fff;
+    padding: 0;
+    width: 150px;
+    z-index: 1000;
+    border-top: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
+}
+.dropdown-content a {
+    padding: 10px 20px;
+    display: block;
+    text-align: left;
+    color: #333;
+    text-decoration: none;
+    font-size: 0.8rem;
+}
+.dropdown-content a:hover {
+    background-color: #f1f1f1;
+}
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+/* 회원 정보 및 마이페이지 */
+.user-info {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+.user-info span {
+    font-size: 1.1rem;
+}
+.user-info a {
+    margin-left: 15px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #121212;
+    text-decoration: none;
+}
+.user-info form {
+    display: inline;
+}
+.user-info button {
+    margin-left: 10px;
+    padding: 5px 10px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    background-color: #291e4ee5;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.user-info button:hover {
+    background-color: #3a2f6f; /* 호버 시 색상 변경 */
+}
 .container {
     max-width: 1200px;
     margin: 0 auto;
@@ -120,7 +146,6 @@ header, footer {
     border: 1px solid #ddd;
     border-radius: 10px;
 }
-
 .content-row {
     display: flex; /* 차트와 설명을 가로로 배치 */
     justify-content:center; /* 왼쪽 정렬 */
@@ -128,26 +153,22 @@ header, footer {
     gap: 20px; /* 차트와 설명 간 간격 */
     margin-bottom: 20px; /* 행 간 간격 */
 }
-
 .title-and-selector {
     display: flex; /* 제목과 드롭다운을 한 줄로 */
     justify-content: space-between; /* 제목은 왼쪽, 드롭다운은 오른쪽 */
     align-items: center; /* 수직 정렬 */
     margin-bottom: 20px; /* 아래 요소와 간격 */
 }
-
 .date-selector select {
     font-size: 1rem; /* 드롭다운 크기 */
     padding: 5px; /* 패딩 조정 */
 }
-
 .charts-section {
     display: flex; /* 가로 배치 */
     justify-content: space-between; /* 그래프 사이 간격 유지 */
     align-items: flex-start; /* 상단 정렬 */
     gap: 20px; /* 그래프 간 간격 */
 }
-
 .chart-container {
     flex: 1;
     display: flex;
@@ -166,7 +187,6 @@ header, footer {
     position: relative; /* ::after 위치 설정을 위한 기준 */
     padding-bottom: 10px; /* 헤더와 바 사이 간격 */
 }
-
 .chart-header::after {
     content: ''; /* 가상의 요소 생성 */
     position: absolute; /* 헤더 아래에 위치 */
@@ -176,7 +196,6 @@ header, footer {
     height: 1.5px; /* 바 두께 */
     background-color: #ddd; /* 바 색상 */
 }
-
 .chart-header .chart-title {
     font-size: 14px;
     font-weight: bold;
@@ -219,11 +238,9 @@ header, footer {
     outline: none;
     
 }
-
 .date-range-buttons button:hover {
     background-color: #e7f3ff;
 }
-
 .date-range-buttons .active {
     background-color: #007bff;
     color: #ffffff;
@@ -241,19 +258,16 @@ header, footer {
     max-height: 200px; /* 차트 최대 높이 */
     width: 100%; /* 차트가 컨테이너 너비를 차지 */
 }
-
 .highlight {
     font-weight: bold;
     color: #007bff;
 }
-
 .prediction-section .content-row {
     display: flex;
     align-items: center; /* 세로 중앙 정렬 */
     justify-content: center; /* 가로 중앙 정렬 */
     gap: 20px; /* 요소 간 간격 */
 }
-
 .prediction-section .chart-container {
     flex: 2; /* 꺾은선 그래프가 더 넓게 차지 */
     align-items: center; /* 세로 중앙 정렬 */
@@ -269,7 +283,6 @@ header, footer {
     margin-top: 1rem; /* 위와의 간격 */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 박스 그림자 */
 }
-
 .prediction-section .description {
     border: 1px solid #ccc; /* 박스 테두리 색상 */
     border-radius: 10px; /* 둥근 모서리 */
@@ -287,7 +300,6 @@ header, footer {
     /* margin-top: 10px; 위와의 간격 */
      /*  gap: 20px;  그래프와 카드 추천 간 간격 */
 }
-
 .prediction-section .filter-section {
     display: flex;
     justify-content: flex-end; /* 오른쪽 정렬 */
@@ -296,7 +308,6 @@ header, footer {
     gap: 10px;
     width: 100%;
 }
-
 .card-container {
     flex: 1; /* 카드 추천이 적절한 비율을 차지 */
     display: flex;
@@ -346,7 +357,6 @@ header, footer {
     font-size: 14px;
     color: #555;
 }
-
 .content-container {
     background-color: #ffffff;
     padding: 20px;
