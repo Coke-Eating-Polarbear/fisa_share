@@ -67,7 +67,7 @@
                     <p>이번달 지출 총액: <strong>{{ total_spent }} 원</strong></p>
                     <!-- 진행바 -->
                     <div id="progress-bar" style="height: 20px; background-color: #e0e0e0; border-radius: 10px; margin-top: 10px;">
-                        <div id="progress-bar-inner" style="height: 100%; background-color: #5c60e6; text-align: center; color: white; border-radius: 10px;"></div>
+                        <div id="progress-bar-inner" style="height: 100%; background-color: #a8d5f2; text-align: center; color: white; border-radius: 10px;"></div>
                     </div>
                     <p id="result"></p>
 
@@ -225,7 +225,7 @@
         {% for account in expiring_accounts %}
             <p><strong>얼마 뒤면 <span class="expiring-product-name">{{ account.pname }}</span>이 만기에요!</strong></p>
         {% endfor %}
-        <p><a href="{% url 'better' %}" style="color: #5c60e6; text-decoration: none;">상품 둘러보러가기</a></p>
+        <p><a href="{% url 'better' %}" style="color: #8ccae3; text-decoration: none;">상품 둘러보러가기</a></p>
     {% endif %}
 </div>
 
@@ -233,7 +233,7 @@
 <div id="no-expiry-notification" class="expiring-container" style="display: none;">
     {% if not expiring_accounts %}
         <p>현재 만기가 가까운 상품이 없습니다. 
-        <a href="{% url 'top5' %}" style="color: #5c60e6; text-decoration: none;">상품 둘러보러가기</a></p>
+        <a href="{% url 'top5' %}" style="color: #8ccae3; text-decoration: none;">상품 둘러보러가기</a></p>
     {% endif %}
 </div>
 
@@ -301,8 +301,9 @@
                     {
                         data: data,
                         backgroundColor: [
-                            '#ff6384', '#36a2eb', '#ffce56', '#4caf50', '#ff9f40',
-                            '#9966ff', '#ff7a79', '#a3e4d7', '#d68910', '#58d68d', '#f4d03f'
+                            '#FFC2CF', '#A8D8F0', '#FFE5A6', '#A8E4A0', '#FFD2A1',
+                            '#D2A8FF', '#FFC7C5', '#D6F2E9', '#EBC290', '#B7E6C0', '#FBE6A6'
+
                         ]
                     }
                 ]
