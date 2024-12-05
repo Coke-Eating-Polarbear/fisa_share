@@ -230,19 +230,21 @@
 
         function toggleDropdown(id) {
             const dropdown = document.getElementById(id);
-            const button = dropdown.previousElementSibling; // 버튼 요소 가져오기
+            const button = dropdown.previousElementSibling; // 바로 위의 버튼 요소 가져오기
 
             if (dropdown) {
                 if (dropdown.classList.contains('hidden')) {
-                    dropdown.style.width = `${button.offsetWidth}px`; // 버튼 넓이를 동적으로 설정
+                    dropdown.style.width = `${button.offsetWidth}px`; // 버튼 너비에 맞춤
                     dropdown.classList.remove('hidden');
                     dropdown.classList.add('show');
                 } else {
-                    dropdown.classList.add('hidden');
                     dropdown.classList.remove('show');
+                    dropdown.classList.add('hidden');
                 }
             }
         }
+
+
 
 
 

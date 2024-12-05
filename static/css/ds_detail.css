@@ -308,6 +308,7 @@ li {
 /* 드롭다운이 보일 때 */
 .dropdown-content.show {
     display: block !important; /* 드롭다운 내용을 표시 */
+    width: 100% !important ; /* 부모 컨테이너 너비에 맞추기 */
 }
 
 
