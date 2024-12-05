@@ -110,7 +110,7 @@
             <div class="recommendations">
                 <!-- 기존 상품 박스 -->
                 <div class="existing-product-container">
-                    <h2>🦆 곧 만기가 되는 상품이덕 🦆</h2>
+                    <h2>만기가 가장 가까운 예금 상품이다~냥 🐾</h2>
                     {% if nearest_d %}
                         <div class="card">
                             <img src="/static/img/BNK%EC%A0%80%EC%B6%95%EC%9D%80%ED%96%89.PNG" alt="{{ product.bank }} 로고">
@@ -127,7 +127,7 @@
                         {% endif %}
                 </div>
                 <div class="existing-product-container">
-                <h2>🦆 아래의 상품들을 추천한덕 🦆</h2>
+                <h2>아래의 상품들을 추천한다냥! 🐾</h2>
                 {% for product in deposit_recommend %}
                 <div class="card">
                     <img src="{% static product.logo %}" alt="{{ product.bank }} 로고">
@@ -146,7 +146,7 @@
                     {% endif %}
                 </div>
                 {% endfor %}
-                <a href="{% url 'info' %}" class="new-action-button">자세히 설정하기</a>
+                <a href="{% url 'info' %}" class="new-action-button" style="display: block; text-align: center; margin: 20px auto;">세부 조건 설정하기</a>
                 </div>
             </div>
         </div>
@@ -156,7 +156,7 @@
             <div class="recommendations">
                 <!-- 기존 상품 박스 -->
                 <div class="existing-product-container">
-                    <h2>🦆 곧 만기가 되는 상품이덕 🦆</h2>
+                    <h2>만기가 가장 가까운 적금 상품이다~냥 🐾</h2>
                     {% if nearest_s %}
                         <div class="card">
                             <img src="{% static product.logo %}" alt="{{ product.bank }} 로고">
@@ -173,7 +173,7 @@
                         {% endif %}
                 </div>
                 <div class="existing-product-container">
-                <h2>🦆 아래의 상품들을 추천한덕 🦆</h2>
+                <h2>아래의 상품들을 추천한다냥! 🐾</h2>
                 {% for product in final_recommend %}
                 <div class="card">
                     <img src="{% static product.logo %}" alt="{{ product.bank }} 로고">
@@ -193,7 +193,7 @@
                 </div>
                 {% endfor %}
             </div>
-            <a href="{% url 'info' %}" class="new-action-button">자세히 설정하기</a>
+            <a href="{% url 'info' %}" class="new-action-button" style="display: block; text-align: center; margin: 20px auto;">세부 조건 설정하기</a>
             </div>
         </div>
         
