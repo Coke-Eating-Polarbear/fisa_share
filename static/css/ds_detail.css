@@ -5,7 +5,7 @@
     border: 1px solid #ddd;
     padding: 20px;
     margin-bottom: 20px; /* 박스 간 동일한 간격 */
-    width: 1000%; /* 넓이 조정 */
+    width: 100%; /* 넓이 조정 */
     box-sizing: border-box;
 }
 
@@ -324,9 +324,9 @@ ul {
     margin: 0;
 }
 
-*, *::before, *::after {
+/* *, *::before, *::after {
     box-sizing: border-box;
-}
+} */
 
 .inner-box pre {
     margin: 0;
