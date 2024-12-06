@@ -105,6 +105,8 @@
     height: auto; /* 비율 유지 */
     border-radius: 5px;
     object-fit: cover;
+    margin-top: 40px; /* 위쪽에서 20px 띄움 */
+    align-items: center !important; /* 세로 방향 중앙 정렬 */
 }
 
 .card-content {
