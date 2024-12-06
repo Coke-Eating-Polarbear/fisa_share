@@ -152,18 +152,11 @@
             justify-content: space-between; /* 좌측 로고와 우측 버튼 배치 */
             /* justify-content: flex-end; 오른쪽 정렬 */
             align-items: center;
-            padding: 10px 20px;
+            padding: 20px 35px;
             font-size: 0.3rem;
             background-color: #ffffff;
         }
-        .nav-links {
-            margin-right: 10px; /* 회원 정보와의 구분 */
-            display: flex; 
-            justify-content: flex-end; 
-            align-items: center; 
-            flex-grow: 1; 
-            text-align: center;
-        }
+
         .navbar a {
             /* margin: 0 20px; 링크 간격 */
             font-size: 1.1rem; /* 글씨 크기 */
@@ -172,7 +165,15 @@
             text-decoration: none;
             color: #333;
         }
-    
+        
+        .nav-message {
+            font-size: 1.1rem; /* 텍스트 크기 */
+            font-weight: bold; /* 텍스트 두께 */
+            color: #121212; /* 텍스트 색상 */
+            text-align: center; /* 중앙 정렬 */
+            flex-grow: 1; /* 요소가 가로로 중앙에 위치 */
+        }
+        
         .dropdown-content {
             display: none;
             position: absolute; /*부모요소 바로 아래에 위치*/

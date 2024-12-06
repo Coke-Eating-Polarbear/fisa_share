@@ -21,24 +21,17 @@
 <body>
     {% csrf_token %}
     <header>
-    <div class="navbar">
-        <div class="logo">
-            <a href="{% url 'main' %}">
-                <img src="{% static 'img\header_logo.png' %}" style="vertical-align: middle; margin-left: 220px;" alt="로고">
+        <div class="navbar">
+            <div class="logo">
+                <a href="{% url 'main' %}">
+                    <img src="{% static 'img\header_logo.png' %}" style="vertical-align: middle; margin-left: 220px;" alt="로고">
+                </a>
             </div>
-            <div class="nav-links" style="flex-grow: 1; text-align: center; margin-right: 220px;">
-                <a href="{% url 'main' %}" style=" font-weight: bold; color: #121212;">내 금융 바로보기</a> 
-                <div class="dropdown">
-                    <a href="{% url 'main' %}" style=" font-weight: bold; color: #121212;">내 예/적금 찾기</a>
-                    <!-- <div class="dropdown-content">
-                        <a href="savings_info1" style="font-size: 0.8rem;">신규적금추천</a>
-                        <a href="compare_products" style="font-size: 0.8rem;">기존상품비교</a>
-                    </div> -->
-                </div> 
-                <a href="{% url 'main' %}" style=" font-weight: bold; color: #121212;">슬기로운 소비생활</a>
+            <div class="nav-message">
+                금융 비서 <span style="color: #007bff;">천냥이</span>, <span style="color: #ff9900;">만덕이</span>와 똑똑한 금융 생활해요 🌞
             </div>
         </div>
-        </header>
+    </header>    
     <section class="login_section">
         <div class="accounts_container">
             <div class="accounts_image">
