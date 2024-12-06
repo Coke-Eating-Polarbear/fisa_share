@@ -31,7 +31,7 @@
                 <div class="dropdown">
                     <a href="#">내 예/적금 찾기</a>
                     <div class="dropdown-content">
-                        <a href="{% url 'top5' %}">신규적금추천</a>
+                        <a href="{% url 'top5' %}">신규상품추천</a>
                         <a href="{% url 'better' %}">기존상품비교</a>
                     </div>
                 </div>
@@ -105,8 +105,8 @@
 
                                 <!-- 버튼 -->
                                 <div class="button-group" style="margin-top: 20px;">
-                                    <a href="#" class="details-button" style="border-radius: 41px; background-color: #eff5ff; color: #09a56f;">😺 신규 상품 추천</a><br>
-                                    <a href="#" class="details-button" style="border-radius: 41px; background-color: #eff5ff; color: #09a56f;">🦢 기존 상품 비교</a>
+                                    <a href="{% url 'top5' %}" class="details-button" style="border-radius: 41px; background-color: #eff5ff; color: #09a56f;">😺 신규 상품 추천</a><br>
+                                    <a href="{% url 'better' %}" class="details-button" style="border-radius: 41px; background-color: #eff5ff; color: #09a56f;">🦢 기존 상품 비교</a>
                                 </div>
                             </div>
 
@@ -136,7 +136,7 @@
                 
                                 <!-- 버튼 -->
                                 <div class="button-group" style="margin-top: 20px;">
-                                    <a href="#" class="details-button" style="background-color: #6356DA; color: #eff5ff;">🔎 자세히 보러가기</a>
+                                    <a href="{% url 'spending_mbti' %}" class="details-button" style="background-color: #6356DA; color: #eff5ff;">🔎 자세히 보러가기</a>
                                 </div>
                             </div>
                 
@@ -164,7 +164,8 @@
             <p class="section-intro" style="font-size: 14px; color: #666; text-align: center; margin-bottom: 10px;">
                 나에게 맞는 예/적금 상품, 찾기 힘드셨죠?<br>마이데이터를 기반으로 쉽고 정확하게 비교해드립니다.
             </p>
-            <h2 style="margin-bottom: 1rem; color:#121212; font-family: 'Jua', sans-serif; font-weight: 400; font-size: 38px;">{{ user_name }}님 맞춤 예/적금 상품 TOP 5!</h2>
+            
+            <h2 style="margin-top:1rem; margin-bottom: 2.5rem; color:#121212; font-family: 'Jua', sans-serif; font-weight: 400; font-size: 38px;">{{ user_name }}님 맞춤 예/적금 상품 TOP 5!</h2>
     
             <div class="product-list">
                 {% for product in final_recommend %}
@@ -188,10 +189,13 @@
                 {% endfor %}
             </div>
     
-            <a href="{% url 'top5' %}" class="learn-more-button">자세히 알아보기</a>
+            <a href="{% url 'top5' %}" class="learn-more-button" style="border-radius: 41px; background-color: #4a88e5; color: #eff5ff; font-weight:bold;">💰자세히 알아보기</a>
         </div>
     </div>
     
+    <div class="news-intro" style="font-size: 14px; color: #000000; text-align: center; margin-bottom: -20px; margin-top: 100px; font-family:Arial, sans-serif; font-weight:lighter;">
+        <h2>오늘의 금융 관련 주요 뉴스와 워드클라우드를 바로 확인하세요!</h2>
+    </div>
 
     <div class="container_news">
         <div class="news-summary">
@@ -207,7 +211,7 @@
             {% endif %}
         </div>
         <div class="word-cloud">
-            <h2 style="font-weight: bold;">오늘의 뉴스 키워드</h2>
+            <h2>💬 오늘의 뉴스 키워드</h2>
             {% if image_base64 %}
                 <img src="data:image/png;base64,{{ image_base64 }}" alt="Word Cloud Image">
             {% else %}

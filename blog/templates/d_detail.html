@@ -27,7 +27,7 @@
                     <div class="dropdown">
                     <a href="#">내 예/적금 찾기</a>
                         <div class="dropdown-content">
-                        <a href="{% url 'top5' %}">신규적금추천</a>
+                        <a href="{% url 'top5' %}">신규상품추천</a>
                         <a href="{% url 'better' %}">기존상품비교</a>
                     </div> 
                 </div>
@@ -177,7 +177,7 @@
             <div class="card">
                 <img src="{% static product_img %}" 
                      alt="{{ product.bank|default:'은행 정보 없음' }} 로고" 
-                     style="width: 100px; height: auto;">
+                     style="width: 250px; height: auto;">
                 <div class="card-content">
                     <span class="card-title">{{ product.name|default:"상품 이름 없음" }}</span><br>
                     <p><strong>은행:</strong> {{ product.bank|default:"은행 정보 없음" }}</p>
