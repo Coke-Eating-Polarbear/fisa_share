@@ -1,13 +1,13 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>상세 설명</title>
     <link rel="stylesheet" href="{% static 'css/ds_detail.css' %}">
+    <link rel="stylesheet" href="{% static 'css/report_origin.css' %}">
     <link rel="stylesheet" href="{% static 'css/header.css' %}">
-
     <style>
     </style>
 </head>
@@ -39,33 +39,32 @@
                 <a href="./mypage">마이페이지</a>
                 <form method="POST" action="{% url 'logout' %}">
                     {% csrf_token %}
-                    <button type="button" name="logout">로그아웃</button>
+                    <button name="logout">로그아웃</button>
                 </form>
             </div>
         </div>
     </header>
 </body>
 </html>
-    
-        <div class="container">
-            <div class="checklist">
-                <h2>예적금 가입 전/후 체크했덕? 🦆</h2>
-                <div class="row">
-                    <div class="dropdown-section">
-                        <!-- 상자 제목 -->
-                        <h3 class="dropdown-title" onclick="toggleDropdown('dropdown-before')" style="text-align: center;">[가입 전] 알아야 할 사항</h3>
-                        <!-- 상자 본문 -->
-                        <div id="dropdown-before" class="dropdown-content hidden">
-                            <ul>
-                                <li><strong>주요 거래 조건 확인</strong>
-                                    <ul>
-                                        <li>가입 대상, 가입금액(최소 및 한도), 계약기간 확인</li>
-                                        <li>비과세/세금우대 가능 여부 확인</li>
-                                        <li>
-                                            예금자보호 대상 여부 확인:
-                                            <button type="button" class="details-btn" onclick="showPopup('popup-before')">자세히 보기</button>
-                                        </li>
-                                    </ul>
+    <div class="container">
+        <div class="checklist">
+            <h2>예적금 가입 전/후 체크했덕? 🦆</h2>
+            <div class="row">
+                <div class="dropdown-section">
+                    <!-- 상자 제목 -->
+                    <h3 class="dropdown-title" onclick="toggleDropdown('dropdown-before')" style="text-align: center;">[가입 전] 알아야 할 사항</h3>
+                    <!-- 상자 본문 -->
+                    <div id="dropdown-before" class="dropdown-content hidden">
+                        <ul>
+                            <li><strong>주요 거래 조건 확인</strong>
+                                <ul>
+                                    <li>가입 대상, 가입금액(최소 및 한도), 계약기간 확인</li>
+                                    <li>비과세/세금우대 가능 여부 확인</li>
+                                    <li>
+                                        예금자보호 대상 여부 확인:
+                                        <button type="button" class="details-btn" onclick="showPopup('popup-before')">자세히 보기</button>
+                                    </li>
+                                </ul>
                                 </li>
                                 <li><strong>금리 조건과 이자 지급 방식</strong>
                                     <ul>
@@ -208,15 +207,6 @@
                 </div>
             </div>
         </div>
-        
-    
-    <footer>
-        <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0; font-size: 0.8rem;">서울특별시 마포구 월드컵북로 434 상암IT타워 6층</p> 
-        <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0; font-size: 0.8rem;">고객지원 : 02-3151-7000 | 이메일: woorifis.lab44@gmail.com </p >
-        <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0; font-size: 0.8rem;">COPYRIGHT©우리천만해요</p >
-    </footer >
-
-
     <script>
         function showPopup(popupId) {
             document.getElementById(popupId).classList.add('show');
@@ -243,18 +233,11 @@
                 }
             }
         }
-
-
-
-
-
-
-     </script>
-
-
-</body >
-
-
-
-
-</html >
+    </script>
+    <footer>
+        <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0; font-size: 0.8rem;">서울특별시 마포구 월드컵북로 434 상암IT타워 6층</p> 
+        <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0; font-size: 0.8rem;">고객지원 : 02-3151-7000 | 이메일: woorifis.lab44@gmail.com </p >
+        <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0; font-size: 0.8rem;">COPYRIGHT©우리천만해요</p >
+    </footer >
+</body>
+</html>
