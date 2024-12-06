@@ -34,6 +34,7 @@ import re
 from collections import Counter
 import requests
 from collections import defaultdict
+from copy import deepcopy
 es = Elasticsearch([os.getenv('ES')])  # Elasticsearch 설정
 load_dotenv() 
 # openai.api_key = os.getenv('APIKEY')
@@ -1333,7 +1334,7 @@ def summary_view(request):
 
 @login_required_session
 def info(request):
-    customer_id = request.session.get('user_id')  
+    customer_id = request.session.get('user_id')
     user_name = "사용자"
 
     if customer_id:
@@ -1346,20 +1347,21 @@ def info(request):
     context = {'user_name': user_name}
 
     if request.method == 'POST':
-        saving_method = request.POST.get('saving_method')  
-        bank_option = request.POST.get('bank_option')  
-        selected_preferences = request.POST.getlist('preferences')  
+        saving_method = request.POST.get('saving_method')
+        bank_option = request.POST.get('bank_option')
+        selected_preferences = request.POST.getlist('preferences')
         cluster_list = request.session.get('clusters', [])
-        
+
         if not cluster_list:
             return render(request, 'error.html', {'message': 'Cluster 값이 없습니다.'})
 
         # 은행 유형 필터링
+        s_bank_query = Q()
         if bank_option == "일반은행":
             s_bank_query = Q(bank_name__icontains="1금융권")
         elif bank_option == "저축은행":
             s_bank_query = Q(bank_name__icontains="저축은행")
-        else:
+        elif bank_option:
             return render(request, 'error.html', {'message': '유효하지 않은 은행 옵션입니다.'})
 
         # 클러스터 필터링
@@ -1375,28 +1377,38 @@ def info(request):
         for preference in selected_preferences:
             d_preference_query &= Q(condit__icontains=preference)
             s_preference_query &= Q(preferential_conditions__icontains=preference)
-        # 적립 방법에 따라 분리된 로직
+
+        # 적립 방법에 따라 추천 결과 생성
         deposit_recommend = []
         final_recommend = []
         if saving_method == "목돈 모으기":
-            deposit_recommend = DProduct.objects.filter(d_cluster_query).order_by('-maxir', '-name').values()[:5]  # 상위 5개만 가져오기
+            deposit_recommend = DProduct.objects.filter(d_cluster_query).order_by('-maxir', '-name').values()[:5]
+            deposit_recommend = add_bank_logo(deposit_recommend, 'bank')
         elif saving_method == "목돈 굴리기":
-            final_recommend = SProduct.objects.filter(s_bank_query & s_cluster_query).order_by('-max_preferential_rate', '-bank_name').values()[:5]  # 상위 5개만 가져오기
+            final_recommend = SProduct.objects.filter(s_bank_query & s_cluster_query).order_by('-max_preferential_rate', '-bank_name').values()[:5]
+            final_recommend = add_bank_logo(final_recommend, 'bank_name')
         elif saving_method == "목돈 모으기 + 목돈 굴리기":
-            deposit_recommend = DProduct.objects.filter(d_cluster_query).order_by('-maxir', '-name').values()[:5]  # 상위 5개만 가져오기
-            final_recommend = SProduct.objects.filter(s_bank_query & s_cluster_query).order_by('-max_preferential_rate', '-bank_name').values()[:5]  # 상위 5개만 가져오기
+            deposit_recommend = DProduct.objects.filter(d_cluster_query).order_by('-maxir', '-name').values()[:5]
+            deposit_recommend = add_bank_logo(deposit_recommend, 'bank')
+            final_recommend = SProduct.objects.filter(s_bank_query & s_cluster_query).order_by('-max_preferential_rate', '-bank_name').values()[:5]
+            final_recommend = add_bank_logo(final_recommend, 'bank_name')
+        else:
+            return render(request, 'error.html', {'message': '유효하지 않은 적립 방법입니다.'})
         # 추천 결과를 세션에 JSON 형식으로 저장
-        request.session['deposit_recommend'] = json.dumps(list(deposit_recommend), cls=DjangoJSONEncoder)
-        request.session['final_recommend'] = json.dumps(list(final_recommend), cls=DjangoJSONEncoder)
-        context = {
-            'user_name': user_name,
+        if deposit_recommend:
+            request.session['deposit_recommend'] = json.dumps(list(deposit_recommend), cls=DjangoJSONEncoder)
+        if final_recommend:
+            request.session['final_recommend'] = json.dumps(list(final_recommend), cls=DjangoJSONEncoder)
+
+        context.update({
             'deposit_recommend': deposit_recommend,
             'final_recommend': final_recommend
-        }
+        })
         return redirect('top5')
-    
+
     # GET 요청일 경우 템플릿 렌더링
     return render(request, 'savings_info.html', context)
+
 
 @login_required_session
 def top5(request):
@@ -2021,6 +2033,7 @@ def d_detail(request,dsid):
 
     return render(request, 'd_detail.html',context)
 
+@login_required_session
 def s_detail(request, dsid):
     # s_product에서 먼저 검
     customer_id = request.session.get('user_id')  
@@ -2058,3 +2071,14 @@ def get_bank_logo(bank_name):
         return logo_path
     else:
         return "img/default_logo.png"
+
+def add_bank_logo(recommend_list, bank_key):
+    """
+    주어진 추천 리스트에 product_img 키를 추가하여 로고 경로를 삽입합니다.
+    """
+    updated_list = deepcopy(recommend_list)  # 원본 데이터 보호를 위해 deepcopy
+    for item in updated_list:
+        bank_name = item.get(bank_key)  # 은행 이름 가져오기
+        print(bank_name)
+        item['logo'] = get_bank_logo(bank_name)  # 로고 경로 추가
+    return updated_list
