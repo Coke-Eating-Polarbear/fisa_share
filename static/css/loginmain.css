@@ -92,6 +92,7 @@
         border-top: 1px solid #ddd;
         border-bottom: 1px solid #ddd;
         /* border: 1px solid #ddd; */
+        font-size: medium;
     }
 
     .dropdown-content a {
@@ -100,6 +101,7 @@
         text-align: left;
         color: #333;
         text-decoration: none;
+        font-size: 0.8rem
         /* white-space: nowrap; */
     }
 
