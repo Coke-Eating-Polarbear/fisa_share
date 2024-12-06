@@ -35,6 +35,8 @@ from collections import Counter
 import requests
 from collections import defaultdict
 from blog.spending_mbti_def import *
+from copy import deepcopy
+
 es = Elasticsearch([os.getenv('ES')])  # Elasticsearch 설정
 load_dotenv() 
 # openai.api_key = os.getenv('APIKEY')
@@ -176,6 +178,9 @@ def mypage(request):
     user_name = "사용자"
     accounts = []  # 사용자 계좌 정보 저장
     expiring_accounts = []  # 만기일이 90일 이내로 남은 계좌
+    expiring_accounts_json = None
+    accounts_list, d_list, s_list, mypay = [], [], [], []
+    total_spent, goal_amount, comparison = 0, None, None  # 지출 금액, 목표 금액, 비교 결과 초기화
 
     if customer_id:
         try:
@@ -195,6 +200,10 @@ def mypage(request):
                 pyear=current_year,
                 pmonth=current_month
             ).values('pdate', 'bizcode', 'price', 'pyear', 'pmonth')
+
+            # 목표 금액 가져오기
+            goal_amount = user.goal_amount
+
             category_mapping = {
                 'eat': '식비',
                 'transfer': '교통비',
@@ -213,6 +222,18 @@ def mypage(request):
                     category_totals[category_mapping[item['bizcode']]] += item['price']
             # 총 지출 계산
             total_spent = sum(item['price'] for item in mypay)
+
+            # 목표 금액이 입력되지 않은 경우
+            if goal_amount is None:
+                if request.method == 'POST':
+                    # 목표 금액 입력 후 저장
+                    goal_amount = int(request.POST['goal_amount'])
+                    user.goal_amount = goal_amount  # DB에 저장할 목표 금액 설정
+                    user.save()  # 변경사항 DB에 저장
+                    return redirect('mypage')  # 저장 후 페이지 새로 고침
+            else:
+                comparison = "목표 금액 이내로 사용 중입니다." if total_spent <= goal_amount else "목표 금액을 초과했습니다."
+
             category_percentages = {
                 category: round((amount / total_spent) * 100, 2)
                 for category, amount in category_totals.items()
@@ -262,6 +283,8 @@ def mypage(request):
         'mypay' : mypay,
         'total_spent' : total_spent,
         'category_percentages':json.dumps(sorted_category_percentages),
+        'goal_amount' : goal_amount,
+        'comparison' : comparison,
     }
     return render(request, 'mypage.html', context)
 
@@ -683,7 +706,27 @@ def summary_view(request):
 
     if not customer_id:  # 로그인되지 않은 사용자는 로그인 페이지로 리디렉션
         return redirect('login')
+    
+    # Average 테이블에서 고객 소득분위 기준 데이터 조회
+    average_data = Average.objects.filter(
+        stageclass=user.Stageclass,
+        inlevel=user.Inlevel
+    ).first()
 
+    user_asset_data = MyDataAsset.objects.filter(CustomerID=customer_id).first()
+
+    average_values = {
+    '총자산': (average_data.asset + average_data.finance),
+    '현금자산': average_data.finance,
+    '수입': average_data.income,
+    '지출': average_data.spend
+}
+    user_data = {
+    '총자산': user_asset_data.total,
+    '현금자산': user_asset_data.financial,
+    '수입': user_asset_data.monthly_income,
+    '지출': user_asset_data.expenses
+}
     # 추천 상품 처리
     recommended_products = Recommend.objects.filter(CustomerID=customer_id)
     recommended_count = recommended_products.count()
@@ -793,8 +836,14 @@ def summary_view(request):
     final_recommendations_drop_duplicates = final_recommendations.drop_duplicates(subset=["name", "bank", "baser", "maxir", "method"])
     top2 = final_recommendations_drop_duplicates.sort_values(by='maxir', ascending=False).head(5)
     deposit_recommend_dict = top2.to_dict(orient='records')
-    request.session['final_recommend'] = final_recommend_json[:5]  # 적금 Top 5
-    request.session['deposit_recommend'] = deposit_recommend_dict[:5]  # 예금 Top 5
+    final_recommend_with_logo = [
+        {**item, "logo": get_bank_logo(item.get("bank_name", ""))} for item in final_recommend_json
+    ]
+    deposit_recommend_with_logo = [
+        {**item, "logo": get_bank_logo(item.get("bank", ""))} for item in deposit_recommend_dict
+    ]
+    request.session['final_recommend'] = final_recommend_with_logo[:5]  # 적금 Top 5
+    request.session['deposit_recommend'] = deposit_recommend_with_logo[:5]  # 예금 Top 5
 
     final_recommend_display = final_recommend_json[:2]  # 적금 2개
     deposit_recommend_display = deposit_recommend_dict[:3]  # 예금 3개
@@ -818,6 +867,8 @@ def summary_view(request):
         'user_name': user_name,
         'final_recommend': final_recommend_display,  # 적금 Top 3
         'deposit_recommend': deposit_recommend_display,  # 예금 Top 2
+        'average_data': json.dumps(average_values, ensure_ascii=False),
+        'user_data': json.dumps(user_data, ensure_ascii=False),
         
     }
 
@@ -825,7 +876,7 @@ def summary_view(request):
 
 @login_required_session
 def info(request):
-    customer_id = request.session.get('user_id')  
+    customer_id = request.session.get('user_id')
     user_name = "사용자"
 
     if customer_id:
@@ -838,20 +889,21 @@ def info(request):
     context = {'user_name': user_name}
 
     if request.method == 'POST':
-        saving_method = request.POST.get('saving_method')  
-        bank_option = request.POST.get('bank_option')  
-        selected_preferences = request.POST.getlist('preferences')  
+        saving_method = request.POST.get('saving_method')
+        bank_option = request.POST.get('bank_option')
+        selected_preferences = request.POST.getlist('preferences')
         cluster_list = request.session.get('clusters', [])
-        
+
         if not cluster_list:
             return render(request, 'error.html', {'message': 'Cluster 값이 없습니다.'})
 
         # 은행 유형 필터링
+        s_bank_query = Q()
         if bank_option == "일반은행":
             s_bank_query = Q(bank_name__icontains="1금융권")
         elif bank_option == "저축은행":
             s_bank_query = Q(bank_name__icontains="저축은행")
-        else:
+        elif bank_option:
             return render(request, 'error.html', {'message': '유효하지 않은 은행 옵션입니다.'})
 
         # 클러스터 필터링
@@ -867,28 +919,38 @@ def info(request):
         for preference in selected_preferences:
             d_preference_query &= Q(condit__icontains=preference)
             s_preference_query &= Q(preferential_conditions__icontains=preference)
-        # 적립 방법에 따라 분리된 로직
+
+        # 적립 방법에 따라 추천 결과 생성
         deposit_recommend = []
         final_recommend = []
         if saving_method == "목돈 모으기":
-            deposit_recommend = DProduct.objects.filter(d_cluster_query).order_by('-maxir', '-name').values()[:5]  # 상위 5개만 가져오기
+            deposit_recommend = DProduct.objects.filter(d_cluster_query).order_by('-maxir', '-name').values()[:5]
+            deposit_recommend = add_bank_logo(deposit_recommend, 'bank')
         elif saving_method == "목돈 굴리기":
-            final_recommend = SProduct.objects.filter(s_bank_query & s_cluster_query).order_by('-max_preferential_rate', '-bank_name').values()[:5]  # 상위 5개만 가져오기
+            final_recommend = SProduct.objects.filter(s_bank_query & s_cluster_query).order_by('-max_preferential_rate', '-bank_name').values()[:5]
+            final_recommend = add_bank_logo(final_recommend, 'bank_name')
         elif saving_method == "목돈 모으기 + 목돈 굴리기":
-            deposit_recommend = DProduct.objects.filter(d_cluster_query).order_by('-maxir', '-name').values()[:5]  # 상위 5개만 가져오기
-            final_recommend = SProduct.objects.filter(s_bank_query & s_cluster_query).order_by('-max_preferential_rate', '-bank_name').values()[:5]  # 상위 5개만 가져오기
+            deposit_recommend = DProduct.objects.filter(d_cluster_query).order_by('-maxir', '-name').values()[:5]
+            deposit_recommend = add_bank_logo(deposit_recommend, 'bank')
+            final_recommend = SProduct.objects.filter(s_bank_query & s_cluster_query).order_by('-max_preferential_rate', '-bank_name').values()[:5]
+            final_recommend = add_bank_logo(final_recommend, 'bank_name')
+        else:
+            return render(request, 'error.html', {'message': '유효하지 않은 적립 방법입니다.'})
         # 추천 결과를 세션에 JSON 형식으로 저장
-        request.session['deposit_recommend'] = json.dumps(list(deposit_recommend), cls=DjangoJSONEncoder)
-        request.session['final_recommend'] = json.dumps(list(final_recommend), cls=DjangoJSONEncoder)
-        context = {
-            'user_name': user_name,
+        if deposit_recommend:
+            request.session['deposit_recommend'] = json.dumps(list(deposit_recommend), cls=DjangoJSONEncoder)
+        if final_recommend:
+            request.session['final_recommend'] = json.dumps(list(final_recommend), cls=DjangoJSONEncoder)
+
+        context.update({
             'deposit_recommend': deposit_recommend,
             'final_recommend': final_recommend
-        }
+        })
         return redirect('top5')
-    
+
     # GET 요청일 경우 템플릿 렌더링
     return render(request, 'savings_info.html', context)
+
 
 @login_required_session
 def top5(request):
@@ -914,14 +976,6 @@ def top5(request):
     except json.JSONDecodeError:
         final_recommend = []
         deposit_recommend = []
-
-    # 은행 이름에 해당하는 로고 파일명을 매핑
-    final_recommend_with_logo = [
-        {**item, "logo": get_bank_logo(item.get("bank_name", ""))} for item in final_recommend
-    ]
-    deposit_recommend_with_logo = [
-        {**item, "logo": get_bank_logo(item.get("bank", ""))} for item in deposit_recommend
-    ]
 
     # 로그 데이터 확인 
     log_cluster = get_top_data_by_customer_class(user.Stageclass, user.Inlevel)
@@ -950,8 +1004,8 @@ def top5(request):
     # Context에 데이터 추가
     context = {
         'user_name': user_name,
-        'final_recommend': final_recommend_with_logo,  # 적금 Top 3 (로고 포함)
-        'deposit_recommend': deposit_recommend_with_logo,  # 예금 Top 2 (로고 포함)
+        'final_recommend': final_recommend,  # 적금 Top 3 (로고 포함)
+        'deposit_recommend': deposit_recommend,  # 예금 Top 2 (로고 포함)
         'filtered_data' : filtered_data_with_logo,
     }
 
@@ -1425,24 +1479,53 @@ def better_option(request):
                 nearest_s = min(s_list, key=lambda x: x['days_remaining'])
         except UserProfile.DoesNotExist:
             pass  # 사용자가 없을 경우 기본값 유지
-    final_recommend = request.session.get('final_recommend')
-    deposit_recommend = request.session.get('deposit_recommend')
+    final_recommend = request.session.get('final_recommend', [])
+    deposit_recommend = request.session.get('deposit_recommend', [])
+
+    # 각 추천 데이터에 로고 추가
+    try:
+        final_recommend = json.loads(final_recommend) if isinstance(final_recommend, str) else final_recommend
+        deposit_recommend = json.loads(deposit_recommend) if isinstance(deposit_recommend, str) else deposit_recommend
+    except json.JSONDecodeError:
+        final_recommend = []
+        deposit_recommend = []
+    nearest_d_with_logo = (
+        {**nearest_d, "logo": get_bank_logo(nearest_d.get("bank_name", ""))} if nearest_d else None
+    )
+    nearest_s_with_logo = (
+        {**nearest_s, "logo": get_bank_logo(nearest_s.get("bank", ""))} if nearest_s else None
+    )
+    for item in deposit_recommend:
+        logger.debug(f"Item: {item}")
+        if 'dsid' not in item or not item['dsid']:
+            logger.error(f"Invalid dsid in item: {item}")
     context = {
         'user_name': user_name,
         'final_recommend': final_recommend,  # 적금 Top 5
         'deposit_recommend': deposit_recommend,  # 예금 Top 5
-        'nearest_d' : nearest_d,
-        'nearest_s' : nearest_s,
+        'nearest_d' : nearest_d_with_logo,
+        'nearest_s' : nearest_s_with_logo,
     }
 
     return render(request, 'better_options.html',context)
 
+@login_required_session
 def d_detail(request,dsid):
+    customer_id = request.session.get('user_id')  
+    user_name = "사용자"  # 기본값 설정
+    if customer_id:
+        try:
+            # CustomerID로 UserProfile 조회
+            user = UserProfile.objects.get(CustomerID=customer_id)
+            user_name = user.username  # 사용자 이름 설정
+        except UserProfile.DoesNotExist:
+            pass  # 사용자가 없을 경우 기본값 유지
+
     try:
         product = DProduct.objects.get(dsid=dsid)
         index_name = "d_products"  # 인덱스 이름
         index_name_2 = "d_products_tip"
-
+        product_img = get_bank_logo(product.bank)
         # Elasticsearch 검색 쿼리
         query = {
             "_source": ["dsid", "context"],  # 필요한 필드만 가져옴
@@ -1486,20 +1569,35 @@ def d_detail(request,dsid):
         'product': product,
         'context_value' : context_value,
         'context_value_tip':context_value_tip,
+        'user_name' : user_name,
+        'product_img': product_img,
     }
 
     return render(request, 'd_detail.html',context)
 
+@login_required_session
 def s_detail(request, dsid):
-    # s_product에서 먼저 검색
+    # s_product에서 먼저 검
+    customer_id = request.session.get('user_id')  
+    user_name = "사용자"  # 기본값 설정색
+    if customer_id:
+        try:
+            # CustomerID로 UserProfile 조회
+            user = UserProfile.objects.get(CustomerID=customer_id)
+            user_name = user.username  # 사용자 이름 설정
+        except UserProfile.DoesNotExist:
+            pass  # 사용자가 없을 경우 기본값 유지
     try:
         product = SProduct.objects.get(DSID=dsid)
+        product_img = get_bank_logo(product.bank_name)
     except SProduct.DoesNotExist:
         return render(request, 'error.html', {'message': '해당 상품을 찾을 수 없습니다.'})
 
     # 적절한 데이터를 템플릿으로 전달
     context = {
         'product': product,
+        'user_name' : user_name,
+        'product_img': product_img,
     }
     return render(request, 's_detail.html', context)
 
@@ -1515,3 +1613,14 @@ def get_bank_logo(bank_name):
         return logo_path
     else:
         return "img/default_logo.png"
+
+def add_bank_logo(recommend_list, bank_key):
+    """
+    주어진 추천 리스트에 product_img 키를 추가하여 로고 경로를 삽입합니다.
+    """
+    updated_list = deepcopy(recommend_list)  # 원본 데이터 보호를 위해 deepcopy
+    for item in updated_list:
+        bank_name = item.get(bank_key)  # 은행 이름 가져오기
+        print(bank_name)
+        item['logo'] = get_bank_logo(bank_name)  # 로고 경로 추가
+    return updated_list

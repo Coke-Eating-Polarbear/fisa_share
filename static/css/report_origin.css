@@ -1,160 +1,3 @@
-body {
-    background-color: #F5F6F7;
-    font-family: Arial, sans-serif;
-    width: 100vw;
-    padding-top: 30px; /* 헤더 높이에 맞춰 여백 조정 */
-    box-sizing: border-box;
-    min-height: 100%;
-    position: relative;
-    overflow-x: hidden; /* 좌우 스크롤 제거 */
-    max-width: 100%;
-}
-#report-container {
-    border: 1px solid #ddd;
-    padding: 20px;
-    background-color: #f9f9f9;
-    border-radius: 8px;
-    margin-bottom: 30px;
-}
-header, footer {
-    /* background-color: #F5F6F7; */
-    text-align: center;
-    width: 100vw;
-    }
-    header {
-        background-color: #F5F6F7;
-        position: fixed;
-        top: 0;
-        z-index: 2; /* 헤더가 항상 위로 보이게 설정 */
-        height: 80px; /* 헤더 높이를 고정 */
-        width: 100%;
-        display: flex;
-        align-items: center;
-        padding: 0 20px;
-    }
-    footer {
-        background-color: #F5F6F7;
-        height: 10%; /* 화면 높이의 10% 차지 */
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
-        padding: 10px;
-    }
-        /* .nav-box {
-            border: 1px solid #ccc;
-            padding: 10px;
-        } */
-
-        /* 드롭다운 메뉴 스타일 */
-    .dropdown {
-        position: relative;
-        display: inline-block;
-    }
-    .navbar {
-        display: flex;
-        justify-content: space-between; /* 좌측 로고와 우측 버튼 배치 */
-        /* justify-content: flex-end; 오른쪽 정렬 */
-        align-items: center;
-        padding: 10px 20px;
-        font-size: 0.3rem;
-        background-color: #F5F6F7;
-    }
-    .nav-links {
-        margin-right: 10px; /* 회원 정보와의 구분 */
-        display: flex; 
-        justify-content: flex-end; 
-        align-items: center; 
-        flex-grow: 1; 
-        text-align: center;
-    }
-    .navbar a {
-        /* margin: 0 20px; 링크 간격 */
-        font-size: 1.1rem; /* 글씨 크기 */
-        font-weight: bold; /* 글씨 진하게 */
-        margin-left: 15px; /* 각 링크 사이의 간격 */
-        text-decoration: none;
-        color: #333;
-    }
-
-    .dropdown-content {
-        display: none;
-        position: absolute; /*부모요소 바로 아래에 위치*/
-        top: 100%;
-        left: 0;
-        background-color: #fff;
-        /* box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); */
-        padding: 0% ;
-        width: 150px; /*드롭다운이 전체 넓이를 차지*/
-        z-index: 1000;
-        border-top: 1px solid #ddd;
-        border-bottom: 1px solid #ddd;
-        /* border: 1px solid #ddd; */
-    }
-
-    .dropdown-content a {
-        padding: 10px 20px;
-        display: block;
-        text-align: left;
-        color: #333;
-        text-decoration: none;
-        /* white-space: nowrap; */
-    }
-
-    .dropdown-content a:hover {
-        background-color: #f1f1f1;
-    }
-
-    /* 마우스를 올렸을 때 드롭다운 표시 */
-    .dropdown:hover .dropdown-content {
-        display: block;
-    }
-
-    /* 링크 스타일 */
-    .nav-box nav a {
-        color: #333;
-        margin: 0 10px;
-        text-decoration: none;
-    }
-
-    .nav-box nav a:hover {
-        font-weight: bold;
-    }
-
-
-
-.dropdown {
-    position: relative;
-    display: inline-block;
-}
-.dropdown-content {
-    display: none;
-    position: absolute;
-    top: 100%;
-    left: 0;
-    background-color: #fff;
-    /* box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); */
-    padding: 0%;
-    min-width: 150px;
-    z-index: 1;
-    border: 1px solid #ddd;
-}
-.dropdown-content a {
-    padding: 10px 20px;
-    display: block;
-    color: #333;
-    text-align: left;
-    text-decoration: none;
-    /* white-space: nowrap; */
-}
-.dropdown-content a:hover {
-background-color: #f1f1f1;
-}
-.dropdown:hover .dropdown-content {
-    display: block;
-}
-
 .content {
     text-align: center;
     margin-top: 40px;
@@ -173,6 +16,7 @@ background-color: #f1f1f1;
     justify-content: center; /* 내부 내용 가운데 정렬 (수평) */
     align-items: center; /* 내부 내용 가운데 정렬 (수직) */
     text-align: center;
+    font-size: 15px
 }
 .score-summary {
     font-size: 100px;
@@ -195,9 +39,15 @@ background-color: #f1f1f1;
     background-color: #fafafa;
 }
 .report-summary {
-    font-size: 16px;
+    max-width: 90%; /* 차트 박스와 동일한 너비 설정 */
+    margin: 20px auto; /* 중앙 정렬 */
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
 }
-
 /* 큰 컨테이너 */
 .main-container {
     display: flex;
@@ -211,7 +61,6 @@ background-color: #f1f1f1;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
-
 /* 막대 그래프 박스 (2x2 레이아웃) */
 .bar-chart-container {
     flex: 2;
@@ -219,7 +68,6 @@ background-color: #f1f1f1;
     grid-template-columns: repeat(2, 1fr); /* 2열 구성 */
     gap: 20px; /* 셀 간격 */
 }
-
 /* 파이 차트 박스 (위아래 레이아웃) */
 .pie-chart-container {
     flex: 1;
@@ -227,7 +75,6 @@ background-color: #f1f1f1;
     flex-direction: column;
     gap: 20px;
 }
-
 /* 공통 스타일 */
 .chart-box {
     background-color: #f9f9f9;
@@ -250,8 +97,59 @@ background-color: #f1f1f1;
     margin-bottom: 10px;
     color: #333;
 }
-
 canvas {
     max-width: 100%;
     max-height: 200px; /* 동일한 높이로 제한 */
+}
+/* 금융분석 리포트 박스 스타일 */
+.box#analysis-score {
+    color: #5950d6;
+    font-size: 60px;
+    font-weight: bolder;
+    margin-left: 0px;
+    min-width: 75%;
+    min-height: 72%;
+    align-content: center;
+}
+.score-summary {
+    min-width: 90%;
+    min-height: 100%;
+    align-content: center;
+    margin-left: 10px;
+    margin-right: 0%;
+}
+.box#summary {
+    font-weight: bolder;
+    text-align: center;
+    min-width: 85%;
+    min-height: 72%;
+    align-content: center;
+    white-space: pre-line;
+    margin-right: 0%;
+    margin-left: 0%;
+}
+/* 메인 컨테이너 스타일 */
+.main-container {
+    width: 90%;
+    max-width: 1200px;
+}
+/* 그리드 스타일 */
+.grid-layout {
+    display: grid;
+    grid-template-columns: 2fr 2fr 6fr;
+    min-width: 75%;
+    align-items: center;
+    justify-content: center;
+    justify-items: center;
+    margin-left: 30px;
+}
+/* 금융분석 리포트 제목 */
+.report-title {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #333;
+    text-align: left; /* 왼쪽 정렬 */
+    margin-bottom: 20px; /* 아래 간격 추가 */
+    padding-left: 20px; /* 왼쪽 여백 */
+    margin: 0 0 20px 0; /* 상단 마진 제거, 하단 마진 유지 */
 }

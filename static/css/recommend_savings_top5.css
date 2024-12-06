@@ -1,151 +1,27 @@
-body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    background-color: #ffffff;
+/* 상단 제목 스타일 */
+.main-content {
     display: flex;
     flex-direction: column;
-    min-height: 100vh; /* 화면 전체 높이를 차지하도록 설정 */
+    justify-content: flex-start;
+    align-items: center;
 }
-header, footer {
-        /* background-color: #ffffff; */
-        text-align: center;
-        width: 100vw;
-        }
-        header {
-            background-color: #ffffff;
-            position: fixed;
-            top: 0;
-            z-index: 2;
-            height: 80px;
-            width: 100%;
-            display: flex;
-            align-items: center;
-            padding: 0 20px;
-        }
-        
-        footer {
-            background-color: #F5F6F7;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: 10px;
-            box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
-        }
-        footer p {
-            margin: 5px;
-            line-height: 1.2;
-            text-decoration: none;
-            color: #000000;
-            font-size: 0.9rem;
-        }
-        
-        footer a {
-            color: #007bff; /* 링크 색상 */
-            text-decoration: none; /* 링크 밑줄 제거 */
-            font-weight: bold; /* 링크 글씨 굵게 */
-        }
-        
-        footer a:hover {
-            text-decoration: underline; /* 호버 시 밑줄 추가 */
-            color: #0056b3; /* 호버 시 약간 더 진한 파란색 */
-        }
-        
-    
-            /* 드롭다운 메뉴 스타일 */
-        .dropdown {
-            position: relative;
-            display: inline-block;
-        }
-        .navbar {
-            display: flex;
-            justify-content: space-between; /* 좌측 로고와 우측 버튼 배치 */
-            /* justify-content: flex-end; 오른쪽 정렬 */
-            align-items: center;
-            padding: 10px 20px;
-            font-size: 0.3rem;
-            background-color: #ffffff;
-        }
-        .nav-links {
-            margin-right: 10px; /* 회원 정보와의 구분 */
-            display: flex; 
-            justify-content: flex-end; 
-            align-items: center; 
-            flex-grow: 1; 
-            text-align: center;
-        }
-        .navbar a {
-            /* margin: 0 20px; 링크 간격 */
-            font-size: 1.1rem; /* 글씨 크기 */
-            font-weight: bold; /* 글씨 진하게 */
-            margin-left: 15px; /* 각 링크 사이의 간격 */
-            text-decoration: none;
-            color: #333;
-        }
-    
-        .dropdown-content {
-            display: none;
-            position: absolute; /*부모요소 바로 아래에 위치*/
-            top: 100%;
-            left: 0;
-            background-color: #fff;
-            /* box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); */
-            padding: 0% ;
-            width: 150px; /*드롭다운이 전체 넓이를 차지*/
-            z-index: 1000;
-            border-top: 1px solid #ddd;
-            border-bottom: 1px solid #ddd;
-            /* border: 1px solid #ddd; */
-        }
-    
-        .dropdown-content a {
-            padding: 10px 20px;
-            display: block;
-            text-align: left;
-            color: #333;
-            text-decoration: none;
-            /* white-space: nowrap; */
-        }
-    
-        .dropdown-content a:hover {
-            background-color: #f1f1f1;
-        }
-    
-        /* 마우스를 올렸을 때 드롭다운 표시 */
-        .dropdown:hover .dropdown-content {
-            display: block;
-        }
-    
-        /* 링크 스타일 */
-        .nav-box nav a {
-            color: #333;
-            margin: 0 10px;
-            text-decoration: none;
-        }
-    
-        .nav-box nav a:hover {
-            font-weight: bold;
-        }
-
-        .container {
-            margin-top: 20px; /* 상단 여백 줄이기 */
-            margin-bottom: 20px; /* 하단 여백 */
-            flex: 1;
-            width: 70%;
-            max-width: none;
-            background-color: #ffffff;
-            margin: 20px auto;
-            padding: 20px;
-            border: 1px solid #dee2e6;
-            border-radius: 10px;
-            box-sizing: border-box;
-            display: block; /* 다른 정렬 속성에 영향 미치지 않도록 */
-        }
-        
-
+.main-content .main-title-box {
+    align-items: center;
+    text-align: center; /* 중앙 정렬 */
+    margin-top: 10px; /* 위쪽 여백 */
+    margin-bottom: 20px; /* 아래쪽 여백 */
+    padding: 15px 0; /* 위아래 여백 */
+    border: 1px solid #ddd; /* 테두리 */
+    border-radius: 8px; /* 둥근 모서리 */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* 그림자 효과 */
+    width: 40%; /* 박스의 너비를 80%로 설정 */
+}
+.main-content .main-title {
+    font-size: 1.2rem; /* 글자 크기 */
+    font-weight: bold; /* 글자 두께 */
+    color: #333; /* 글자 색상 */
+    margin: 0; /* 기본 여백 제거 */
+}
 /* 탭 스타일 */
 .tabs {
     display: flex;
@@ -155,7 +31,6 @@ header, footer {
     border-radius: 5px;
     padding: 10px 0;
 }
-
 .tab {
     flex: 1;
     text-align: center;
@@ -168,12 +43,10 @@ header, footer {
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
 }
-
 .tab:hover {
     background-color: #f1f1f1; /* 마우스 올릴 때 배경색 */
     border: 1px solid #dee2e6; /* 테두리 추가 */
 }
-
 .tab.active {
     background-color: #007bff; /* 활성화된 탭 색상 */
     color: #ffffff; /* 글자색 */
@@ -181,7 +54,6 @@ header, footer {
     box-shadow: none; /* 활성화된 탭의 그림자 제거 */
     font-weight: bold; /* 활성화된 탭의 글자 굵게 */
 }
-
 .tab-content {
     display: none; /* 기본적으로 숨김 */
     border: 1px solid #dee2e6; /* 테두리 */
@@ -190,12 +62,9 @@ header, footer {
     background-color: #ffffff; /* 배경색 */
     margin-top: 10px; /* 탭 아래 여백 */
 }
-
 .tab-content.active {
     display: block; /* 활성화된 탭 내용 표시 */
 }
-
-
 .card {
     position: relative; /* details-box의 기준 컨테이너로 설정 */
     background-color: #f8f9fa;
@@ -205,7 +74,6 @@ header, footer {
     padding: 15px;
     margin-bottom: 15px;
 }
-
 .card img {
     width: 200px;
     height: 178px;
@@ -213,14 +81,12 @@ header, footer {
     display: block; /* 이미지를 블록 요소로 변경 */
     margin-right: 15px;
 }
-
 .card-content {
     overflow: hidden;
     font-size: 14px;
     color: #555;
     margin-top: 10px; /* 이미지와 텍스트 사이 여백 추가 */
 }
-
 .card-title {
     font-weight: bold; /* 기존 설정 유지 */
     margin-bottom: 5px; /* 기존 설정 유지 */
@@ -228,8 +94,6 @@ header, footer {
     color: #333; /* 글씨 색상을 어두운 회색으로 (선택 사항) */
     text-align: center; /* 중앙 정렬 (선택 사항) */
 }
-
-
 .card-button {
     position: absolute; /* .card를 기준으로 위치를 설정 */
     bottom: 10px; /* 컨테이너의 아래쪽에서 10px 위로 */
@@ -244,8 +108,6 @@ header, footer {
     text-decoration: none;
     cursor: pointer;
 }
-
-
 .details-box {
     display: none;
     position: absolute; /* 카드 컨테이너를 기준으로 위치를 설정 */
@@ -259,7 +121,6 @@ header, footer {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* 그림자 효과 */
     z-index: 1; /* 다른 요소 위에 표시되도록 설정 */
 }
-
 .close-button {
     position: absolute;
     top: 5px;
@@ -270,30 +131,6 @@ header, footer {
     background: none;
     border: none;
 }
-
-.main-title-box {
-    text-align: center; /* 중앙 정렬 */
-    margin: 10px 0; /* 위아래 여백 줄이기 */
-    padding: 10px 0; /* 내부 여백 */
-    background-color: #ffffff; /* 배경색 */
-}
-
-.main-title {
-    font-size: 1.5rem; /* 글씨 크기 */
-    font-weight: bold; /* 글씨 굵게 */
-    color: #333; /* 글씨 색상 */
-    display: inline-block; /* 글자 크기에 맞는 박스 크기 */
-    padding: 10px 20px; /* 내부 여백 */
-    border: 2px solid #555; /* 테두리 */
-    border-radius: 8px; /* 테두리를 둥글게 */
-    background-color: #f8f9fa; /* 박스 배경색 */
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* 약간의 그림자 */
-}
-
-.main-content {
-    margin-top: 100px; /* 헤더의 높이와 동일하게 설정 */
-}
-
 .existing-product-container {
     margin-bottom: 20px; /* 추천 상품과의 간격 */
     padding: 10px; /* 선택적: 여백 추가 */
@@ -301,27 +138,34 @@ header, footer {
     border-radius: 8px; /* 선택적: 모서리 둥글게 */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 선택적: 그림자 */
 }
-
 /* 버튼을 중앙에 배치 */
 .new-action-button {
     display: inline-block;
-    margin: 20px auto; /* 상하 20px, 좌우 자동 정렬 */
-    padding: 10px 20px; /* 버튼 크기 조정 */
-    background-color: #007BFF; /* 배경색 (선택 사항) */
-    color: white; /* 텍스트 색상 */
-    text-align: center; /* 텍스트 중앙 정렬 */
-    text-decoration: none; /* 밑줄 제거 */
-    border-radius: 5px; /* 둥근 모서리 */
-    font-size: 16px; /* 글자 크기 */
-    display: block; /* 버튼을 블록 요소로 설정 */
+    justify-items: center;
+    margin-top: 20px;
+    padding: 12px 25px;
+    font-size: 16px;
+    color: white;
+    background-color: #4747c5; /* 녹색 */
+    border: none;
+    border-radius: 25px;
+    text-decoration: none;
+    text-align: center;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.new-action-button:hover {
+    background-color: #1b1c76; /* 호버 시 밝은 녹색 */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+    transform: scale(1.05);
+    text-decoration: underline;
 }
 
 /* 부모 요소 설정 */
 .recommendations {
     text-align: center; /* 자식 요소 중앙 정렬 */
 }
-
-
 /* 실시간 추천 섹션 */
 .real-time-recommendations {
     margin-top: 40px;
@@ -331,7 +175,6 @@ header, footer {
     border: 1px solid #dee2e6; /* 테두리 추가 */
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* 부드러운 그림자 */
 }
-
 .real-time-recommendations h2 {
     text-align: center; /* 텍스트 중앙 정렬 */
     font-size: 1.5rem;
@@ -342,14 +185,11 @@ header, footer {
     justify-content: center; /* 컨테이너 내 중앙 정렬 */
     align-items: center; /* 세로축 중앙 정렬 */
 }
-
-
 .recommendation-boxes {
     display: flex;
     justify-content: space-between;
     gap: 10px;
 }
-
 .recommendation-box {
     flex: 0 0 48%; /* 두 상자가 균등하게 48%씩 차지 */
     background-color: #ffffff;
@@ -357,14 +197,12 @@ header, footer {
     border-radius: 10px;
     box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
 }
-
 .recommendation-box h3 {
     font-size: 1.2rem;
     margin-bottom: 15px;
     color: #007BFF;
     text-align: center;
 }
-
 .recommendations_2  {
     display: flex;
     flex-direction: column;

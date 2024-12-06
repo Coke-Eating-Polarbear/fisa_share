@@ -185,11 +185,11 @@ def login_view(request):  # 이름을 login_view로 변경
                 return redirect('loginmain')  # main.html로 리디렉션
             else:
                 # 비밀번호가 틀린 경우
-                return render(request, 'accounts/login.html', {'error': 'Invalid ID or password.'})
+                return render(request, 'accounts/login.html', {'error': '잘못된 비밀번호입니다.'})
         
         except UserProfile.DoesNotExist:
             # 사용자 ID가 없는 경우
-            return render(request, 'accounts/login.html', {'error': 'Invalid ID or password.'})
+            return render(request, 'accounts/login.html', {'error': '잘못된 ID 또는 비밀번호입니다.'})
     
     return render(request, 'accounts/login.html')
 
