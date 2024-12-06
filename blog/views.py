@@ -1184,9 +1184,6 @@ def summary_view(request):
     '수입': user_asset_data.monthly_income,
     '지출': user_asset_data.expenses
 }
-    print('average_values',average_values)
-    print('user_data',user_data)
-
     # 추천 상품 처리
     recommended_products = Recommend.objects.filter(CustomerID=customer_id)
     recommended_count = recommended_products.count()
@@ -1974,7 +1971,7 @@ def d_detail(request,dsid):
         product = DProduct.objects.get(dsid=dsid)
         index_name = "d_products"  # 인덱스 이름
         index_name_2 = "d_products_tip"
-
+        product_img = get_bank_logo(product.bank)
         # Elasticsearch 검색 쿼리
         query = {
             "_source": ["dsid", "context"],  # 필요한 필드만 가져옴
@@ -2018,21 +2015,34 @@ def d_detail(request,dsid):
         'product': product,
         'context_value' : context_value,
         'context_value_tip':context_value_tip,
-        'user_name' : user_name
+        'user_name' : user_name,
+        'product_img': product_img,
     }
 
     return render(request, 'd_detail.html',context)
 
 def s_detail(request, dsid):
-    # s_product에서 먼저 검색
+    # s_product에서 먼저 검
+    customer_id = request.session.get('user_id')  
+    user_name = "사용자"  # 기본값 설정색
+    if customer_id:
+        try:
+            # CustomerID로 UserProfile 조회
+            user = UserProfile.objects.get(CustomerID=customer_id)
+            user_name = user.username  # 사용자 이름 설정
+        except UserProfile.DoesNotExist:
+            pass  # 사용자가 없을 경우 기본값 유지
     try:
         product = SProduct.objects.get(DSID=dsid)
+        product_img = get_bank_logo(product.bank_name)
     except SProduct.DoesNotExist:
         return render(request, 'error.html', {'message': '해당 상품을 찾을 수 없습니다.'})
 
     # 적절한 데이터를 템플릿으로 전달
     context = {
         'product': product,
+        'user_name' : user_name,
+        'product_img': product_img,
     }
     return render(request, 's_detail.html', context)
 
