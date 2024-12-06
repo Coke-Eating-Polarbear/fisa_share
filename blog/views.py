@@ -1163,7 +1163,27 @@ def summary_view(request):
 
     if not customer_id:  # 로그인되지 않은 사용자는 로그인 페이지로 리디렉션
         return redirect('login')
+    
+    # Average 테이블에서 고객 소득분위 기준 데이터 조회
+    average_data = Average.objects.filter(
+        stageclass=user.Stageclass,
+        inlevel=user.Inlevel
+    ).first()
 
+    user_asset_data = MyDataAsset.objects.filter(CustomerID=customer_id).first()
+
+    average_values = {
+    '총자산': (average_data.asset + average_data.finance),
+    '현금자산': average_data.finance,
+    '수입': average_data.income,
+    '지출': average_data.spend
+}
+    user_data = {
+    '총자산': user_asset_data.total,
+    '현금자산': user_asset_data.financial,
+    '수입': user_asset_data.monthly_income,
+    '지출': user_asset_data.expenses
+}
     # 추천 상품 처리
     recommended_products = Recommend.objects.filter(CustomerID=customer_id)
     recommended_count = recommended_products.count()
@@ -1304,6 +1324,8 @@ def summary_view(request):
         'user_name': user_name,
         'final_recommend': final_recommend_display,  # 적금 Top 3
         'deposit_recommend': deposit_recommend_display,  # 예금 Top 2
+        'average_data': json.dumps(average_values, ensure_ascii=False),
+        'user_data': json.dumps(user_data, ensure_ascii=False),
         
     }
 
@@ -1933,12 +1955,23 @@ def better_option(request):
 
     return render(request, 'better_options.html',context)
 
+@login_required_session
 def d_detail(request,dsid):
+    customer_id = request.session.get('user_id')  
+    user_name = "사용자"  # 기본값 설정
+    if customer_id:
+        try:
+            # CustomerID로 UserProfile 조회
+            user = UserProfile.objects.get(CustomerID=customer_id)
+            user_name = user.username  # 사용자 이름 설정
+        except UserProfile.DoesNotExist:
+            pass  # 사용자가 없을 경우 기본값 유지
+
     try:
         product = DProduct.objects.get(dsid=dsid)
         index_name = "d_products"  # 인덱스 이름
         index_name_2 = "d_products_tip"
-
+        product_img = get_bank_logo(product.bank)
         # Elasticsearch 검색 쿼리
         query = {
             "_source": ["dsid", "context"],  # 필요한 필드만 가져옴
@@ -1982,20 +2015,34 @@ def d_detail(request,dsid):
         'product': product,
         'context_value' : context_value,
         'context_value_tip':context_value_tip,
+        'user_name' : user_name,
+        'product_img': product_img,
     }
 
     return render(request, 'd_detail.html',context)
 
 def s_detail(request, dsid):
-    # s_product에서 먼저 검색
+    # s_product에서 먼저 검
+    customer_id = request.session.get('user_id')  
+    user_name = "사용자"  # 기본값 설정색
+    if customer_id:
+        try:
+            # CustomerID로 UserProfile 조회
+            user = UserProfile.objects.get(CustomerID=customer_id)
+            user_name = user.username  # 사용자 이름 설정
+        except UserProfile.DoesNotExist:
+            pass  # 사용자가 없을 경우 기본값 유지
     try:
         product = SProduct.objects.get(DSID=dsid)
+        product_img = get_bank_logo(product.bank_name)
     except SProduct.DoesNotExist:
         return render(request, 'error.html', {'message': '해당 상품을 찾을 수 없습니다.'})
 
     # 적절한 데이터를 템플릿으로 전달
     context = {
         'product': product,
+        'user_name' : user_name,
+        'product_img': product_img,
     }
     return render(request, 's_detail.html', context)
 

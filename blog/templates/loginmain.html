@@ -1,4 +1,8 @@
 {% load static %}
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Do+Hyeon&family=Jua&family=Nanum+Gothic&display=swap');
+    </style>
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -7,85 +11,179 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>금융 리포트</title>
     <link rel="stylesheet" href="{% static 'css/loginmain.css' %}">
+
     <style>
     </style>
 </head>
 <body>
     {% csrf_token %}
     <header>
-    <div class="navbar">
-        <div class="logo">
-            <a href="{% url 'loginmain' %}">
-                <img src="{% static 'img\header_logo.png' %}" style="vertical-align: middle; margin-left: 100px;" alt="로고">
+        <div class="navbar">
+            <!-- 로고 -->
+            <div class="logo">
+                <a href="{% url 'loginmain' %}">
+                    <img src="{% static 'img/header_logo.png' %}" alt="로고">
+                </a>
             </div>
-            <div class="nav-links" style="flex-grow: 1; text-align: center; margin-right: 220px;">
-                <a href="{% url 'originreport' %}" style=" font-weight: bold; color: #121212;">금융분석 리포트</a> 
+            <!-- 네비게이션 -->
+            <div class="nav-links">
+                <a href="{% url 'originreport' %}">내 금융 바로보기</a>
                 <div class="dropdown">
-                    <a href="#" style=" font-weight: bold; color: #121212;">예/적금 추천</a>
+                    <a href="#">내 예/적금 찾기</a>
                     <div class="dropdown-content">
-                        <a href="{% url 'top5' %}" style="font-size: 0.8rem;">신규적금추천</a>
-                        <a href="{% url 'better' %}" style="font-size: 0.8rem;">기존상품비교</a>
+                        <a href="{% url 'top5' %}">신규적금추천</a>
+                        <a href="{% url 'better' %}">기존상품비교</a>
                     </div>
-                </div> 
-                <a href="{% url 'spending_mbti' %}" style=" font-weight: bold; color: #121212;">소비MBTI</a>
+                </div>
+                <a href="{% url 'spending_mbti' %}">슬기로운 소비생활</a>
             </div>
-           <!-- 회원 정보 및 마이페이지 -->
-        <div class="user-info">
-            <span style="font-size: 1.1rem;">{{ user_name }}님</span> 
-            <a href="./mypage" style="margin-left: 15px; 
-            text-decoration: none; 
-            font-size: 1.1rem; 
-            font-weight: bold; 
-            color: #121212;">마이페이지</a> 
-            <form method="POST" action="{% url 'logout' %}" style="display: inline;">
-                {% csrf_token %}
-                <button name="logout" style="margin-left: 10px; 
-                margin-right: 100px; 
-                padding: 5px 10px; 
-                font-size: 0.9rem; 
-                font-weight: bold; 
-                background-color: #291e4ee5; 
-                color: white; 
-                border: none; 
-                border-radius: 5px; 
-                cursor: pointer;">
-                    로그아웃
-                </button>
-            </form>
+            <!-- 회원 정보 및 마이페이지 -->
+            <div class="user-info">
+                <span>{{ user_name }}님</span>
+                <a href="./mypage">마이페이지</a>
+                <form method="POST" action="{% url 'logout' %}">
+                    {% csrf_token %}
+                    <button name="logout">로그아웃</button>
+                </form>
+            </div>
+        </div>
+    </header>
+</body>
+</html>
+
+    <div class="carousel">
+            <!-- 슬라이드 컨테이너 -->
+            <div class="slides">
+                <!-- 첫 번째 슬라이더 -->
+                <div class="slide active">
+                    <div class="container">
+                        <div class="summary" style="background: #DCF0FD; display: flex; align-items: center;">
+                            <!-- 왼쪽 섹션 -->
+                            <div style="flex: 1.5; padding: 20px;">
+                                <h2>
+                                    <span class="text">내 금융생활 한눈에 체크하기 💰</span><br>
+                                </h2>
+        
+                                <!-- 점수 및 요약 -->
+                                <p class="finance-score">
+                                    <strong class="lighter-heading">고객님의 금융점수:</strong> 
+                                    <span id="analysis-score"></span> 
+                                    <span class="score-summary"></span>
+                                </p>
+                                <p class="finance-summary">
+                                    <strong class="lighter-heading">현재 금융 상황 요약:</strong> 
+                                    <span id="summary"></span>
+                                </p>
+        
+                                <!-- 자세히 보기 버튼 -->
+                                <a href="{% url 'originreport' %}" class="details-button">🍀 금융 리포트 보러가기</a>
+                            </div>
+        
+                            <!-- 오른쪽 섹션 -->
+                            <div style="flex: 1; text-align: center;">
+                                <img src="{% static 'img/메인로고1.png' %}" alt="메인 로고" style="max-width: 80%; max-height: 100%;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        
+                <!-- 두 번째 슬라이더 -->
+                <div class="slide">
+                    <div class="container">
+                        <div class="summary" style="display: flex; align-items: center; background-color: #eff5ff;">
+                            <!-- 왼쪽 섹션 -->
+                            <div style="flex: 1.5; padding: 20px;">
+                                <h2 style="margin-bottom: 20px; letter-spacing: 0.8px;">
+                                    <span class="text">나에게 딱 맞는 금융 상품 찾기</span>
+                                </h2>
+        
+                                <!-- 설명 -->
+                                <p class="lighter-heading">
+                                    1. 나에게 딱 맞는 신규 예/적금 상품 추천<br>
+                                    2. 기존보다 더 좋은 우대 금리를 갖는 예/적금 상품 추천
+                                </p>
+
+                                <!-- 버튼 -->
+                                <div class="button-group" style="margin-top: 20px;">
+                                    <a href="#" class="details-button" style="border-radius: 41px; background-color: #eff5ff; color: #09a56f;">😺 신규 상품 추천</a><br>
+                                    <a href="#" class="details-button" style="border-radius: 41px; background-color: #eff5ff; color: #09a56f;">🦢 기존 상품 비교</a>
+                                </div>
+                            </div>
+
+                            <!-- 오른쪽 섹션 -->
+                            <div style="flex: 1; text-align: center;">
+                                <img src="{% static 'img/메인로고2.png' %}" alt="예적금 상품 이미지" style="max-width: 90%; max-height: 100%;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        
+                <!-- 세 번째 슬라이더 -->
+                <div class="slide">
+                    <div class="container">
+                        <div class="summary" style="display: flex; align-items: center; background-color: #EAE8FF;">
+                            <!-- 왼쪽 섹션 -->
+                            <div style="flex: 1.5; padding: 20px;">
+                                <h2 style="margin-bottom: 20px;">
+                                    <span class="text">슬기로운 소비생활 도우미</span>
+                                </h2>
+                
+                                <!-- 설명 -->
+                                <p class="lighter-heading">
+                                    1. 나의 소비 패턴 한눈에 확인하기<br>
+                                    2. 내 소비를 줄여주는 혜택 높은 카드 추천받기
+                                </p>
+                
+                                <!-- 버튼 -->
+                                <div class="button-group" style="margin-top: 20px;">
+                                    <a href="#" class="details-button" style="background-color: #6356DA; color: #eff5ff;">🔎 자세히 보러가기</a>
+                                </div>
+                            </div>
+                
+                            <!-- 오른쪽 섹션 -->
+                            <div style="flex: 1; text-align: center;">
+                                <img src="{% static 'img/메인로고3.png' %}" alt="메인 로고" style="max-width: 90%; max-height: 100%;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        
+            <!-- 네비게이션 -->
+            <div class="carousel-navigation">
+                <button class="nav-dot active" data-index="0"></button>
+                <button class="nav-dot" data-index="1"></button>
+                <button class="nav-dot" data-index="2"></button>
+            </div>
         </div>
     </div>
-    </header>
-
-    <!-- 중앙 금융 리포트 내용 -->
-    <div class="container" style="margin-left: 10px; margin-right: 10px;">
-        <div class="summary">
-            <h2>금융리포트 요약</h2>
-            <p>자세히 보기를 누르면 금융리포트 창으로 넘어갑니다.</p>
-            <a href="{% url 'originreport' %}"class="details-button">자세히 보기</a>
-        </div>
     
         <!-- 맞춤 예측 상품 TOP 5 섹션 -->
         <div class="product-section">
-            <h2 style="margin-bottom: 1rem;">{{ user_name }}님 맞춤 예/적금 상품 TOP 5!</h2>
+                <!-- 안내 문구 -->
+            <p class="section-intro" style="font-size: 14px; color: #666; text-align: center; margin-bottom: 10px;">
+                나에게 맞는 예/적금 상품, 찾기 힘드셨죠?<br>마이데이터를 기반으로 쉽고 정확하게 비교해드립니다.
+            </p>
+            <h2 style="margin-bottom: 1rem; color:#121212; font-family: 'Jua', sans-serif; font-weight: 400; font-size: 38px;">{{ user_name }}님 맞춤 예/적금 상품 TOP 5!</h2>
     
             <div class="product-list">
                 {% for product in final_recommend %}
                     <div class="product-card">
-                        <p><strong>상품명:</strong> {{ product.product_name }}</p>
-                        <p><strong>은행:</strong> {{ product.bank_name }}</p>
+                        <p class="product-name">✔ {{ product.product_name }}</p>
+                        <p class="bank-name">{{ product.bank_name }}</p>
                         <p><strong>기준 금리:</strong> {{ product.base_rate }}</p>
                         <p><strong>최대 금리:</strong> {{ product.max_preferential_rate }}</p>
-                        <p><strong>가입 방법:</strong> {{ product.signup_method }}</p>
+                        <!-- <p><strong>가입 방법:</strong> {{ product.signup_method }}</p> -->
                     </div>
                 {% endfor %}
             
                 {% for product in deposit_recommend %}
                     <div class="product-card">
-                        <p><strong>상품명:</strong> {{ product.name }}</p>
-                        <p><strong>은행:</strong> {{ product.bank }}</p>
+                        <p class="product-name">✔ {{ product.name }}</p>
+                        <p class="bank-name">{{ product.bank }}</p>
                         <p><strong>기준 금리:</strong> {{ product.baser }}</p>
                         <p><strong>최대 금리:</strong> {{ product.maxir }}</p>
-                        <p><strong>가입 방법:</strong> {{ product.method }}</p>
+                        <!-- <p><strong>가입 방법:</strong> {{ product.method }}</p> -->
                     </div>
                 {% endfor %}
             </div>
@@ -118,10 +216,112 @@
         </div>
     </div>
 
+    <script>
+        const user_data = JSON.parse('{{ user_data|safe|escapejs }}');
+        const average_data = JSON.parse('{{ average_data|safe|escapejs }}');
+        const userValues = Object.values(user_data);
+        const averageValues = Object.values(average_data);
+
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const totalIncome = userValues[2]; // 총수입
+            const totalSpending = userValues[3]; // 총지출
+            const averageIncome = averageValues[2]; // 평균수입
+
+            console.log('totalIncome',totalIncome);
+            console.log('totalSpending',totalSpending);
+            console.log('averageIncome',averageIncome);
+
+            // A 계산 (지출/수입 비율)
+            const spendingRatio = (totalSpending / totalIncome) * 100;
+            let aStatus;
+            if (spendingRatio <= 50) {
+                aStatus = "좋음";
+            } else if (spendingRatio <= 70) {
+                aStatus = "보통";
+            } else {
+                aStatus = "나쁨";
+            }
+
+            // B 계산 (평균 수입과 비교)
+            const bStatus = totalIncome > averageIncome ? "높음" : "낮음";
+
+            // 점수와 금융 날씨 결정
+            let score, condition, summary, emoji;
+            if (aStatus === "좋음" && bStatus === "높음") {
+                score = 100;
+                condition = "Excellent";
+                summary = "모든 조건이 이상적이며, 재정 상태가 매우 좋습니다.<br>" + "수입 대비 지출 비율이 좋고 평균 이상으로 안정적이며<br>" +"장기적인 재정 관리가 매우 양호한 편입니다.";
+                emoji = "😎";
+            } else if (aStatus === "좋음" && bStatus === "낮음") {
+                score = 90;
+                condition = "VeryGood";
+                summary = "수입 대비 지출 비율이 좋지만 평균에 비해 살짝 낮은 편입니다.<br>" + "재정적으로 안정적이지만 조금 더 관리가 필요합니다.";
+                emoji = "🥰";
+            } else if (aStatus === "보통" && bStatus === "높음") {
+                score = 80;
+                condition = "Good";
+                summary = "평균보다 수입이 높고, 재정상태가 무난하지만 수입 대비 지출이 높은 편입니다.<br>" +"지출 부분을 약간 개선한다면 더 좋은 재정상태가 될 수 있습니다. ";
+                emoji = "😀";
+            } else if (aStatus === "보통" && bStatus === "낮음") {
+                score = 70;
+                condition = "Soso";
+                summary = "수입 대비 지출의 비중이 높은편은 아니지만<br>"+"평균 수입을 고려한다면 조금 더 관리와 주의가 필요합니다.";
+                emoji = "😊";
+            } else if (aStatus === "나쁨" && bStatus === "높음") {
+                score = 60;
+                condition = "NotBad";
+                summary = "평균보다 소득이 높은 편이지만 수입 대비 지출이 많습니다.<br>" + "장기적으로 안정적인 재정 상태를 유지하기 위해선 추가적인 관리와 주의가 필요합니다.";
+                emoji = "🥲";
+            } else {
+                score = 50;
+                condition = "Bad";
+                summary = "수입 대비 지출이 높아 재정 상태가 좋지않은 위험한 상태입니다.<br>" + "즉각적인 재정 관리와 개선 조치가 필요한 상황입니다.";
+                emoji = "😢";
+            }
+
+            // 데이터 화면에 출력
+            document.getElementById('analysis-score').textContent = `${score}점`;
+            document.getElementById('summary').innerHTML = summary;
+            document.querySelector('.score-summary').textContent = emoji;
+            });
+        
+        document.addEventListener("DOMContentLoaded", function () {
+            const slides = document.querySelectorAll(".slide");
+            const dots = document.querySelectorAll(".nav-dot");
+
+            // 슬라이드 변경 함수
+            function changeSlide(index) {
+                slides.forEach((slide, i) => {
+                    slide.classList.toggle("active", i === index);
+                });
+                dots.forEach((dot, i) => {
+                    dot.classList.toggle("active", i === index);
+                });
+            }
+
+            // 네비게이션 버튼 클릭 이벤트
+            dots.forEach((dot) => {
+                dot.addEventListener("click", () => {
+                    const index = parseInt(dot.getAttribute("data-index"), 10);
+                    changeSlide(index);
+                });
+            });
+
+            // 자동 슬라이드 (5초마다)
+            let currentIndex = 0;
+            setInterval(() => {
+                currentIndex = (currentIndex + 1) % slides.length;
+                changeSlide(currentIndex);
+            }, 5000);
+        });
+
+    </script>
+
     <footer>
-        <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0;">서울특별시 마포구 월드컵북로 434 상암IT타워 6층</p> 
-        <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0;">고객지원 : 02-3151-7000 | 이메일: woorifis.lab44@gmail.com </p >
-        <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0;">COPYRIGHT©천만해요</p >
+        <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0; font-size: 0.8rem;">서울특별시 마포구 월드컵북로 434 상암IT타워 6층</p> 
+        <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0; font-size: 0.8rem;">고객지원 : 02-3151-7000 | 이메일: woorifis.lab44@gmail.com </p >
+        <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0; font-size: 0.8rem;">COPYRIGHT©우리천만해요</p >
     </footer >
 
     <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script> -->

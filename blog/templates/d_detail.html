@@ -1,11 +1,13 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>상세 설명</title>
     <link rel="stylesheet" href="{% static 'css/ds_detail.css' %}">
+    <link rel="stylesheet" href="{% static 'css/report_origin.css' %}">
+    <link rel="stylesheet" href="{% static 'css/header.css' %}">
     <style>
     </style>
 </head>
@@ -13,48 +15,37 @@
     {% csrf_token %}
     <header>
         <div class="navbar">
+            <!-- 로고 -->
             <div class="logo">
                 <a href="{% url 'loginmain' %}">
-                    <img src="{% static 'img\header_logo.png' %}" style="vertical-align: middle; margin-left: 100px;" alt="로고">
+                    <img src="{% static 'img/header_logo.png' %}" alt="로고">
+                </a>
                 </div>
-                <div class="nav-links" style="flex-grow: 1; text-align: center; margin-right: 220px;">
-                    <a href="{% url 'originreport' %}" style=" font-weight: bold; color: #121212;">금융분석 리포트</a> 
+            <!-- 네비게이션 -->
+            <div class="nav-links">
+                <a href="{% url 'originreport' %}">내 금융 바로보기</a>
                     <div class="dropdown">
-                        <a href="#" style=" font-weight: bold; color: #121212;">예/적금 추천</a>
+                    <a href="#">내 예/적금 찾기</a>
                         <div class="dropdown-content">
-                            <a href="{% url 'top5' %}" style="font-size: 0.8rem;">신규적금추천</a>
-                            <a href="{% url 'better' %}" style="font-size: 0.8rem;">기존상품비교</a>
-                        </div>
+                        <a href="{% url 'top5' %}">신규적금추천</a>
+                        <a href="{% url 'better' %}">기존상품비교</a>
                     </div> 
-                    <a href="{% url 'spending_mbti' %}" style=" font-weight: bold; color: #121212;">소비MBTI</a>
+                </div>
+                <a href="{% url 'spending_mbti' %}">슬기로운 소비생활</a>
                 </div>
                <!-- 회원 정보 및 마이페이지 -->
             <div class="user-info">
-                <span style="font-size: 1.1rem;">{{ user_name }}님</span> 
-                <a href="./mypage" style="margin-left: 15px; 
-                text-decoration: none; 
-                font-size: 1.1rem; 
-                font-weight: bold; 
-                color: #121212;">마이페이지</a> 
-                <form method="POST" action="{% url 'logout' %}" style="display: inline;">
+                <span>{{ user_name }}님</span>
+                <a href="./mypage">마이페이지</a>
+                <form method="POST" action="{% url 'logout' %}">
                     {% csrf_token %}
-                    <button name="logout" style="margin-left: 10px; 
-                    margin-right: 100px; 
-                    padding: 5px 10px; 
-                    font-size: 0.9rem; 
-                    font-weight: bold; 
-                    background-color: #291e4ee5; 
-                    color: white; 
-                    border: none; 
-                    border-radius: 5px; 
-                    cursor: pointer;">
-                        로그아웃
-                    </button>
+                    <button name="logout">로그아웃</button>
                 </form>
             </div>
         </div>
         </header>
-    
+</body>
+</html>
         <div class="container">
             <div class="checklist">
                 <h2>예적금 가입 전/후 체크했덕? 🦆</h2>
@@ -71,7 +62,7 @@
                                         <li>비과세/세금우대 가능 여부 확인</li>
                                         <li>
                                             예금자보호 대상 여부 확인:
-                                            <button class="details-btn" onclick="showPopup('popup-before')">자세히 보기</button>
+                                        <button type="button" class="details-btn" onclick="showPopup('popup-before')">자세히 보기</button>
                                         </li>
                                     </ul>
                                 </li>
@@ -97,7 +88,9 @@
                                         <li>* 추후 권리 구제가 어려울 수 있습니다 *</li>
                                     </ul>
                                 </li>
-                                <p><strong>이 내용을 기반으로 예·적금 가입 및 관리를 철저히 할 수 있도록 준비하세요! 🚀</strong></p>
+                                <li style="list-style: none; margin-left: 10px;">
+                                    <strong>이 내용을 기반으로 예·적금 가입 및 관리를 철저히 할 수 있도록 준비하세요! 🚀</strong>
+                                </li>
                             </ul>
                         </div>
                     </div>
@@ -119,7 +112,7 @@
                                         <li>금리 상승기에는 짧은 만기의 상품을 선택하거나 회전식 정기예금을 고려</li>
                                         <li>
                                             회전식 정기예금은 금리가 낮을 수 있으니 확인 후 선택
-                                            <button class="details-btn" onclick="showPopup('popup-before_2')">회전식 정기예금이란?</button>
+                                            <button type="button" class="details-btn" onclick="showPopup('popup-before_2')">회전식 정기예금이란?</button>
                                         </li>
                                     </ul>
                                 </li>
@@ -152,27 +145,37 @@
                                         <li>휴면예금통합조회서비스(www.sleepmoney.or.kr)**를 통해 조회 가능</li>
                                     </ul>
                                 </li>
-                                <p><strong>이 내용을 기반으로 예·적금 가입 및 관리를 철저히 할 수 있도록 준비하세요! 🚀</strong></p>
+                                <li style="list-style: none; margin-left: 0px;">
+                                    <strong>이 내용을 기반으로 예·적금 가입 및 관리를 철저히 할 수 있도록 준비하세요! 🚀</strong>
+                                </li>
                             </ul>
                         </div>
                     </div>                    
                 </div>
             </div>
 
+                    <!-- 팝업 박스 -->
+                    <div id="popup-before" class="popup">
+                        <div class="popup-content">
+                            <h4>🔎 자세히 보기</h4>
+                            <p>보호대상 상품인지 상품설명서의 예금보호 로고 확인</p>
+                            <p>- 예금자보호법에 따라 원금과 이자를 합쳐 1인당 5천만 원까지 보호</p>
+                            <p>- 금융기관별로 산정되므로 은행 또는 저축은행당 분산 가입 필요</p>
+                            <button type="button" class="close-btn" onclick="closePopup('popup-before')">닫기</button>
+                        </div>
         </div>
 
-        <!-- 만덕이가 알기 쉽게 정리했덕-!!! 요약 설명 -->
-        <div class="checklist">
-       <h3>만덕이가 알기 쉽게 정리했덕-!!!🦆</h3>
-    
-            <div class="inner-box">
-                <pre style="white-space: pre-wrap;">{{ context_value|linebreaks }}</pre>
-
+                    <div id="popup-before_2" class="popup">
+                        <div class="popup-content">
+                            <h4>🔎 회전식 정기예금이란?</h4>
+                            <p>예금만기 이내에서 회전주기(1,3,6,12개월 등 이자율이 변동 적용되는 기간) 단위로 예금 금리가 시중금리에 따라 바뀌는 예금</p>
+                            <button type="button" class="close-btn" onclick="closePopup('popup-before_2')">닫기</button>
+                        </div>
             </div>
 
             <!-- 상품 세부 정보 -->
             <div class="card">
-                <img src="{% static product.logo|default:'path/to/default_logo.png' %}" 
+                <img src="{% static product_img %}" 
                      alt="{{ product.bank|default:'은행 정보 없음' }} 로고" 
                      style="width: 100px; height: auto;">
                 <div class="card-content">
@@ -184,6 +187,17 @@
                 </div>
             </div>
         
+        <!-- 만덕이가 알기 쉽게 정리했덕-!!! 요약 설명 -->
+        <div class="checklist">
+       <h3>만덕이가 알기 쉽게 정리했덕-!!!🦆</h3>
+    
+            <div class="inner-box">
+                <pre style="white-space: pre-wrap;">{{ context_value|linebreaks }}</pre>
+
+            </div>
+        </div>
+            
+        
             <!-- 만덕이가 알기 쉽게 정리했덕-!!! 요약 설명 -->
             <div class="checklist">
                 <h3>만덕이가 알기 쉽게 정리했덕-!!!🦆</h3>
@@ -193,44 +207,37 @@
                 </div>
             </div>
         </div>
-        
-    
-    <footer>
-        <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0;">서울특별시 마포구 월드컵북로 434 상암IT타워 6층</p> 
-        <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0;">고객지원 : 02-3151-7000 | 이메일: woorifis.lab44@gmail.com </p >
-        <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0;">COPYRIGHT©2024 우리 천만해요</p >
-    </footer >
-
-
     <script>
         function showPopup(popupId) {
+            document.getElementById(popupId).classList.add('show');
             document.getElementById(popupId).classList.remove('hidden');
         }
 
         function closePopup(popupId) {
+            document.getElementById(popupId).classList.remove('show');
             document.getElementById(popupId).classList.add('hidden');
         }
 
         function toggleDropdown(id) {
             const dropdown = document.getElementById(id);
-            dropdown.classList.toggle('show'); // show 클래스를 추가/제거
+            const button = dropdown.previousElementSibling; // 바로 위의 버튼 요소 가져오기
+
+            if (dropdown) {
+                if (dropdown.classList.contains('hidden')) {
+                    dropdown.style.width = `${button.offsetWidth}px`; // 버튼 너비에 맞춤
+                    dropdown.classList.remove('hidden');
+                    dropdown.classList.add('show');
+                } else {
+                    dropdown.classList.remove('show');
+                    dropdown.classList.add('hidden');
         }
-
-
-        function showPopup(popupId) {
-            document.getElementById(popupId).classList.remove('hidden');
+            }
         }
-
-        function closePopup(popupId) {
-            document.getElementById(popupId).classList.add('hidden');
-        }
-
      </script>
-
-
-</body >
-
-
-
-
-</html >
+    <footer>
+        <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0; font-size: 0.8rem;">서울특별시 마포구 월드컵북로 434 상암IT타워 6층</p> 
+        <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0; font-size: 0.8rem;">고객지원 : 02-3151-7000 | 이메일: woorifis.lab44@gmail.com </p >
+        <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0; font-size: 0.8rem;">COPYRIGHT©우리천만해요</p >
+    </footer >
+</body>
+</html>

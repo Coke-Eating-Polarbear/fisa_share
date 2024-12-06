@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>금융분석리포트</title>
     <link rel="stylesheet" href="{% static 'css/report_origin.css' %}">
+    <link rel="stylesheet" href="{% static 'css/header.css' %}">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Marked.js 라이브러리 -->
     <script src="https://cdn.jsdelivr.net/npm/marked@2.1.3/marked.min.js"></script>
@@ -15,120 +16,101 @@
 <body>
     {% csrf_token %}
     <header>
-    <div class="navbar">
-        <div class="logo">
-            <a href="{% url 'loginmain' %}">
-                <img src="{% static 'img\header_logo.png' %}" style="vertical-align: middle; margin-left: 100px;" alt="로고">
+        <div class="navbar">
+            <!-- 로고 -->
+            <div class="logo">
+                <a href="{% url 'loginmain' %}">
+                    <img src="{% static 'img/header_logo.png' %}" alt="로고">
+                </a>
             </div>
-            <div class="nav-links" style="flex-grow: 1; text-align: center; margin-right: 220px;">
-                <a href="{% url 'originreport' %}" style=" font-weight: bold; color: #121212;">금융분석 리포트</a> 
+            <!-- 네비게이션 -->
+            <div class="nav-links">
+                <a href="{% url 'originreport' %}">내 금융 바로보기</a>
                 <div class="dropdown">
-                    <a href="#" style=" font-weight: bold; color: #121212;">예/적금 추천</a>
+                    <a href="#">내 예/적금 찾기</a>
                     <div class="dropdown-content">
-                        <a href="{% url 'top5' %}" style="font-size: 0.8rem;">신규적금추천</a>
-                        <a href="{% url 'better' %}" style="font-size: 0.8rem;">기존상품비교</a>
+                        <a href="{% url 'top5' %}">신규적금추천</a>
+                        <a href="{% url 'better' %}">기존상품비교</a>
                     </div>
-                </div> 
-                <a href="{% url 'spending_mbti' %}" style=" font-weight: bold; color: #121212;">소비MBTI</a>
+                </div>
+                <a href="{% url 'spending_mbti' %}">슬기로운 소비생활</a>
             </div>
-           <!-- 회원 정보 및 마이페이지 -->
-        <div class="user-info">
-            <span style="font-size: 1.1rem;">{{ user_name }}님</span> 
-            <a href="{% url 'mypage' %}" style="margin-left: 15px; 
-            text-decoration: none; 
-            font-size: 1.1rem; 
-            font-weight: bold; 
-            color: #121212;">마이페이지</a> 
-            <form method="POST" action="{% url 'logout' %}" style="display: inline;">
-                {% csrf_token %}
-                <button name="logout" style="margin-left: 10px; 
-                margin-right: 100px; 
-                padding: 5px 10px; 
-                font-size: 0.9rem; 
-                font-weight: bold; 
-                background-color: #291e4ee5; 
-                color: white; 
-                border: none; 
-                border-radius: 5px; 
-                cursor: pointer;">
-                    로그아웃
-                </button>
-            </form>
+            <!-- 회원 정보 및 마이페이지 -->
+            <div class="user-info">
+                <span>{{ user_name }}님</span>
+                <a href="./mypage">마이페이지</a>
+                <form method="POST" action="{% url 'logout' %}">
+                    {% csrf_token %}
+                    <button name="logout">로그아웃</button>
+                </form>
+            </div>
         </div>
-    </div>
     </header>
-
-    <div class="container" style="margin-top: 60px;">
-        <div class="content" style="justify-content: center; justify-items: center;">
-            <div class="box">
-                <h2>{{ user_name }}님의 금융분석 리포트입니다</h2>
-            </div>
-            <div style="display: grid; grid-template-columns: 2fr 2fr 6fr; min-width: 75%; align-items: center; justify-content: center; justify-items: center; margin-left: 30px;">
-                <div class="box" id="analysis-score" style="color: #5950d6; font-size: 60px; font-weight: bolder; margin-left: 0px; min-width: 75%; min-height: 72%; align-content: center;"></div>
-                <div class="score-summary" style="min-width: 90%; min-height: 100%; align-content: center; margin-left: 10px; margin-right: 0%;"><span class="score-summary"></span></div>
-                <div class="box" id="summary" style="font-weight: bolder; text-align: center; min-width: 85%;min-height: 72%; align-content: center; white-space: pre-line; margin-right: 0%; margin-left: 0%;"></div>
-            </div>
-            <div class="main-container" style="width: 90%; max-width: 1200px;">
-                <!-- 막대 그래프 박스 -->
-                <div class="bar-chart-container chart-box">
-                    <div class="chart-box small">
-                        <h3>총자산</h3>
-                        <canvas id="chartTotal"></canvas>
-                    </div>
-                    <div class="chart-box small">
-                        <h3>현금자산</h3>
-                        <canvas id="chartCash"></canvas>
-                    </div>
-                    <div class="chart-box small">
-                        <h3>수입</h3>
-                        <canvas id="chartIncome"></canvas>
-                    </div>
-                    <div class="chart-box small">
-                        <h3>지출</h3>
-                        <canvas id="chartSpend"></canvas>
-                    </div>
+</body>
+</html>
+<div class="container" style="margin-top: 60px;">
+    <div class="content">
+        <h2 class="report-title">👀한 눈에 보는 {{ user_name }}님의 금융분석 리포트</h2>
+        </div>
+        <div class="grid-layout">
+            <div class="box" id="analysis-score"></div>
+            <div class="score-summary"><span class="score-summary"></span></div>
+            <div class="box" id="summary"></div>
+        </div>
+        <div class="main-container">
+            <!-- 막대 그래프 박스 -->
+            <div class="bar-chart-container chart-box">
+                <div class="chart-box small">
+                    <h3>총자산</h3>
+                    <canvas id="chartTotal"></canvas>
                 </div>
-            
-                <!-- 파이 차트 박스 -->
-                <div class="pie-chart-container chart-box">
-                    <div class="chart-box small">
-                        <h3>자산 구성 비율</h3>
-                        <canvas id="pieChart1"class="chart"></canvas>
-                    </div>
-                    <div class="chart-box small">
-                        <h3>지출 구성 비율</h3>
-                        <canvas id="pieChart2" class="chart"></canvas>
-                    </div>
+                <div class="chart-box small">
+                    <h3>현금자산</h3>
+                    <canvas id="chartCash"></canvas>
+                </div>
+                <div class="chart-box small">
+                    <h3>수입</h3>
+                    <canvas id="chartIncome"></canvas>
+                </div>
+                <div class="chart-box small">
+                    <h3>지출</h3>
+                    <canvas id="chartSpend"></canvas>
                 </div>
             </div>
-            
-            <div class="box report-summary">
-                <h3>만덕이가 분석한 금융 리포트</h3>
-            
-               {% if report %}
-                    <p  id="report-container">{{ report }}</p>
-                {% else %}
-                    <p>리포트를 생성하려면 버튼을 눌러주세요.</p>
-                    <form method="POST">
-                        {% csrf_token %}
-                        <button type="submit">리포트 생성</button>
-                    </form>
-                {% endif %}
+            <!-- 파이 차트 박스 -->
+            <div class="pie-chart-container chart-box">
+                <div class="chart-box small">
+                    <h3>자산 구성 비율</h3>
+                    <canvas id="pieChart1" class="chart"></canvas>
+                </div>
+                <div class="chart-box small">
+                    <h3>지출 구성 비율</h3>
+                    <canvas id="pieChart2" class="chart"></canvas>
+                </div>
             </div>
         </div>
+        <div class="box report-summary">
+            <h3>만덕이가 분석한 금융 리포트</h3>
+            {% if report %}
+                <p id="report-container">{{ report }}</p>
+            {% else %}
+                <p>리포트를 생성하려면 버튼을 눌러주세요.</p>
+                <form method="POST">
+                    {% csrf_token %}
+                    <button type="submit">리포트 생성</button>
+                </form>
+            {% endif %}
+        </div>
     </div>
-
-
+</div>
     <script>
         // DOMContentLoaded 이벤트로 스크립트 실행
         document.addEventListener("DOMContentLoaded", function () {
             // Django에서 전달된 데이터를 JavaScript로 로드
             const markdownReport = `{{ report|safe }}`;
-
             // 마크다운을 HTML로 변환
             document.getElementById('report-container').innerHTML = marked(markdownReport);
         });
-
         // Django에서 전달된 데이터를 JavaScript로 로드
         const barData = JSON.parse('{{ bar_data|safe }}');
         const averageData = JSON.parse('{{ average_data|safe }}');
@@ -136,7 +118,6 @@
         const categories = Object.keys(barData); // ['총자산', '현금자산', '수입', '지출']
         const userValues = Object.values(barData);
         const averageValues = Object.values(averageData);
-
         // 플러그인: 각 차트에 수평선(평균 데이터) 추가
         const drawAverageLinePlugin = {
             id: 'drawAverageLine',
@@ -144,15 +125,12 @@
                 const { ctx, scales } = chart;
                 const yAxis = scales.y;
                 const xAxis = scales.x;
-
                 // 평균값 가져오기
                 const averageValue = chart.config.options.plugins.averageLine.value;
-
                 // 수평선 그리기
                 const yPos = yAxis.getPixelForValue(averageValue); // Y축 값 위치 계산
                 const xStart = xAxis.left; // 차트 왼쪽 끝
                 const xEnd = xAxis.right; // 차트 오른쪽 끝
-
                 ctx.save();
                 ctx.beginPath();
                 ctx.strokeStyle = 'red'; // 수평선 색상
@@ -163,18 +141,15 @@
                 ctx.restore();
             }
         };
-
         // 차트 생성 함수
         function createBarChart(chartId, label, userValue, averageValue) {
             const ctx = document.getElementById(chartId).getContext('2d');
-
             // // Y축 범위 계산
             // const range = Math.abs(userValue - averageValue);
             // const buffer = range * 0.5;
             // const minValue = Math.min(userValue, averageValue) - buffer;
             // const maxValue = Math.max(userValue, averageValue) + buffer;
             // const stepSize = 50000;
-
             // 평균선 플러그인
             const averageLinePlugin = {
                 id: 'averageLine',
@@ -182,9 +157,7 @@
                     const ctx = chart.ctx;
                     const yScale = chart.scales.y;
                     const xScale = chart.scales.x;
-
                     const averageY = yScale.getPixelForValue(averageValue);
-
                     ctx.save();
                     ctx.beginPath();
                     ctx.moveTo(xScale.left, averageY);
@@ -194,14 +167,12 @@
                     ctx.setLineDash([15, 10]);
                     ctx.stroke();
                     ctx.restore();
-
                     // 평균선 레이블 추가
                     ctx.font = '12px Arial';
                     ctx.fillStyle = 'lightgray';
                     ctx.fillText(`평균: ${averageValue.toLocaleString()}원`, xScale.right - 100, averageY - 5);
                     }
                 };
-
             // 차트별 설정값 정의
             const chartSettings = {
                 '총자산': {
@@ -229,10 +200,7 @@
                     format: value => (value / 10000).toLocaleString() + '만원'
                 }
             };
-
             const settings = chartSettings[label];
-
-
                 // 차트 생성
                 new Chart(ctx, {
                     type: 'bar',
@@ -241,8 +209,8 @@
                         datasets: [{
                                 label: '사용자 데이터',
                                 data: [userValue],
-                                backgroundColor: 'rgba(75, 192, 192, 0.6)',
-                                borderColor: 'rgba(75, 192, 192, 1)',
+                                backgroundColor: '#BAE1FF',
+                                borderColor: '#BAE1FF',
                                 borderWidth: 1
                             }]
                     },
@@ -255,7 +223,6 @@
                                     stepSize: settings.stepSize,
                                     callback: settings.format
                                 }
-
                             }
                     },
                     plugins: {
@@ -275,19 +242,12 @@
                     plugins: [averageLinePlugin]
                 });
             }
-
-
         // 4개의 그래프 생성
         createBarChart('chartTotal', '총자산', userValues[0], averageValues[0]);
         createBarChart('chartCash', '현금자산', userValues[1], averageValues[1]);
         createBarChart('chartIncome', '수입', userValues[2], averageValues[2]);
         createBarChart('chartSpend', '지출', userValues[3], averageValues[3]);
-
-
-
-
         // 파이 차트 데이터
-
         const sortedCategoriesJson = '{{ sorted_categories_json|safe }}'; // Django 템플릿에서 가져오기
         const sortedCategories = JSON.parse(sortedCategoriesJson); // JSON 문자열을 객체로 변환
         
@@ -296,9 +256,7 @@
         const assetData = JSON.parse(assetDataJson);
         
         console.log("Parsed assetData:", assetData);
-
             
-
         // Chart.js에서 사용할 데이터 형식으로 변환
         const pieData2 = {
             labels: Object.keys(sortedCategories), // 항목 이름 (예: 식비, 교통비, 통신비 등)
@@ -306,25 +264,23 @@
                 {
                     data: Object.values(sortedCategories), // 각 항목의 값
                     backgroundColor: [ // 차트의 색상 배열
-                        '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0',
-                        '#9966FF', '#FF9F40', '#FFCD56', '#FF6384'
+                    '#FFB1C1', '#A3D8F7', '#FFE8A3', '#A6E5E5', 
+                    '#D3B8FF', '#FFC997', '#FFE9A6', '#FFB1C1' 
                     ],
                 }
             ]
         };
-
         const pieData1 = {
             labels: Object.keys(assetData), // 항목 이름 (예: 식비, 교통비, 통신비 등)
             datasets: [
                 {
                     data: Object.values(assetData), // 각 항목의 값
                     backgroundColor: [ // 차트의 색상 배열
-                        '#FF6384', '#36A2EB', '#FFCE56'
+                        '#FFB1C1', '#A3D8F7', '#FFE8A3'
                     ],
                 }
             ]
         };
-
         // 파이 차트 생성 함수
         function createPieChart(chartId, data) {
             const ctx = document.getElementById(chartId).getContext('2d');
@@ -347,17 +303,13 @@
                 }
             });
         }
-
         // 각각의 `<canvas>` ID로 차트를 생성
         createPieChart('pieChart1', pieData1); // 첫 번째 차트 (MyDataAsset 기반)
         createPieChart('pieChart2', pieData2); // 두 번째 차트 (Sorted Categories 기반)
-
         document.addEventListener("DOMContentLoaded", function () {
-
             const totalIncome = userValues[2]; // 총수입
             const totalSpending = userValues[3]; // 총지출
             const averageIncome = averageValues[2]; // 평균수입
-
             // A 계산 (지출/수입 비율)
             const spendingRatio = (totalSpending / totalIncome) * 100;
             let aStatus;
@@ -368,10 +320,8 @@
             } else {
                 aStatus = "나쁨";
             }
-
             // B 계산 (평균 수입과 비교)
             const bStatus = totalIncome > averageIncome ? "높음" : "낮음";
-
             // 점수와 금융 날씨 결정
             let score, condition, summary, emoji;
             if (aStatus === "좋음" && bStatus === "높음") {
@@ -405,20 +355,16 @@
                 summary = "수입 대비 지출이 높아 재정 상태가 좋지않은 위험한 상태입니다.\n" + "즉각적인 재정 관리와 개선 조치가 필요한 상황입니다.";
                 emoji = "😢";
             }
-
             // 데이터 화면에 출력
             document.getElementById('analysis-score').textContent = `${score}점`;
             document.getElementById('summary').textContent = summary;
             document.querySelector('.score-summary').textContent = emoji;
         });
-
-
     </script>
-
     <footer>
-        <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0;">서울특별시 마포구 월드컵북로 434 상암IT타워 6층</p> 
-        <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0;">고객지원 : 02-3151-7000 | 이메일: woorifis.lab44@gmail.com </p >
-        <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0;">COPYRIGHT©우리팀이름~</p >
+        <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0; font-size: 0.8rem;">서울특별시 마포구 월드컵북로 434 상암IT타워 6층</p> 
+        <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0; font-size: 0.8rem;">고객지원 : 02-3151-7000 | 이메일: woorifis.lab44@gmail.com </p >
+        <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0; font-size: 0.8rem;">COPYRIGHT©우리천만해요</p >
     </footer >
 </body>
 </html>
