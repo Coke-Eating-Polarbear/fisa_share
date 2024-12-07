@@ -121,6 +121,7 @@ footer {
 }
 .user-info button {
     margin-left: 10px !important;
+    margin-top: 14px;
     padding: 5px 10px !important;
     font-size: 0.9rem !important;
     font-weight: bold !important;
