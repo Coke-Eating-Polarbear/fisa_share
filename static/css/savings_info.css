@@ -1,11 +1,13 @@
-/**  {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    }*/
+@font-face {
+    font-family: 'Pretendard-Regular';
+    src: url('https://fastly.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-Regular.woff') format('woff');
+    font-weight: 400;
+    font-style: normal;
+}
+
     body {
         background-color: #f4f4f6;
-        font-family: Arial, sans-serif;
+        font-family:'Pretendard-Regular', sans-serif;
         width: 100vw;
         padding-top: 150px;
         /* margin: 0;
@@ -161,7 +163,7 @@ footer {
         background-color: #f4f4f6;
         padding: 10px; /* 내부 여백 */
         min-width: 100%;
-        z-index: 1; /* 헤더 아래로 배치 */
+        z-index: 0; /* 헤더 아래로 배치 */
         gap: 20px; /* 내부 요소 간 간격 */
         margin-top: -21px;
 
