@@ -1,16 +1,25 @@
- /* 기본 스타일 */
- body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    background-color: #ffffff;
-    height: 100vh; /* 전체 화면 높이 */
-    display: flex;
-    flex-direction: column; /* Flexbox로 세로 정렬 */
-    overflow-x: hidden !important; /* 좌우 스크롤 제거 */
+/* 최상위 요소들의 여백 제거 */
+@font-face {
+    font-family: 'Pretendard-Regular';
+    src: url('https://fastly.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-Regular.woff') format('woff');
+    font-weight: 300;
+    font-style: normal;
+  } 
 
-}
+    /* 기본 스타일 */
+    body {
+        font-family:'Pretendard-Regular', sans-serif;
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        background-color: #ffffff;
+        height: 100vh; /* 전체 화면 높이 */
+        display: flex;
+        flex-direction: column; /* Flexbox로 세로 정렬 */
+        overflow-x: hidden !important; /* 좌우 스크롤 제거 */
+
+    }
+
     .login_section {
         flex: 1; /* 남은 공간을 모두 차지 */
         display: flex;
