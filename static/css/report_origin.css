@@ -170,3 +170,21 @@ canvas {
     padding-left: 20px; /* 왼쪽 여백 */
     margin: 0 0 20px 0; /* 상단 마진 제거, 하단 마진 유지 */
 }
+
+.report-button {
+    border-radius: 30px; /* 둥근 버튼 */
+    background-color: #eff5ff; /* 배경 색상 */
+    color: #0d00ff; /* 텍스트 색상 */
+    font-weight: bold; /* 글씨 두껍게 */
+    font-size: 18px; /* 글씨 크기 */
+    border-radius: 30px;
+    width: 180px; /* 버튼 너비 */
+    height: 40px; /* 버튼 높이 */
+    cursor: pointer; /* 마우스 올릴 때 포인터 표시 */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 그림자 효과 */
+    transition: background-color 0.3s ease; /* 색상 변화 효과 */
+}
+
+.report-button:hover {
+    background-color: #d4eaff; /* 호버 시 색상 변경 */
+}

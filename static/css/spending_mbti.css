@@ -288,8 +288,8 @@ footer {
     border-radius: 10px; /* 둥근 모서리 */
     padding: 0.5rem; /* 내부 여백 */
     background-color: #f9f9f9; /* 배경색 */
-    margin-top: 1rem; /* 위와의 간격 */
-    margin-bottom: 1rem; /* 아래 간격 추가 */
+    margin-top: 2.5rem; /* 위와의 간격 */
+    margin-bottom: 0.5rem; /* 아래 간격 추가 */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 박스 그림자 */
     width: 100%; /* 박스 크기 */
     display: flex; /* 가로 정렬 */
@@ -333,12 +333,18 @@ footer {
     align-items: center;
     justify-content: center;
     border-right: 1px solid #dee2e6;
+    width: 120px; /* 박스 너비 고정 */
+    height: 150px; /* 박스 높이 고정 */
+    overflow: hidden; /* 박스 크기를 초과하는 이미지 숨김 */
 }
 .card-image-box img {
-    width: 90px;
+    width: 100px;
     height: 100px;
     cursor: pointer;
     border-radius: 5px;
+    width: 100%; /* 부모 박스 너비를 채움 */
+    height: 100%; /* 부모 박스 높이를 채움 */
+    object-fit: cover; /* 이미지 비율을 유지하며 꽉 채우기 */
 }
 .card-name {
     font-size: 1.2rem;
@@ -347,7 +353,7 @@ footer {
 }
 .card-description-box {
     width: 100%;
-    margin-left:10px;
+    margin-left: 0;
     display: flex;
     align-items: center;
     margin-bottom: 10px;
