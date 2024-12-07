@@ -92,7 +92,7 @@
     <h2 style="margin-top: 15px; margin-bottom: 20px; text-align: center; line-height: 0.5;">소비 예측 및 카드 추천</h2>
     <div class="prediction-and-cards-section" style="display: flex; gap: 2rem; align-items: flex-start; margin-top: 0.5rem;">
         <!-- 소비 예측 섹션 -->
-        <div class="prediction-section" style="flex: 0.7;"> <!-- 예측 섹션 간격 설정 -->
+        <div class="prediction-section" style="flex: 0.7; margin-top: 10px;"> <!-- 예측 섹션 간격 설정 -->
             <div class="chart-container" style="margin-bottom: 1rem;">
                 <div class="chart-header">
                     <div class="chart-title">다음 달 소비 예측</div>
@@ -117,10 +117,10 @@
                 <canvas id="predictionLineChart" class="chart" style="width: 100%; height: 250px;"></canvas>
             </div>
             <!-- 설명 -->
-            <div class="description" style="margin-top: 1rem; line-height: 1; font-size: 1rem; color: #555;">
+            <div class="description" style=" line-height: 1; font-size: 1rem; color: #555;">
                 <p>다음 달 예상 소비 금액은 <span id="predicted-total" class="highlight"></span>원 입니다.</p>
                 <p>💡<span style="font-weight: bold; color: blue;"> {{top_card_list.0}}</span>와 <span style="font-weight: bold; color: blue;"> {{top_card_list.1}}</span>에서 가장 큰 소비가 예상됩니다.</p>
-                <p>소비가 높은 항목에서 혜택이 높은 <span style="font-weight: bold; color: red;">오른쪽 카드</span>를 추천드려요!</p>
+                <p>소비가 높은 항목에서 <span style="font-weight: bold; color: red;">혜택이 높은 카드</span>를 추천드려요!</p>
                 <!-- <p>💳예상 절감 금액: <span class="highlight">##원💳</span></p> -->
                 <p>카드 이미지를 클릭해서 정보를 확인해보세요 😊</p>
             </div>
@@ -132,7 +132,7 @@
                 {% for card in card_list %}
                     <div class="card-box" style="border: 1px solid #ccc; padding: 0.5rem; border-radius: 5px;">
                         <a href="{{ card.Link }}" target="_blank" class="card-image-box" style="display: flex; align-items: center; gap: 1rem;">
-                            <img src="{{ card.image }}" alt="{{ card.Name }} 이미지" style="width: 90px; height: 100px;">
+                            <img src="{{ card.image }}" alt="{{ card.Name }} 이미지">
                         </a>
                         <div class="card-description-box" style="margin-top: 0.5rem; display: flex; flex-direction: column; gap: 0.3rem;">
                             <div class="card-name">{{ card.corp }} - {{ card.Name }}</div>
@@ -185,20 +185,35 @@
             const FreqsortedCategories = JSON.parse('{{ Freq_sorted_categories_json|escapejs }}');
             const freqTotal = JSON.parse('{{ Freq_total_json|escapejs }}');
         
-            // 카테고리별 고유 색상 정의 (무지개 순서 파스텔톤)
+            //  카테고리별 고유 색상 정의 (무지개 순서 파스텔톤)
+            // const categoryColors = {
+            //     '식비': '#FFB3BA',       // 연한 빨강
+            //     '교통비': '#FFDFBA',    // 연한 주황
+            //     '모임회비': '#BAFFC9',  // 연한 연초록
+            //     '교육비': '#CAFFBF',    // 연한 초록
+            //     '주거비': '#BAE1FF',    // 연한 하늘색
+            //     '통신비': '#A0C4FF',    // 연한 파랑
+            //     '패션/잡화': '#BDB2FF', // 연한 보라
+            //     '의료비': '#FFC6FF',    // 연한 핑크
+            //     '여가/취미': '#FFB4E6', // 연한 핑크 퍼플
+            //     '경조사': '#c8babe',    // 연한 민트
+            //     '공과금': '#FFFFFC',    // 연한 크림
+            // };
+
             const categoryColors = {
-                '식비': '#FFB3BA',       // 연한 빨강
-                '교통비': '#FFDFBA',    // 연한 주황
-                '모임회비': '#BAFFC9',  // 연한 연초록
-                '교육비': '#CAFFBF',    // 연한 초록
-                '주거비': '#BAE1FF',    // 연한 하늘색
-                '통신비': '#A0C4FF',    // 연한 파랑
-                '패션/잡화': '#BDB2FF', // 연한 보라
-                '의료비': '#FFC6FF',    // 연한 핑크
-                '여가/취미': '#FFB4E6', // 연한 핑크 퍼플
-                '경조사': '#c8babe',    // 연한 민트
-                '공과금': '#FFFFFC',    // 연한 크림
-            };
+            '식비': '#FF6F61',       // 선명한 빨강
+            '교통비': '#FFAA00',    // 선명한 주황
+            '모임회비': '#56C596',  // 선명한 초록
+            '교육비': '#1EAC91',    // 선명한 초록
+            '주거비': '#4A90E2',    // 선명한 하늘색
+            '통신비': '#0073E6',    // 선명한 파랑
+            '패션/잡화': '#7D3EB5', // 선명한 보라
+            '의료비': '#E83E8C',    // 선명한 핑크
+            '여가/취미': '#F368E0', // 선명한 핑크 퍼플
+            '경조사': '#2F4F4F',    // 다크 민트
+            '공과금': '#FFD700',    // 선명한 노랑
+        };
+
         
         
         

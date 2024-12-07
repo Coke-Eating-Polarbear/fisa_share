@@ -94,14 +94,14 @@
             </div>
         </div>
         <div class="box report-summary">
-            <h3 style="font-size: 20; margin-top: 0;">🦆 만덕이가 분석한 금융 리포트</h3>
+            <h3 style="font-size: 25; margin-top: 0;">🎈 만덕이가 분석한 금융 리포트</h3>
             {% if report %}
                 <p id="report-container" style="font-size: 15;">{{ report }}</p>
             {% else %}
                 <p>리포트를 생성하려면 버튼을 눌러주세요.</p>
-                <form method="POST">
+                <form method="POST" style="margin-top: 20px; margin-bottom: 0;">
                     {% csrf_token %}
-                    <button type="submit" style="border-radius: 41px; background-color: #eff5ff; color: #09a56f;">리포트 생성</button>
+                    <button type="submit" class="report-button">🦆 리포트 생성</button>
                 </form>
             {% endif %}
         </div>
