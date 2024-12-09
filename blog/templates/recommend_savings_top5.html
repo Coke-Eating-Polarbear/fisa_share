@@ -136,44 +136,43 @@
                 <a href="./mypage">마이페이지</a>
                 <form method="POST" action="{% url 'logout' %}">
                     {% csrf_token %}
-                    <button name="logout">로그아웃</button>
+                    <button name="logout" style="margin-top: -8px;" >로그아웃</button>
                 </form>
             </div>
         </div>
     </header>
 </body>
 </html>
-<div class="main-content">
-    <div class="main-title-box">
-        <div class="main-title">
-            천냥이가 추천하는 {{ user_name }}님 맞춤 예/적금 추천 상품 TOP 3 🎯
+<div class="container">
+            <div class="main-content">
+                <h2 style = " text-align: center; "> 🐱 {{ user_name }}님 맞춤 예/적금 추천 상품 TOP 3에용~ 🐱 
         </div>
-    </div>
-</div>
-
     <!-- 탭 영역 -->
-    <div class="container">
+    <div style = "margin: 15px auto !important ;" class="container">
+
+        <div class="outer-box">
+    <div>
         <div class="tabs">
             <div class="tab active" onclick="showTab('deposit')">예금 추천</div>
             <div class="tab" onclick="showTab('savings')">적금 추천</div>
         </div>
 
+        {% load static %}
         <!-- 예금 추천 콘텐츠 -->
         <div id="deposit" class="tab-content active">
             <div class="recommendations">
                 <!-- 추천 3개만 표시 -->
                 {% for product in deposit_recommend|slice:":3" %}   
-                <div class="card">
-                    <img src="{% static product.logo %}" alt="{{ product.bank }} 로고">
+                <div class="card" onclick="location.href='{% url 'd-detail' product.dsid %}'">
+                    <img src="{% static 'img/예금.PNG' %}" alt="예금 로고">
                     <div class="card-content">
                         <span class="card-title">{{ product.name }}</span><br>
                         <p><strong>은행:</strong> {{ product.bank }}</p>
-                        <p><strong>기준 금리:</strong> {{ product.baser }}</p>
-                        <p><strong>최대 금리:</strong> {{ product.maxir }}</p>
+                        <p><strong>기준 금리:</strong> {{ product.baser }}%</p>
+                        <p><strong>최대 금리:</strong> {{ product.maxir }}%</p>
                         <p><strong>가입 방법:</strong> {{ product.method }}</p>
-                        <p><strong>상품 코드:</strong>{{ product.dsid }}</p>
                     </div>
-                    <a href="{% url 'd-detail' product.dsid %}" class="card-button">자세히보기</a>
+                    <!-- <a href="{% url 'd-detail' product.dsid %}" class="card-button">자세히보기</a> -->
                 </div>
                 {% endfor %}
                
@@ -182,33 +181,38 @@
             
         </div>
 
+        {% load static %}
         <!-- 적금 추천 콘텐츠 -->
             <div id="savings" class="tab-content">
                 <div class="recommendations">
                     {% for product in final_recommend|slice:":3" %}
-                    <div class="card">
-                        <img src="{% static product.logo %}" alt="{{ product.bank }} 로고">
+                    <div class="card" onclick="location.href='{% url 's-detail' product.DSID %}'">
+                        <img src="{% static 'img/적금.PNG' %}" alt="적금 로고">
                         <div class="card-content">
                             
                             <span class="card-title">{{ product.product_name }}</span><br>
                             <p><strong>은행:</strong> {{ product.bank_name }}</p>
-                            <p><strong>기준 금리:</strong> {{ product.base_rate }}</p>
-                            <p><strong>최대 금리:</strong> {{ product.max_preferential_rate }}</p>
+                            <p><strong>기준 금리:</strong> {{ product.base_rate }}%</p>
+                            <p><strong>최대 금리:</strong> {{ product.max_preferential_rate }}%</p>
                             <p><strong>가입 방법:</strong> {{ product.signup_method }}</p>
-                            <p><strong>상품 코드:</strong>{{ product.DSID }}</p>
                         </div>
-                        <a href="{% url 's-detail' product.DSID %}" class="card-button">자세히보기</a>
+                        <!-- <a href="{% url 's-detail' product.DSID %}" class="card-button">자세히보기</a> -->
                     </div>
                     
                     {% endfor %}
                 </div>
-                <a href="{% url 'info' %}" class="new-action-button" style="display: block; text-align: center; margin: 20px auto;">세부 조건 설정하기</a>
+                    <p class="description-text">"세부조건 설정"을 통해서 더 정확한 추천을 받을 수 있다 냥~🐾</p>
+                    <a href="{% url 'info' %}" class="new-action-button" style="display: block; text-align: center; margin: 20px auto;" >세부 조건 설정하기</a>
             </div>
+            
     </div>
+    </div>
+</div>
 
 <!-- 실시간 예적금 추천 섹션 -->
+{% load static %}
 <div class="container">
-    <h2 style = " text-align: center; ">✨ 실시간 인기있는 예적금 추천 ✨</h2>
+    <h2 style = " text-align: center; ">✨ 실시간 인기있는 예적금 추천이다냥~ ✨</h2>
     <div class="real-time-recommendations">
         <div class="recommendation-boxes">
 
@@ -216,12 +220,12 @@
             <div class="recommendations_2">
                 {% with filtered_data|first as product %}
                 <div class="card">
-                    <img src="{% static product.logo %}" alt="{{ product.bank }} 로고">
+                    <img src="{% static 'img/예금.PNG' %}" alt="예금 로고">
                     <div class="card-content">
                         <span class="card-title">{{ product.product_name|default:"상품명 없음" }}</span><br>
                         <p><strong>은행:</strong> {{ product.bank|default:"은행 정보 없음" }}</p>
-                        <p><strong>기준 금리:</strong> {{ product.baser|default:"-" }}</p>
-                        <p><strong>최대 금리:</strong> {{ product.maxir|default:"-" }}</p>
+                        <p><strong>기준 금리:</strong> {{ product.baser|default:"-" }}%</p>
+                        <p><strong>최대 금리:</strong> {{ product.maxir|default:"-" }}%</p>
                         <p><strong>가입 방법:</strong> {{ product.method|default:"가입 방법 정보 없음" }}</p>
                     </div>
                 </div>
@@ -232,12 +236,12 @@
             <div class="recommendations_2">
                 {% with filtered_data|slice:"1:2"|first as product %}
                 <div class="card">
-                    <img src="{% static product.logo %}" alt="{{ product.bank }} 로고">
+                    <img src="{% static 'img/적금.PNG' %}" alt="적금 로고">
                     <div class="card-content">
                         <span class="card-title">{{ product.product_name|default:"상품명 없음" }}</span><br>
                         <p><strong>은행:</strong> {{ product.bank|default:"은행 정보 없음" }}</p>
-                        <p><strong>기준 금리:</strong> {{ product.baser|default:"-" }}</p>
-                        <p><strong>최대 금리:</strong> {{ product.maxir|default:"-" }}</p>
+                        <p><strong>기준 금리:</strong> {{ product.baser|default:"-" }}%</p>
+                        <p><strong>최대 금리:</strong> {{ product.maxir|default:"-" }}%</p>
                         <p><strong>가입 방법:</strong> {{ product.method|default:"가입 방법 정보 없음" }}</p>
                     </div>
                 </div>
@@ -248,11 +252,26 @@
     </div>
 
 </div>
+</div>
 <footer>
     <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0; font-size: 0.8rem;">서울특별시 마포구 월드컵북로 434 상암IT타워 6층</p> 
     <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0; font-size: 0.8rem;">고객지원 : 02-3151-7000 | 이메일: woorifis.lab44@gmail.com </p >
     <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0; font-size: 0.8rem;">COPYRIGHT©우리천만해요</p >
 </footer >
+
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const titleElements = document.querySelectorAll(".card-title"); // 여러 요소 선택
+        titleElements.forEach((titleElement) => {
+            if (titleElement.innerText.length > 15) {
+                titleElement.innerText = titleElement.innerText.substring(0, 15) + "...";
+            }
+        });
+    });
+
+</script>
 
 </body>
 </html>
