@@ -1,6 +1,14 @@
+/* 최상위 요소들의 여백 제거 */
+@font-face {
+    font-family: 'Pretendard-Regular';
+    src: url('https://fastly.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-Regular.woff') format('woff');
+    font-weight: 300;
+    font-style: normal;
+  } 
+
     /* 기본 스타일 */
     body {
-        font-family: Arial, sans-serif;
+        font-family: 'Pretendard-Regular', sans-serif;
         background-color: #ffffff; /* 배경 흰색 */
         padding: 0;
         margin: 0;
@@ -308,13 +316,16 @@
         font-weight: bold;
         color: #333;
         flex-shrink: 0; /* 제목 크기를 고정 */
-        text-align: center; /* 텍스트 가로 중앙 정렬 */
+        /* text-align: center; 텍스트 가로 중앙 정렬 */
         align-self: center; /* 세로 중앙 정렬 */
         flex-shrink: 0; /* 제목 크기를 고정 */
         /* width: 30%; 제목 영역 너비 설정 */
         /* text-align: center; 왼쪽 정렬 */
+        margin-top: 10px;
         margin-bottom: 10px;
         /* line-height: 1.4; */
+        overflow: hidden;
+        white-space: nowrap;
         }
     
     .word-cloud {
@@ -333,7 +344,8 @@
     .word-cloud h2 {
         font-size: 1.5rem; /* "오늘의 뉴스 키워드" 글씨 크기 조정 */
         font-weight: bold;
-        margin-bottom: 20px;
+        margin-top: 0;
+        margin-bottom: 5px;
     }
 
     .word-cloud img {
@@ -354,6 +366,8 @@
         display: flex;
         flex-direction: column;
         gap: 10px;
+        overflow: hidden; /* 넘친 텍스트 숨김 */
+        text-overflow: ellipsis; /* 넘친 텍스트에 "..." 표시 */
     }
 
     .summary-box:hover {
@@ -410,8 +424,10 @@
         justify-content: space-between; /* 내용이 균등하게 배치되도록 설정 */
         height: 100%; /* 동일한 높이 유지 */
         align-items: center; /* 세로 중앙 정렬 */
-        text-align: center; /* 텍스트 가로 중앙 정렬 */
+        /* text-align: center; 텍스트 가로 중앙 정렬 */
         line-height: 1.5;
+        margin-top: 20px;
+        margin-bottom: 20px;
     }
     
 
@@ -471,7 +487,7 @@
     }
 
     .product-name {
-        font-size: 18px; /* 글씨 크기 조정 */
+        font-size: 20px; /* 글씨 크기 조정 */
         font-weight: bold; /* 굵게 표시 */
         margin-bottom: 8px; /* 아래 여백 */
         color: #000097; /* 텍스트 색상 (선택 사항) */

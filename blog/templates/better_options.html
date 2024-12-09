@@ -80,7 +80,7 @@
                 <a href="./mypage">마이페이지</a>
                 <form method="POST" action="{% url 'logout' %}">
                     {% csrf_token %}
-                    <button name="logout">로그아웃</button>
+                    <button name="logout" style="margin-top: -7px";>로그아웃</button>
                 </form>
             </div>
         </div>
@@ -89,22 +89,21 @@
 </html>
 
 
-<div class="main-content">
-    <div class="main-title-box">
-        <div class="main-title">
-            천냥이가 추천하는 {{ user_name }}님 맞춤 예/적금 추천 상품 TOP 5 🎯
-        </div>
-    </div>
-</div>
-
-
     <!-- 탭 영역 -->
     <div class="container">
+
+        <div class="main-content">
+            <h2 style = " text-align: center; "> </h2>🐱 {{ user_name }}님 맞춤 예/적금 추천 상품 TOP 5에용~ 🐱 
+        </div>
+
+        <div style = "margin: 15px auto !important ;" class="container">
+
         <div class="tabs">
             <div class="tab active">예금 추천</div>
             <div class="tab">적금 추천</div>
         </div>
 
+        {% load static %}
         <!-- 예금 추천 콘텐츠 -->
         <div class="tab-content active">
             <div class="recommendations">
@@ -113,7 +112,7 @@
                     <h2>만기가 가장 가까운 예금 상품이다~냥 🐾</h2>
                     {% if nearest_d %}
                         <div class="card">
-                            <img src="/static/img/부산은행로고.png" alt="{{ product.bank }} 로고">
+                            <img src="{% static 'img/예금.PNG' %}" alt="예금 로고">
                             <div class="card-content_n">
                                 <span class="card-title">{{ nearest_d.pname }}</span><br>
                                 <p><strong>은행:</strong> {{ nearest_d.bank_name }}</p>
@@ -129,23 +128,23 @@
                 <div class="existing-product-container">
                 <h2>아래의 상품들을 추천한다냥! 🐾</h2>
                 {% for product in deposit_recommend %}
-                <div class="card">
-                    <img src="{% static product.logo %}" alt="{{ product.bank }} 로고">
+                <div class="card" onclick="location.href='{% url 'd-detail' product.dsid %}'">
+                    <img src="{% static 'img/예금.PNG' %}" alt="예금 로고">
                     <div class="card-content">
                         <span class="card-title">{{ product.name }}</span><br>
                         <p><strong>은행:</strong> {{ product.bank }}</p>
-                        <p><strong>기준 금리:</strong> {{ product.baser }}</p>
-                        <p><strong>최대 금리:</strong> {{ product.maxir }}</p>
+                        <p><strong>기준 금리:</strong> {{ product.baser }}%</p>
+                        <p><strong>최대 금리:</strong> {{ product.maxir }}%</p>
                         <p><strong>가입 방법:</strong> {{ product.method }}</p>
-                        <p><strong>상품 코드:</strong>{{ product.dsid }}</p>
                     </div>
-                    {% if product.dsid %}
+                    <!--{% if product.dsid %}
                     <a href="{% url 'd-detail' product.dsid %}" class="card-button">자세히보기</a>
                     {% else %}
                         <span>No Detail Available</span>
-                    {% endif %}
+                    {% endif %}-->
                 </div>
                 {% endfor %}
+                <p class="description-text" style="text-align: center;">"세부조건 설정"을 통해서 더 정확한 추천을 받을 수 있다 냥~🐾</p>
                 <a href="{% url 'info' %}" class="new-action-button" style="display: block; text-align: center; margin: 20px auto;">세부 조건 설정하기</a>
                 </div>
             </div>
@@ -159,7 +158,7 @@
                     <h2>만기가 가장 가까운 적금 상품이다~냥 🐾</h2>
                     {% if nearest_s %}
                         <div class="card">
-                            <img src="{% static product.logo %}" alt="{{ product.bank }} 로고">
+                            <img src="{% static 'img/적금.PNG' %}" alt="적금 로고">
                             <div class="card-content">
                                 <span class="card-title">{{ nearest_s.pname }}</span><br>
                                 <p><strong>은행:</strong> {{ nearest_s.bank_name }}</p>
@@ -175,28 +174,29 @@
                 <div class="existing-product-container">
                 <h2>아래의 상품들을 추천한다냥! 🐾</h2>
                 {% for product in final_recommend %}
-                <div class="card">
-                    <img src="{% static product.logo %}" alt="{{ product.bank }} 로고">
+                <div class="card" onclick="location.href='{% url 's-detail' product.DSID %}'">
+                    <img src="{% static 'img/적금.PNG' %}" alt="적금 로고">
                     <div class="card-content">
-                        <span class="card-title">{{ product.product_name }}</span>
+                        <span class="card-title">{{ product.product_name }}</span><br>
                         <p><strong>은행:</strong> {{ product.bank_name }}</p>
-                        <p><strong>기준 금리:</strong> {{ product.base_rate }}</p>
-                        <p><strong>최대 금리:</strong> {{ product.max_preferential_rate }}</p>
+                        <p><strong>기준 금리:</strong> {{ product.base_rate }}%</p>
+                        <p><strong>최대 금리:</strong> {{ product.max_preferential_rate }}%</p>
                         <p><strong>가입 방법:</strong> {{ product.signup_method }}</p>
-                        <p><strong>상품 코드:</strong>{{ product.DSID }}</p>
                     </div>
-                    {% if product.DSID %}
+                    <!-- {% if product.DSID %}
                     <a href="{% url 's-detail' product.DSID %}" class="card-button">자세히보기</a>
                     {% else %}
                         <span>No Detail Available</span>
-                    {% endif %}
+                    {% endif %} -->
                 </div>
+
                 {% endfor %}
             </div>
+            <p class="description-text" style="text-align: center;">"세부조건 설정"을 통해서 더 정확한 추천을 받을 수 있다 냥~🐾</p>
             <a href="{% url 'info' %}" class="new-action-button" style="display: block; text-align: center; margin: 20px auto;">세부 조건 설정하기</a>
             </div>
         </div>
-        
+    </div>
         </div>
     </div>
 

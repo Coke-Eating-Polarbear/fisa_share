@@ -61,15 +61,16 @@
                             <!-- 왼쪽 섹션 -->
                             <div style="flex: 1.5; padding: 20px;">
                                 <h2>
-                                    <span class="text">내 금융생활 한눈에 체크하기 💰</span><br>
+                                    <span class="text">고객님의 금융점수: <span id="analysis-score"></span> <span class="score-summary"></span></span> <br>
                                 </h2>
         
-                                <!-- 점수 및 요약 -->
+                                <!-- 점수 및 요약 
                                 <p class="finance-score">
                                     <strong class="lighter-heading">고객님의 금융점수:</strong> 
                                     <span id="analysis-score"></span> 
                                     <span class="score-summary"></span>
                                 </p>
+                                -->
                                 <p class="finance-summary">
                                     <strong class="lighter-heading">현재 금융 상황 요약:</strong> 
                                     <span id="summary"></span>
@@ -99,8 +100,8 @@
         
                                 <!-- 설명 -->
                                 <p class="lighter-heading">
-                                    1. 나에게 딱 맞는 신규 예/적금 상품 추천<br>
-                                    2. 기존보다 더 좋은 우대 금리를 갖는 예/적금 상품 추천
+                                    나에게 딱 맞는 신규 예/적금 상품 추천<br>
+                                    기존보다 더 좋은 우대 금리를 갖는 예/적금 상품 추천
                                 </p>
 
                                 <!-- 버튼 -->
@@ -172,8 +173,8 @@
                     <div class="product-card">
                         <p class="product-name">✔ {{ product.product_name }}</p>
                         <p class="bank-name">{{ product.bank_name }}</p>
-                        <p><strong>기준 금리:</strong> {{ product.base_rate }}</p>
-                        <p><strong>최대 금리:</strong> {{ product.max_preferential_rate }}</p>
+                        <p><strong>기준 금리:</strong> {{ product.base_rate }}%</p>
+                        <p><strong>최대 금리:</strong> {{ product.max_preferential_rate }}%</p>
                         <!-- <p><strong>가입 방법:</strong> {{ product.signup_method }}</p> -->
                     </div>
                 {% endfor %}
@@ -182,8 +183,8 @@
                     <div class="product-card">
                         <p class="product-name">✔ {{ product.name }}</p>
                         <p class="bank-name">{{ product.bank }}</p>
-                        <p><strong>기준 금리:</strong> {{ product.baser }}</p>
-                        <p><strong>최대 금리:</strong> {{ product.maxir }}</p>
+                        <p><strong>기준 금리:</strong> {{ product.baser }}%</p>
+                        <p><strong>최대 금리:</strong> {{ product.maxir }}%</p>
                         <!-- <p><strong>가입 방법:</strong> {{ product.method }}</p> -->
                     </div>
                 {% endfor %}
@@ -193,9 +194,9 @@
         </div>
     </div>
     
-    <div class="news-intro" style="font-size: 14px; color: #000000; text-align: center; margin-bottom: -20px; margin-top: 100px; font-family:Arial, sans-serif; font-weight:lighter;">
-        <h2>오늘의 금융 관련 주요 뉴스와 워드클라우드를 바로 확인하세요!</h2>
-    </div>
+    <div class="news-intro" style="font-size: 14px; color: #000000; text-align: center; margin-bottom: -20px; margin-top: 100px; font-weight: 250;">
+        <h2>📰 오늘의 금융 관련 주요 뉴스와 워드클라우드를 바로 확인하세요!</h2>
+    </div> 
 
     <div class="container_news">
         <div class="news-summary">
@@ -292,34 +293,62 @@
         
         document.addEventListener("DOMContentLoaded", function () {
             const slides = document.querySelectorAll(".slide");
+            const slideContainer = document.querySelector(".slides");
             const dots = document.querySelectorAll(".nav-dot");
+            let currentIndex = 0;
+            let slideInterval;
+
 
             // 슬라이드 변경 함수
             function changeSlide(index) {
                 slides.forEach((slide, i) => {
-                    slide.classList.toggle("active", i === index);
+                    slide.classList.toggle("active", i === index); // 활성화된 슬라이드 표시
                 });
                 dots.forEach((dot, i) => {
-                    dot.classList.toggle("active", i === index);
+                    dot.classList.toggle("active", i === index); // 활성화된 네비게이션 표시
                 });
+                currentIndex = index; // 현재 슬라이드 인덱스 업데이트
+            }
+
+            /// 자동 슬라이드 시작
+            function startAutoSlide() {
+                slideInterval = setInterval(() => {
+                    currentIndex = (currentIndex + 1) % slides.length;
+                    changeSlide(currentIndex);
+                }, 6000);
+            }
+
+            // 자동 슬라이드 초기화
+            function resetAutoSlide() {
+                clearInterval(slideInterval);
+                startAutoSlide();
             }
 
             // 네비게이션 버튼 클릭 이벤트
             dots.forEach((dot) => {
                 dot.addEventListener("click", () => {
                     const index = parseInt(dot.getAttribute("data-index"), 10);
-                    changeSlide(index);
+                    changeSlide(index); // 클릭한 슬라이드로 이동
+                    resetAutoSlide(); // 유지 시간 초기화
                 });
             });
-
-            // 자동 슬라이드 (5초마다)
-            let currentIndex = 0;
-            setInterval(() => {
-                currentIndex = (currentIndex + 1) % slides.length;
-                changeSlide(currentIndex);
-            }, 5000);
+            // 초기 설정
+            setSlideHeight(); // 슬라이드 높이 설정
+            window.addEventListener("resize", setSlideHeight); // 창 크기 변경 시 높이 재설정
+            changeSlide(currentIndex); // 초기 슬라이드 설정
+            startAutoSlide(); // 자동 슬라이드 시작
         });
 
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const titles = document.querySelectorAll(".title"); // 모든 .title 요소 선택
+
+            titles.forEach(title => {
+                if (title.innerText.length > 22) {
+                    title.innerText = title.innerText.substring(0, 22) + "..."; // 17자까지만 표시하고 생략 부호 추가
+                }
+            });
+        });
     </script>
 
     <footer>

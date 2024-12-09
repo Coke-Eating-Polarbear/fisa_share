@@ -1,3 +1,7 @@
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Do+Hyeon&family=Jua&family=Nanum+Gothic&display=swap');
+    </style>
+
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
@@ -50,10 +54,10 @@
 </html>
 <div class="container" style="margin-top: 60px;">
     <div class="content">
-        <h2 class="report-title">👀한 눈에 보는 {{ user_name }}님의 금융분석 리포트</h2>
+        <h2 class="report-title" style="font-family: Jua, sans-serif;">👀한 눈에 보는 {{ user_name }}님의 금융분석 리포트</h2>
         </div>
         <div class="grid-layout">
-            <div class="box" id="analysis-score"></div>
+            <div class="box" id="analysis-score" style="font-family: Jua, sans-serif; font-weight: l;"></div>
             <div class="score-summary"><span class="score-summary"></span></div>
             <div class="box" id="summary"></div>
         </div>
@@ -90,14 +94,14 @@
             </div>
         </div>
         <div class="box report-summary">
-            <h3>만덕이가 분석한 금융 리포트</h3>
+            <h3 style="font-size: 25; margin-top: 0;">🎈 만덕이가 분석한 금융 리포트</h3>
             {% if report %}
-                <p id="report-container">{{ report }}</p>
+                <p id="report-container" style="font-size: 15;">{{ report }}</p>
             {% else %}
                 <p>리포트를 생성하려면 버튼을 눌러주세요.</p>
-                <form method="POST">
+                <form method="POST" style="margin-top: 20px; margin-bottom: 0;">
                     {% csrf_token %}
-                    <button type="submit">리포트 생성</button>
+                    <button type="submit" class="report-button">🦆 리포트 생성</button>
                 </form>
             {% endif %}
         </div>

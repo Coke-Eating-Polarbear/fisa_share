@@ -1,6 +1,6 @@
 /* 공통 스타일 */
 body {
-    font-family: Arial, sans-serif !important;
+    font-family: 'Pretendard-Regular', sans-serif;
     background-color: #F5F6F7 !important;
     margin: 0 !important;
     padding: 0 !important;
@@ -121,6 +121,7 @@ footer {
 }
 .user-info button {
     margin-left: 10px !important;
+    margin-top: 14px;
     padding: 5px 10px !important;
     font-size: 0.9rem !important;
     font-weight: bold !important;

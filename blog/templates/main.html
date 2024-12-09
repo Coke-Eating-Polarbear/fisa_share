@@ -30,7 +30,9 @@
         <h1 style="font-family: 'Jua', sans-serif;">
         🔊 생활맞춤형 금융 에이전트 서비스를 만나보세요 !
         </h1>
-        <p>고객님의 금융 데이터를 기반으로 맞춤형 서비스를 제공합니다.<br> 지금 가입하셔서 가장 적합한 금융 솔루션을 확인해보세요!🌈</p>
+        <p>고객님의 금융 데이터를 기반으로 맞춤형 서비스를 제공합니다.<br> 
+          고객님에게 맞는 상품을 추천해주는 천냥이😺와 만능오리 만덕이🦆가 도움을 드립니다.🥰<br>
+          지금 가입하셔서 가장 적합한 금융 솔루션을 확인해보세요!🌈</p>
         <a href="{% url 'accounts:login' %}" class="btn">ALL SERVICES</a>
       </div>
       <div class="services-section">
@@ -67,6 +69,7 @@
   
   
   <script>
+    document.addEventListener("DOMContentLoaded", function () {
       const details = {
       finance: {
         title: "📊 내 금융 보기",
@@ -132,14 +135,27 @@
   
     // 카드 클릭 이벤트 처리
     cards.forEach((card) => {
-      card.addEventListener("click", () => {
-        // 모든 카드에서 'active' 클래스 제거
-        cards.forEach((c) => c.classList.remove("active"));
-  
-        // 클릭된 카드에만 'active' 클래스 추가
-        card.classList.add("active");
-      });
+    card.addEventListener("click", () => {
+      // 모든 카드에서 'active' 클래스 제거
+      cards.forEach((c) => c.classList.remove("active"));
+
+      // 클릭된 카드에만 'active' 클래스 추가
+      card.classList.add("active");
+
+      // 클릭된 카드의 onclick 속성에서 key 가져오기
+      const key = card.getAttribute("onclick").match(/showDetails\('(\w+)'\)/)[1];
+      showDetails(key); // 해당 키로 설명 표시
     });
+  });
+
+    // 페이지 로드 시 첫 번째 설명 열기 (기본값 설정)
+  const defaultKey = "finance";
+  const firstCard = document.querySelector(`[onclick="showDetails('${defaultKey}')"]`);
+  if (firstCard) {
+    firstCard.classList.add("active"); // 첫 번째 카드 활성화
+    showDetails(defaultKey); // 첫 번째 설명 표시
+  }
+});
   
   
   </script>
