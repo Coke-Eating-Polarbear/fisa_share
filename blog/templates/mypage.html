@@ -43,7 +43,7 @@
                 <a href="./mypage">마이페이지</a>
                 <form method="POST" action="{% url 'logout' %}">
                     {% csrf_token %}
-                    <button name="logout">로그아웃</button>
+                    <button name="logout" style="margin-top: 0;">로그아웃</button>
                 </form>
             </div>
         </div>
@@ -67,7 +67,7 @@
                     <p>이번달 지출 총액: <strong>{{ total_spent }} 원</strong></p>
                     <!-- 진행바 -->
                     <div id="progress-bar" style="height: 20px; background-color: #e0e0e0; border-radius: 10px; margin-top: 10px;">
-                        <div id="progress-bar-inner" style="height: 100%; background-color: #0099ff; text-align: center; color: white; border-radius: 10px;"></div>
+                        <div id="progress-bar-inner" style="height: 100%; background-color: #0073E6; text-align: center; color: white; border-radius: 10px;"></div>
                     </div>
                     <p id="result"></p>
 
@@ -225,7 +225,7 @@
         {% for account in expiring_accounts %}
             <p><strong><span class="expiring-product-name">{{ account.pname }}</span>이 만기까지 <span class="expiring-days">{{ account.days_remaining }}</span>일 남았어요!</strong></p>
         {% endfor %}
-        <p><a href="{% url 'better' %}" style="color: #8ccae3; text-decoration: none;">상품 둘러보러가기</a></p>
+        <p><a href="{% url 'better' %}" style="color: #0073E6; text-decoration: none;">상품 둘러보러가기</a></p>
     {% endif %}
 </div>
 
@@ -233,7 +233,7 @@
 <div id="no-expiry-notification" class="expiring-container" style="display: none;">
     {% if not expiring_accounts %}
         <p>현재 만기가 가까운 상품이 없습니다. 
-        <a href="{% url 'top5' %}" style="color: #8ccae3; text-decoration: none;">상품 둘러보러가기</a></p>
+        <a href="{% url 'top5' %}" style="color: #0073E6; text-decoration: none;">상품 둘러보러가기</a></p>
     {% endif %}
 </div>
 
