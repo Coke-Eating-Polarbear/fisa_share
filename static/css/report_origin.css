@@ -1,6 +1,18 @@
+@font-face {
+    font-family: 'Pretendard-Regular';
+    src: url('https://fastly.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-Regular.woff') format('woff');
+    font-weight: 200;
+    font-style: normal;
+}
+
+/* 전체 페이지에 폰트 적용 */
+body {
+    font-family: 'Pretendard-Regular', sans-serif;
+}
+
 .content {
     text-align: center;
-    margin-top: 40px;
+    margin-top: 10px;
 }
 .box {
     background-color: white;
@@ -18,13 +30,7 @@
     text-align: center;
     font-size: 15px
 }
-.score-summary {
-    font-size: 100px;
-    background-color: #ffffff;
-    border-radius: 10px;
-    border: 1px solid #ddd;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
+
 .graphs {
     display: flex;
     justify-content: space-around;
@@ -41,7 +47,7 @@
 .report-summary {
     max-width: 90%; /* 차트 박스와 동일한 너비 설정 */
     margin: 20px auto; /* 중앙 정렬 */
-    background-color: #ffffff;
+    background-color: #ffffff;pieChart1
     border: 1px solid #ddd;
     border-radius: 10px;
     padding: 20px;
@@ -92,7 +98,7 @@
     box-shadow: none !important; /* 그림자 제거 */*/
 }
 .chart-box h3 {
-    font-size: 1rem;
+    font-size: 19;
     font-weight: bold;
     margin-bottom: 10px;
     color: #333;
@@ -112,14 +118,23 @@ canvas {
     align-content: center;
 }
 .score-summary {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border: 1px solid #ddd;
+    background-color: #ffffff;
+    border-radius: 10px;
     min-width: 90%;
     min-height: 100%;
+    display: flex;
+    justify-content: center; /* 가로 중앙 정렬 */
     align-content: center;
+    text-align: center;
     margin-left: 10px;
     margin-right: 0%;
+    font-size: 110px; /* 글꼴 크기 조정 */
 }
+
 .box#summary {
-    font-weight: bolder;
+    /* font-weight: bolder; */
     text-align: center;
     min-width: 85%;
     min-height: 72%;
@@ -127,6 +142,7 @@ canvas {
     white-space: pre-line;
     margin-right: 0%;
     margin-left: 0%;
+    font-size: 25;
 }
 /* 메인 컨테이너 스타일 */
 .main-container {
@@ -145,11 +161,30 @@ canvas {
 }
 /* 금융분석 리포트 제목 */
 .report-title {
-    font-size: 1.2rem;
-    font-weight: bold;
+    font-family: Jua, sans-serif;
+    font-size: 2rem;
+    font-weight: lighter;
     color: #333;
-    text-align: left; /* 왼쪽 정렬 */
-    margin-bottom: 20px; /* 아래 간격 추가 */
+    text-align: center; /* 왼쪽 정렬 */
+    margin-bottom: 40px; /* 아래 간격 추가 */
     padding-left: 20px; /* 왼쪽 여백 */
     margin: 0 0 20px 0; /* 상단 마진 제거, 하단 마진 유지 */
+}
+
+.report-button {
+    border-radius: 30px; /* 둥근 버튼 */
+    background-color: #eff5ff; /* 배경 색상 */
+    color: #0d00ff; /* 텍스트 색상 */
+    font-weight: bold; /* 글씨 두껍게 */
+    font-size: 18px; /* 글씨 크기 */
+    border-radius: 30px;
+    width: 180px; /* 버튼 너비 */
+    height: 40px; /* 버튼 높이 */
+    cursor: pointer; /* 마우스 올릴 때 포인터 표시 */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 그림자 효과 */
+    transition: background-color 0.3s ease; /* 색상 변화 효과 */
+}
+
+.report-button:hover {
+    background-color: #d4eaff; /* 호버 시 색상 변경 */
 }

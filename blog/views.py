@@ -910,7 +910,7 @@ def spending_mbti(request):
                     print(f"{keyword}에 해당하는 카테고리가 없습니다.")
 
                 #여기서 할인률, Freq, ammount, discount(할인률 * amount * 0.01)
-                AmountNum = round(AmountNum, 2)
+                AmountNum = round(AmountNum / 10) * 10
                 # 할인률
                 # max_card_json가 JSON 문자열일 경우 파싱
                 if isinstance(max_card_json, str):
@@ -931,7 +931,7 @@ def spending_mbti(request):
                 max_value = list(max_values.values())[0]
 
                 # discount 값
-                discount = round(AmountNum * max_value * 0.01, 2)
+                discount = round(AmountNum * max_value * 0.01 / 10) * 10
 
                 # JSON 데이터가 문자열로 되어 있다면, 이를 변환
                 if isinstance(max_card_detail_json, str):
@@ -1129,6 +1129,10 @@ def get_top_data_by_customer_class(stageclass, inlevel):
     except Exception as e:
         # 오류 처리
         return JsonResponse({"error": str(e)}, status=500)
+
+
+
+
 
 @login_required_session
 def summary_view(request):
@@ -1350,19 +1354,30 @@ def info(request):
         saving_method = request.POST.get('saving_method')
         bank_option = request.POST.get('bank_option')
         selected_preferences = request.POST.getlist('preferences')
+        period = request.POST.get('period')
         cluster_list = request.session.get('clusters', [])
 
         if not cluster_list:
             return render(request, 'error.html', {'message': 'Cluster 값이 없습니다.'})
 
+
         # 은행 유형 필터링
         s_bank_query = Q()
         if bank_option == "일반은행":
             s_bank_query = Q(bank_name__icontains="1금융권")
-        elif bank_option == "저축은행":
-            s_bank_query = Q(bank_name__icontains="저축은행")
+        elif bank_option == "일반은행 + 저축은행":
+            pass
         elif bank_option:
             return render(request, 'error.html', {'message': '유효하지 않은 은행 옵션입니다.'})
+        
+        d_bank_query = Q()
+        if bank_option == "일반은행":
+            d_bank_query = ~Q(bank__icontains="저축은행")
+        elif bank_option == "일반은행 + 저축은행":
+            pass
+        elif bank_option:
+            return render(request, 'error.html', {'message': '유효하지 않은 은행 옵션입니다.'})
+        
 
         # 클러스터 필터링
         d_cluster_query = Q()
@@ -1371,27 +1386,73 @@ def info(request):
             d_cluster_query |= Q(cluster=cluster)
             s_cluster_query |= Q(cluster1=cluster)
 
-        # 우대조건 필터링
-        d_preference_query = Q()
-        s_preference_query = Q()
-        for preference in selected_preferences:
-            d_preference_query &= Q(condit__icontains=preference)
-            s_preference_query &= Q(preferential_conditions__icontains=preference)
 
+        d_period_query = Q()
+        s_period_query = Q()
+        # 기간 필터링
+        if period in ["12", "24", "36"]:
+            d_period_query = (
+                Q(mindate__lte=int(period)) & Q(maxdate__gte=int(period)) &
+                ~Q(mindate=F('maxdate'))  # mindate와 maxdate가 같은 경우 제외
+            ) | Q(mindate=F('maxdate'))  # mindate가 maxdate와 같다면 선택
+            s_period_query =  (
+                Q(min_period=int(period)) & Q(max_period__gte=int(period)) &
+                ~Q(min_period=F('max_period')) 
+            ) | Q(min_period=F('max_period')) 
+        else:
+            pass
+        
+
+        # 우대조건 필터링
+        d_preference_query = Q(condit__icontains="해당없음")
+        s_preference_query = Q(preferential_conditions__icontains="해당없음")
+
+        for preference in selected_preferences:
+            d_preference_query |= Q(condit__icontains=preference)  # LIKE '%preference%'
+            s_preference_query |= Q(preferential_conditions__icontains=preference)  # LIKE '%preference%'
         # 적립 방법에 따라 추천 결과 생성
         deposit_recommend = []
         final_recommend = []
+
         if saving_method == "목돈 모으기":
-            deposit_recommend = DProduct.objects.filter(d_cluster_query).order_by('-maxir', '-name').values()[:5]
+            deposit_recommend = DProduct.objects.filter(d_bank_query & d_preference_query & d_cluster_query & d_period_query).order_by('-maxir', '-name').values()[:5]
             deposit_recommend = add_bank_logo(deposit_recommend, 'bank')
+                        # 중복 제거
+            ## 중복 제거 키 설정
+            keys_to_check = ["name", "bank", "baser", "maxir"]
+
+            ## 데이터 중복 제거
+            # 데이터프레임으로 변환
+            df = pd.DataFrame(deposit_recommend)
+            # 중복 제거
+            df = df.drop_duplicates(subset=keys_to_check)
+            # 다시 딕셔너리 리스트로 변환
+            deposit_recommend = df.to_dict(orient='records')
+
+
         elif saving_method == "목돈 굴리기":
-            final_recommend = SProduct.objects.filter(s_bank_query & s_cluster_query).order_by('-max_preferential_rate', '-bank_name').values()[:5]
+            final_recommend = SProduct.objects.filter(s_bank_query & s_preference_query & s_cluster_query & s_period_query).order_by('-max_preferential_rate', '-bank_name').values()[:5]
             final_recommend = add_bank_logo(final_recommend, 'bank_name')
+
+
+            
         elif saving_method == "목돈 모으기 + 목돈 굴리기":
-            deposit_recommend = DProduct.objects.filter(d_cluster_query).order_by('-maxir', '-name').values()[:5]
+            deposit_recommend = DProduct.objects.filter(d_preference_query & d_bank_query & d_cluster_query & d_period_query).order_by('-maxir', '-name').values()[:5]
             deposit_recommend = add_bank_logo(deposit_recommend, 'bank')
-            final_recommend = SProduct.objects.filter(s_bank_query & s_cluster_query).order_by('-max_preferential_rate', '-bank_name').values()[:5]
+            final_recommend = SProduct.objects.filter(s_bank_query & s_preference_query & s_cluster_query & s_period_query).order_by('-max_preferential_rate', '-base_rate','-bank_name').values()[:5]
             final_recommend = add_bank_logo(final_recommend, 'bank_name')
+                                    # 중복 제거
+            ## 중복 제거 키 설정
+            keys_to_check = ["name", "bank", "baser", "maxir"]
+
+            ## 데이터 중복 제거
+            # 데이터프레임으로 변환
+            df = pd.DataFrame(deposit_recommend)
+            # 중복 제거
+            df = df.drop_duplicates(subset=keys_to_check)
+            # 다시 딕셔너리 리스트로 변환
+            deposit_recommend = df.to_dict(orient='records')
+
         else:
             return render(request, 'error.html', {'message': '유효하지 않은 적립 방법입니다.'})
         # 추천 결과를 세션에 JSON 형식으로 저장
@@ -1400,9 +1461,17 @@ def info(request):
         if final_recommend:
             request.session['final_recommend'] = json.dumps(list(final_recommend), cls=DjangoJSONEncoder)
 
+        # 목표 금액
+
+        # 가입 기간
+        
+        # 우대 조건 적용
+
         context.update({
             'deposit_recommend': deposit_recommend,
-            'final_recommend': final_recommend
+            'final_recommend': final_recommend,
+            # 'select_deposit_recommend' : select_deposit_recommend,
+            # 'select_final_recommend' :select_final_recommend,
         })
         return redirect('top5')
 
@@ -1738,7 +1807,9 @@ def originreport_page(request):
         당신은 금융 데이터 분석 전문가인 '만덕이'입니다. 고객의 자산, 소득, 지출 데이터를 기반으로 개인화된 금융 생활 분석 및 개선 리포트를 작성하세요.
         만덕이는 긍정적이고 따뜻하게 응원해주는 오리로, 고객이 스스로를 격려하며 개선 방향을 이해할 수 있도록 설명합니다.
         예를 들어, "오! 정말 잘하고 있어요! 조금만 더 이렇게 하면 완벽할 거예요"처럼 친절하고 귀여운 말투를 사용하세요.
-        리포트 작성 시 한 문장 마다 띄어쓰기해주세요. 리포트 각 항목마다 앞의 '-' 표시는 지우고 출력해주세요. 금액을 표시할때는 만단위로 말해주세요. 
+        리포트 작성 시 한 문장 마다 띄어쓰기해주세요. 리포트 각 항목마다 앞의 '-' 표시는 지우고 출력해주세요. 금액을 표시할때는 만단위로 말해주세요.
+        총 글자수는 2500자를 넘지 않도록 해주세요. 
+
 
         - 자산 정보:
                 - 총자산: {user_asset_data.total}
@@ -1788,6 +1859,7 @@ def originreport_page(request):
         제가 당신의 금융 생활을 분석해왔어요-! 우리 같이 살펴볼까요? 🤗
 
         #### **자산 현황 분석**
+        [줄바꿈]
         비유동자산, 유동성비율 등 조금 어려운 금융용어는 쉬운 설명으로 바꿔서 출력해주세요. 
         고객의 자산현황을 분석하기위한 평가 지표는 다음과 같습니다. 
         순자산이 평균 그룹의 순자산보다 많은지 비교하세요. 평균보다 높다면 잘하고 있는겁니다. 금융자산, 부동산자산, 기타자산의 비중을 정리하고 각 자산의 비중을 그룹별 자산비중과 비교합니다. 비유동자산의 비율이 50이하면 좋음, 그렇지 않으면 위험이라는 것을 기준으로 비유동자산 상황을 분석합니다. 부채비율은 40 이하(이상적), 40-80(주의 필요), 80 이상(위험)을 기준으로 부채비율을 평가합니다. 유동성 비율은 2 이상(매우 양호), 1.5-2(양호), 1.0-1.5(주의 필요), 1.0 이하(위험)의 기준으로 평가합니다.  
@@ -1795,16 +1867,19 @@ def originreport_page(request):
         전반적인 평가를 모두 합쳐 고객의 자산상황을 평가하고 응원의 메세지와 함께 개선방향을 제시해주세요. 
 
         #### **저축 및 소비 습관 분석**
+        [줄바꿈]
         월저축률(월소득 대비 저축률)이 10-20% 미만이면 위험, 10-20%는 최소 충족, 50-60%가 이상적임을 기준으로 평가합니다. 50-60% 이하의 월 저축률은 조금 더 개선이 필요한 부분입니다. 월저축률이 최소충족 비율보다 높더라도 이상적인 기준보다 낮다면 저축을 늘릴 필요가 있다는 점을 알려주세요. 총자산저축률은 20-30%면 양호한 수준이지만 저축을 조금 더 늘리도록 장려할 필요가 있습니다. 소득 대비 자산 비율은 3-5가 양호, 5 이상은 아주 좋은 수준, 3 미만은 자산 형성이 필요한 상태임을 기준으로 평가합니다.
         고객에게 보여주는 리포트에는 고객의 자산이나 비율만 표시하고 기준점은 따로 설명하지 않습니다.
         고객의 전체적인 저축 상태를 진단하고, 저축 상태가 보통 또는 보통이하(위험) 수준이면 저축을 장려하는 응원 멘트화 함께 개선방향을 제시해주세요.
 
         #### **소비 분석**
+        [줄바꿈]
         평균과의 소비 비교 : 평균보다 많이 지출하거나 적게 지출하는지를 기준으로 고객의 소비 습관을 판단합니다. 카테고리별 소비 차이 분석 : 소비 카테고리별 비중을 분석해 결제 빈도별, 결제 금액별 가장 소비가 많은 상위 5개 카테고리를 나열하고, 가장 많이 쓰는 카테고리 1개를 특별히 설명해주세요. 
         고객에게 보여주는 리포트에는 고객의 자산이나 비율만 표시하고 기준점은 따로 설명하지 않습니다.
         전체적인 고객의 소비패턴을 분석하고 개선방향을 알려주세요.
 
         #### **종합 판단**
+        [줄바꿈]
         고객의 전체적인 자산 현황, 소비 패턴, 저축 상황 등을 종합적으로 판단하여 한 줄 요약으로 정리해주고, 마지막에는 응원의 메세지를 함께 출력해주세요.
 
         리포트를 작성할 때 따뜻하고 희망적인 메시지를 중심으로, 고객이 긍정적인 변화를 추구할 수 있도록 도와주세요!
@@ -2079,6 +2154,5 @@ def add_bank_logo(recommend_list, bank_key):
     updated_list = deepcopy(recommend_list)  # 원본 데이터 보호를 위해 deepcopy
     for item in updated_list:
         bank_name = item.get(bank_key)  # 은행 이름 가져오기
-        print(bank_name)
         item['logo'] = get_bank_logo(bank_name)  # 로고 경로 추가
     return updated_list
