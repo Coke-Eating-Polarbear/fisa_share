@@ -101,8 +101,8 @@ font-family:'Pretendard-Regular', sans-serif;
 }
 
 .right-box h2 {
-font-size: 20px; /* 더 큰 폰트 크기 */
-margin-bottom: 0px; /* 아래쪽 간격 */
+font-size: 24px; /* 더 큰 폰트 크기 */
+/*margin-top: 25x; /* 아래쪽 간격 */
 font-weight: bold; /* 텍스트 굵게 */
 color: #333; /* 텍스트 색상 추가 */
 }
@@ -158,7 +158,7 @@ color: #333; /* 텍스트 색상 추가 */
     display: inline-block;
     padding: 10px 20px; /* 버튼 크기 조정 */
     font-size: 1rem; /* 글씨 크기 */
-    background-color: #0099ff;
+    background-color: #0073E6;
     color: white;
     text-decoration: none;
     border-radius: 5px;
@@ -231,13 +231,14 @@ display: block; /* 블록 요소로 설정 */
     cursor: pointer; /* 마우스 커서를 포인터로 변경 */
     font-size: 20px;
     font-weight: bold; /* 텍스트 굵게 */
-    background-color: #a8d5f2; /* 기본 배경색 */
-    color: #ffffff;
+    background-color: #ffffff ; /* 기본 배경색 */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    color: #000000;
 }
 
 .tab-button.active {
-    background-color: #5dadcc; /* 활성화된 버튼 색상 */
-    color: rgb(0, 0, 0); /* 텍스트 색상 */
+    background-color: #4A90E2 ; /* 활성화된 버튼 색상 */
+    color: rgb(255, 255, 255); /* 텍스트 색상 */
 }
 
 .tab-box-container {
@@ -274,11 +275,12 @@ flex: 3; /* 왼쪽 영역 비율 */
 }
 .additional-box {
 flex: 3; /* 오른쪽 영역 비율 */
-background-color: #8ccae3; /* 강조된 배경 */
+/*background-color: #cfe8ff; /* 강조된 배경 */
 color: rgb(0, 0, 0); /* 텍스트 색상 */
 padding: 30px; /* 내용 여백 */
 margin-left: 15px; /* 왼쪽 요소와 간격 */
 border-radius: 5px; /* 둥근 모서리 */
+border: 2px solid #000000; /* 두께, 스타일, 색상 */
 font-size: 1rem; /* 글씨 크기 */
 font-weight: lighter; /* 글씨 얇게 */
 text-align: left; /* 텍스트 가운데 정렬 */
