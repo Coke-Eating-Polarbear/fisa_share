@@ -1130,6 +1130,10 @@ def get_top_data_by_customer_class(stageclass, inlevel):
         # 오류 처리
         return JsonResponse({"error": str(e)}, status=500)
 
+
+
+
+
 @login_required_session
 def summary_view(request):
     customer_id = request.session.get('user_id')  # 세션에서 CustomerID 가져오기
@@ -1350,19 +1354,30 @@ def info(request):
         saving_method = request.POST.get('saving_method')
         bank_option = request.POST.get('bank_option')
         selected_preferences = request.POST.getlist('preferences')
+        period = request.POST.get('period')
         cluster_list = request.session.get('clusters', [])
 
         if not cluster_list:
             return render(request, 'error.html', {'message': 'Cluster 값이 없습니다.'})
 
+
         # 은행 유형 필터링
         s_bank_query = Q()
         if bank_option == "일반은행":
             s_bank_query = Q(bank_name__icontains="1금융권")
-        elif bank_option == "저축은행":
-            s_bank_query = Q(bank_name__icontains="저축은행")
+        elif bank_option == "일반은행 + 저축은행":
+            pass
         elif bank_option:
             return render(request, 'error.html', {'message': '유효하지 않은 은행 옵션입니다.'})
+        
+        d_bank_query = Q()
+        if bank_option == "일반은행":
+            d_bank_query = ~Q(bank__icontains="저축은행")
+        elif bank_option == "일반은행 + 저축은행":
+            pass
+        elif bank_option:
+            return render(request, 'error.html', {'message': '유효하지 않은 은행 옵션입니다.'})
+        
 
         # 클러스터 필터링
         d_cluster_query = Q()
@@ -1371,27 +1386,73 @@ def info(request):
             d_cluster_query |= Q(cluster=cluster)
             s_cluster_query |= Q(cluster1=cluster)
 
-        # 우대조건 필터링
-        d_preference_query = Q()
-        s_preference_query = Q()
-        for preference in selected_preferences:
-            d_preference_query &= Q(condit__icontains=preference)
-            s_preference_query &= Q(preferential_conditions__icontains=preference)
 
+        d_period_query = Q()
+        s_period_query = Q()
+        # 기간 필터링
+        if period in ["12", "24", "36"]:
+            d_period_query = (
+                Q(mindate__lte=int(period)) & Q(maxdate__gte=int(period)) &
+                ~Q(mindate=F('maxdate'))  # mindate와 maxdate가 같은 경우 제외
+            ) | Q(mindate=F('maxdate'))  # mindate가 maxdate와 같다면 선택
+            s_period_query =  (
+                Q(min_period=int(period)) & Q(max_period__gte=int(period)) &
+                ~Q(min_period=F('max_period')) 
+            ) | Q(min_period=F('max_period')) 
+        else:
+            pass
+        
+
+        # 우대조건 필터링
+        d_preference_query = Q(condit__icontains="해당없음")
+        s_preference_query = Q(preferential_conditions__icontains="해당없음")
+
+        for preference in selected_preferences:
+            d_preference_query |= Q(condit__icontains=preference)  # LIKE '%preference%'
+            s_preference_query |= Q(preferential_conditions__icontains=preference)  # LIKE '%preference%'
         # 적립 방법에 따라 추천 결과 생성
         deposit_recommend = []
         final_recommend = []
+
         if saving_method == "목돈 모으기":
-            deposit_recommend = DProduct.objects.filter(d_cluster_query).order_by('-maxir', '-name').values()[:5]
+            deposit_recommend = DProduct.objects.filter(d_bank_query & d_preference_query & d_cluster_query & d_period_query).order_by('-maxir', '-name').values()[:5]
             deposit_recommend = add_bank_logo(deposit_recommend, 'bank')
+                        # 중복 제거
+            ## 중복 제거 키 설정
+            keys_to_check = ["name", "bank", "baser", "maxir"]
+
+            ## 데이터 중복 제거
+            # 데이터프레임으로 변환
+            df = pd.DataFrame(deposit_recommend)
+            # 중복 제거
+            df = df.drop_duplicates(subset=keys_to_check)
+            # 다시 딕셔너리 리스트로 변환
+            deposit_recommend = df.to_dict(orient='records')
+
+
         elif saving_method == "목돈 굴리기":
-            final_recommend = SProduct.objects.filter(s_bank_query & s_cluster_query).order_by('-max_preferential_rate', '-bank_name').values()[:5]
+            final_recommend = SProduct.objects.filter(s_bank_query & s_preference_query & s_cluster_query & s_period_query).order_by('-max_preferential_rate', '-bank_name').values()[:5]
             final_recommend = add_bank_logo(final_recommend, 'bank_name')
+
+
+            
         elif saving_method == "목돈 모으기 + 목돈 굴리기":
-            deposit_recommend = DProduct.objects.filter(d_cluster_query).order_by('-maxir', '-name').values()[:5]
+            deposit_recommend = DProduct.objects.filter(d_preference_query & d_bank_query & d_cluster_query & d_period_query).order_by('-maxir', '-name').values()[:5]
             deposit_recommend = add_bank_logo(deposit_recommend, 'bank')
-            final_recommend = SProduct.objects.filter(s_bank_query & s_cluster_query).order_by('-max_preferential_rate', '-bank_name').values()[:5]
+            final_recommend = SProduct.objects.filter(s_bank_query & s_preference_query & s_cluster_query & s_period_query).order_by('-max_preferential_rate', '-base_rate','-bank_name').values()[:5]
             final_recommend = add_bank_logo(final_recommend, 'bank_name')
+                                    # 중복 제거
+            ## 중복 제거 키 설정
+            keys_to_check = ["name", "bank", "baser", "maxir"]
+
+            ## 데이터 중복 제거
+            # 데이터프레임으로 변환
+            df = pd.DataFrame(deposit_recommend)
+            # 중복 제거
+            df = df.drop_duplicates(subset=keys_to_check)
+            # 다시 딕셔너리 리스트로 변환
+            deposit_recommend = df.to_dict(orient='records')
+
         else:
             return render(request, 'error.html', {'message': '유효하지 않은 적립 방법입니다.'})
         # 추천 결과를 세션에 JSON 형식으로 저장
@@ -1400,9 +1461,17 @@ def info(request):
         if final_recommend:
             request.session['final_recommend'] = json.dumps(list(final_recommend), cls=DjangoJSONEncoder)
 
+        # 목표 금액
+
+        # 가입 기간
+        
+        # 우대 조건 적용
+
         context.update({
             'deposit_recommend': deposit_recommend,
-            'final_recommend': final_recommend
+            'final_recommend': final_recommend,
+            # 'select_deposit_recommend' : select_deposit_recommend,
+            # 'select_final_recommend' :select_final_recommend,
         })
         return redirect('top5')
 
@@ -2079,6 +2148,5 @@ def add_bank_logo(recommend_list, bank_key):
     updated_list = deepcopy(recommend_list)  # 원본 데이터 보호를 위해 deepcopy
     for item in updated_list:
         bank_name = item.get(bank_key)  # 은행 이름 가져오기
-        print(bank_name)
         item['logo'] = get_bank_logo(bank_name)  # 로고 경로 추가
     return updated_list
