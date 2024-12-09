@@ -339,6 +339,16 @@
             startAutoSlide(); // 자동 슬라이드 시작
         });
 
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const titles = document.querySelectorAll(".title"); // 모든 .title 요소 선택
+
+            titles.forEach(title => {
+                if (title.innerText.length > 22) {
+                    title.innerText = title.innerText.substring(0, 22) + "..."; // 17자까지만 표시하고 생략 부호 추가
+                }
+            });
+        });
     </script>
 
     <footer>

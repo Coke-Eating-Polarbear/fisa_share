@@ -39,7 +39,7 @@
                 <a href="./mypage">마이페이지</a>
                 <form method="POST" action="{% url 'logout' %}">
                     {% csrf_token %}
-                    <button name="logout">로그아웃</button>
+                    <button name="logout" style="margin-top: -7px";>로그아웃</button>
                 </form>
             </div>
         </div>
@@ -181,8 +181,8 @@
                 <div class="card-content">
                     <span class="card-title">{{ product.name|default:"상품 이름 없음" }}</span><br>
                     <p><strong>은행:</strong> {{ product.bank|default:"은행 정보 없음" }}</p>
-                    <p><strong>기준 금리:</strong> {{ product.baser|default:"기준 금리 정보 없음" }}</p>
-                    <p><strong>최대 금리:</strong> {{ product.maxir|default:"최대 금리 정보 없음" }}</p>
+                    <p><strong>기준 금리:</strong> {{ product.baser|default:"기준 금리 정보 없음" }}%</p>
+                    <p><strong>최대 금리:</strong> {{ product.maxir|default:"최대 금리 정보 없음" }}%</p>
                     <p><strong>가입 방법:</strong> {{ product.method|default:"가입 방법 정보 없음" }}</p>
                 </div>
             </div>

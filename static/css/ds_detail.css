@@ -129,7 +129,7 @@ body {
 .card-title {
     font-size: 1.2rem;
     font-weight: bold;
-    margin-bottom: 20px;
+    margin-bottom: 0px;
     color: #333;
     text-overflow: ellipsis; /* 생략 부호 추가 */
 }
@@ -276,10 +276,12 @@ li {
     text-align: center;
     box-sizing: border-box;
     margin: 0 auto;
+    cursor: pointer; /* 손가락 모양 커서 */
+    transition: background-color 0.3s ease, color 0.3s ease; /* 부드러운 전환 */
 }
 
 .dropdown-title:hover {
-    background-color: #e9e9e9;
+    background-color: #f9f9f9;
 }
 
 .dropdown-section h3 {
