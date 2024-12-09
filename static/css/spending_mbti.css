@@ -1,6 +1,13 @@
+@font-face {
+    font-family: 'Pretendard-Regular';
+    src: url('https://fastly.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-Regular.woff') format('woff');
+    font-weight: 300;
+    font-style: normal;
+  }
+
 /* 공통 스타일 */
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Pretendard-Regular';
     background-color: #F5F6F7;
     margin: 0;
     padding: 0;
@@ -331,7 +338,7 @@ footer {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    /* justify-content: center; */
     border-right: 1px solid #dee2e6;
     width: 120px; /* 박스 너비 고정 */
     height: 150px; /* 박스 높이 고정 */
@@ -343,13 +350,14 @@ footer {
     cursor: pointer;
     border-radius: 5px;
     width: 100%; /* 부모 박스 너비를 채움 */
-    height: 100%; /* 부모 박스 높이를 채움 */
+    height: 105%; /* 부모 박스 높이를 채움 */
     object-fit: cover; /* 이미지 비율을 유지하며 꽉 채우기 */
 }
 .card-name {
-    font-size: 1.2rem;
+    font-size: 1.3rem;
     font-weight: bold;
     color: #333;
+    margin-top: 10px;
 }
 .card-description-box {
     width: 100%;
@@ -360,8 +368,10 @@ footer {
     text-align: center;
 }
 .card-description {
-    font-size: 14px;
+    font-size: 15px;
     color: #555;
+    margin-top: 5px;
+    
 }
 .content-container {
     background-color: #ffffff;

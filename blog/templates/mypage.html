@@ -67,7 +67,7 @@
                     <p>이번달 지출 총액: <strong>{{ total_spent }} 원</strong></p>
                     <!-- 진행바 -->
                     <div id="progress-bar" style="height: 20px; background-color: #e0e0e0; border-radius: 10px; margin-top: 10px;">
-                        <div id="progress-bar-inner" style="height: 100%; background-color: #a8d5f2; text-align: center; color: white; border-radius: 10px;"></div>
+                        <div id="progress-bar-inner" style="height: 100%; background-color: #0099ff; text-align: center; color: white; border-radius: 10px;"></div>
                     </div>
                     <p id="result"></p>
 
@@ -109,6 +109,9 @@
         <div class="product-list">
             {% for product in accounts_list %}
             <div class="product-container hidden-product">
+                <div class="product-image" style="flex-shrink: 0;">
+                    <img src="{% static 'img/천냥만덕2.png' %}" alt="{{ product.pname }} 이미지" style="width: 120px; height: 100px; border-radius: 8px; margin-right: 15px;">
+                </div>
                 <div class="product-details">
                     <h3>{{ product.pname }}</h3>
                     <p>잔고: {{ product.balance }}원</p>
@@ -134,12 +137,13 @@
         <div class="product-list">
             {% for deposit in d_list %}
             <div class="product-container hidden-product">
-                <div class="product-details">
+                <div class="product-image" style="flex-shrink: 0;">
+                    <img src="{% static 'img/천냥2.png' %}" alt="{{ product.pname }} 이미지" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px; margin-right: 15px;">
+                </div>
+                <div class="product-details" style="">
                     <h3>{{ deposit.pname }}</h3>
                     <p>총 예금액: {{ deposit.balance }}원</p>
                     <p>적용 금리: {{ deposit.ds_rate }}%</p>
-                    <!-- <p>만기일: {{ deposit.end_date }}</p> -->
-                     <!-- 만기일 조건에 따른 처리 -->
                     <p>
                         만기일: 
                         {% if deposit.end_date == "2999-12-31" %}
@@ -149,24 +153,17 @@
                         {% endif %}
                     </p>
                 </div>
-                <div class="additional-box">
-                    <!-- <strong>
-                    {% if deposit.maturity_amount %}
-                        만기일에 받을 수 있는 예상 금액은 {{ deposit.maturity_amount }}원입니다!
-                    {% else %}
-                        현재 잔액은 {{ deposit.balance }}원입니다.
-                    {% endif %}
-                    </strong> -->
+                <div class="additional-box", style="letter-spacing: 0.1em;">
                     <strong>
                     {% if deposit.end_date == "2999-12-31" %}
-                    만기일이 없는 자유저축예탁금 상품입니다.<br>    
-                    현재 예금 잔액은 {{ deposit.balance }}원 입니다.<br>   
+                    만기일이 없는 자유저축예탁금 상품입니덕! 🦆<br>    
+                    현재 예금 잔액은 {{ deposit.balance }}원 입니덕~<br>   
                     {% else %}
                         {% if deposit.days_remaining %}
-                            예금 만기까지 {{ deposit.days_remaining }}일 남았습니다!<br>
-                            아자아자 ~ 조금만 더 힘내봐요!<br> 만기까지 만덕이가 응원할게요!!🤗<br>
+                            예금 만기까지 {{ deposit.days_remaining }}일 남았습니덕 !🦆<br>
+                            아자아자 ~ 조금만 더 힘내봐요!<br> 만기까지 만덕이가 응원할게요 !!덕~ 🦆🤗<br>
                         {% else %}
-                            현재 적금액은 {{ deposit.balance }}원입니다.
+                            현재 적금액은 {{ deposit.balance }}원입니덕~
                         {% endif %}
                     {% endif %}
                     </strong>
@@ -182,6 +179,9 @@
         <div class="product-list">
             {% for savings in s_list %}
             <div class="product-container hidden-product">
+                <div class="product-image" style="flex-shrink: 0;">
+                    <img src="{% static 'img/만덕2.png' %}" alt="{{ product.pname }} 이미지" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px; margin-right: 15px;">
+                </div>
                 <div class="product-details">
                     <h3>{{ savings.pname }}</h3>
                     <p>총 적금액: {{ savings.balance }}원</p>
@@ -197,17 +197,17 @@
                         {% endif %}
                     </p>
                 </div>
-                <div class="additional-box">
+                <div class="additional-box" ,style="letter-spacing: 0.1em;">
                     <strong>
                     {% if savings.end_date == "2999-12-31" %}
-                    현재 적금액은 {{ savings.balance }}원입니다.<br>    
-                    목표를 향해 열심히 저축 중이에요!<br> 꾸준히 하시면 큰 성과를 얻을 거예요. 💪   
+                    현재 적금액은 {{ savings.balance }}원입니덕~<br>    
+                    목표를 향해 열심히 저축 중! 멋지다덕 !!💚  <br> 꾸준히 하시면 큰 성과를 얻을 거예요. 덕! 🦆 
                     {% else %}
                         {% if savings.days_remaining %}
-                            적금 만기까지 {{ savings.days_remaining }}일 남았습니다!<br>
-                            아자아자 ~ 조금만 더 힘내봐요!<br> 만기까지 만덕이가 응원할게요!!🤗<br>
+                            적금 만기까지 {{ savings.days_remaining }}일 남았습니덕 !🦆<br>
+                            아자아자 ~ 조금만 더 힘내봐요!<br> 만기까지 만덕이가 응원할게요 !!덕~ 🦆🤗<br>
                         {% else %}
-                            현재 적금액은 {{ savings.balance }}원입니다.
+                            현재 적금액은 {{ savings.balance }}원입니덕~
                         {% endif %}
                     {% endif %}
                     </strong>
@@ -223,7 +223,7 @@
 <div id="expiring-notification" class="expiring-container" style="display: none;">
     {% if expiring_accounts %}
         {% for account in expiring_accounts %}
-            <p><strong>얼마 뒤면 <span class="expiring-product-name">{{ account.pname }}</span>이 만기에요!</strong></p>
+            <p><strong><span class="expiring-product-name">{{ account.pname }}</span>이 만기까지 <span class="expiring-days">{{ account.days_remaining }}</span>일 남았어요!</strong></p>
         {% endfor %}
         <p><a href="{% url 'better' %}" style="color: #8ccae3; text-decoration: none;">상품 둘러보러가기</a></p>
     {% endif %}
@@ -301,8 +301,8 @@
                     {
                         data: data,
                         backgroundColor: [
-                            '#FFC2CF', '#A8D8F0', '#FFE5A6', '#A8E4A0', '#FFD2A1',
-                            '#D2A8FF', '#FFC7C5', '#D6F2E9', '#EBC290', '#B7E6C0', '#FBE6A6'
+                            '#FF6F61', '#FFAA00', '#56C596', '#1EAC91', '#4A90E2',
+                            '#0073E6', '#7D3EB5', '#E83E8C', '#F368E0', '#2F4F4F', '#FFD700'
 
                         ]
                     }
@@ -373,21 +373,21 @@
             }
         }
         // 서버에서 예적금 만기 변수 필요
-            document.addEventListener('DOMContentLoaded', () => {
-        const expiringProducts = JSON.parse('{{ expiring_accounts_json|safe }}');
-        const expiringContainer = document.getElementById('expiring-notification');
-        const noExpiryContainer = document.getElementById('no-expiry-notification');
-        
-        if (expiringProducts.length > 0) {
-            // 만기 상품이 있는 경우
-            expiringContainer.style.display = 'block';
-            noExpiryContainer.style.display = 'none';
-        } else {
-            // 만기 상품이 없는 경우
-            noExpiryContainer.style.display = 'block';
-            expiringContainer.style.display = 'none';
-        }
-    });
+        document.addEventListener('DOMContentLoaded', () => {
+            const expiringProducts = JSON.parse('{{ expiring_accounts_json|safe }}');
+            const expiringContainer = document.getElementById('expiring-notification');
+            const noExpiryContainer = document.getElementById('no-expiry-notification');
+            
+            if (expiringProducts.length > 0) {
+                // 만기 상품이 있는 경우
+                expiringContainer.style.display = 'block';
+                noExpiryContainer.style.display = 'none';
+            } else {
+                // 만기 상품이 없는 경우
+                noExpiryContainer.style.display = 'block';
+                expiringContainer.style.display = 'none';
+            }
+        });
 
 
 </script>

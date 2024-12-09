@@ -89,8 +89,9 @@
 
 <!-- 2. 소비 예측 및 카드 추천 박스 -->
 <div class="box" style="border: 1px solid #ccc; border-radius: 10px; padding: 1rem; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
-    <h2 style="margin-top: 15px; margin-bottom: 20px; text-align: center; line-height: 0.5;">소비 예측 및 카드 추천</h2>
-    <div class="prediction-and-cards-section" style="display: flex; gap: 2rem; align-items: flex-start; margin-top: 0.5rem;">
+    <h2 style="margin-top: 20px; margin-bottom: 20px; margin-left:15px; text-align: left; line-height: 0.5;">소비 예측 및 카드 추천</h2>
+    <p style="text-align: left; font-size: 0.9rem; margin-left:15px; color: #666;">천냥이가 고객님의 과거 소비를 기반으로 다음 달의 소비를 예측하고, 소비를 줄일 수 있는 카드를 추천드린다냥 ! 💨</p>
+    <div class="prediction-and-cards-section" style="display: flex; gap: 2rem; align-items: flex-start; margin-top: 2rem;">
         <!-- 소비 예측 섹션 -->
         <div class="prediction-section" style="flex: 0.7; margin-top: 10px;"> <!-- 예측 섹션 간격 설정 -->
             <div class="chart-container" style="margin-bottom: 1rem;">
@@ -118,11 +119,11 @@
             </div>
             <!-- 설명 -->
             <div class="description" style=" line-height: 1; font-size: 1rem; color: #555;">
-                <p>다음 달 예상 소비 금액은 <span id="predicted-total" class="highlight"></span>원 입니다.</p>
-                <p>💡<span style="font-weight: bold; color: blue;"> {{top_card_list.0}}</span>와 <span style="font-weight: bold; color: blue;"> {{top_card_list.1}}</span>에서 가장 큰 소비가 예상됩니다.</p>
-                <p>소비가 높은 항목에서 <span style="font-weight: bold; color: red;">혜택이 높은 카드</span>를 추천드려요!</p>
+                <p>다음 달 예상 소비 금액은 <span id="predicted-total" class="highlight"></span><span class="highlight">냥</span>이에요~! 😸</p>
+                <p>💡<span style="font-weight: bold; color: blue;"> {{top_card_list.0}}</span>와 <span style="font-weight: bold; color: blue;"> {{top_card_list.1}}</span>에서 가장 큰 소비가 있을 것 같아요, 냥! 🐾</p>
+                <p>소비가 높은 항목에서 <span style="font-weight: bold; color: red;">혜택이 높은 카드</span>를 추천드려요! 😻</p>
                 <!-- <p>💳예상 절감 금액: <span class="highlight">##원💳</span></p> -->
-                <p>카드 이미지를 클릭해서 정보를 확인해보세요 😊</p>
+                <p>카드 이미지를 클릭해서 정보를 확인해보라냥 !</p>
             </div>
         </div>
 
@@ -134,12 +135,13 @@
                         <a href="{{ card.Link }}" target="_blank" class="card-image-box" style="display: flex; align-items: center; gap: 1rem;">
                             <img src="{{ card.image }}" alt="{{ card.Name }} 이미지">
                         </a>
-                        <div class="card-description-box" style="margin-top: 0.5rem; display: flex; flex-direction: column; gap: 0.3rem;">
+                        <div class="card-description-box" style=" display: flex; flex-direction: column; gap: 0.3rem;">
                             <div class="card-name">{{ card.corp }} - {{ card.Name }}</div>
                             <div class="card-description">
-                                <p>{{key}} 카테고리의 혜택이 가장 높은 카드입니다</p>
-                                <p>{{user_name}}님의 소비 성향을 바탕으로 다음 달 소비를 예측했을 때</p>
-                                <p>총 {{card.AmountNum}}원의 {{card.max_value}}%인 {{card.discount}}원을 할인 받을 수 있어요-!</p>
+                                <p>{{key}} 카테고리에서 혜택이 제일 높은 카드에옹 !🙀</p>
+                                <p>{{user_name}}님이 어떤 소비를 할지 똑똑한 예측을 해봤다냥~!</p>
+                                <p>총 {{card.AmountNum}}냥 중 {{card.max_value}}%인 {{card.discount}}냥을 할인받을 수 있어요~! 😸</p>
+
                             </div>
                         </div>
                     </div>
@@ -217,11 +219,16 @@
         
         
         
+            // 10원 단위 반올림 함수 정의
+            function roundToTen(value) {
+                return Math.round(value / 10) * 10;
+            }
+
             // `frequencyData` 생성
             const freq_labels = Object.keys(FreqsortedCategories); // 키를 라벨로 사용
-            const freq_data = Object.values(FreqsortedCategories); // 값을 데이터로 사용
+            const freq_data = Object.values(FreqsortedCategories).map(roundToTen); // 값을 10원 단위로 반올림
             const freq_backgroundColors = freq_labels.map(label => categoryColors[label] || '#DDDDDD'); // 기본 색상은 회색
-        
+
             const frequencyData = {
                 labels: freq_labels,
                 datasets: [{
@@ -229,20 +236,18 @@
                     backgroundColor: freq_backgroundColors, // 카테고리별 색상 적용
                 }]
             };
-        
+
             // `amountData` 생성
             const sortedCategories = JSON.parse('{{ sorted_categories_json|escapejs }}');
             const amountTotal = JSON.parse('{{ amount_total_json|escapejs }}');
-        
+
             const amount_labels = Object.keys(sortedCategories); // 키를 라벨로 사용
-            const amount_data = Object.values(sortedCategories); // 값을 데이터로 사용
+            const amount_data = Object.values(sortedCategories).map(roundToTen); // 값을 10원 단위로 반올림
             const amount_backgroundColors = amount_labels.map(label => categoryColors[label] || '#DDDDDD'); // 기본 색상은 회색
-        
+
             const amount_top1 = amount_labels[0];
             const amount_top2 = amount_labels[1];
             const amount_top3 = amount_labels[2];
-
-
 
             const amountData = {
                 labels: amount_labels,
@@ -251,6 +256,7 @@
                     backgroundColor: amount_backgroundColors, // 카테고리별 색상 적용
                 }]
             };
+
         
             // 차트 생성
             new Chart(document.getElementById('frequencyChart'), {

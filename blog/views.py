@@ -910,7 +910,7 @@ def spending_mbti(request):
                     print(f"{keyword}에 해당하는 카테고리가 없습니다.")
 
                 #여기서 할인률, Freq, ammount, discount(할인률 * amount * 0.01)
-                AmountNum = round(AmountNum, 2)
+                AmountNum = round(AmountNum / 10) * 10
                 # 할인률
                 # max_card_json가 JSON 문자열일 경우 파싱
                 if isinstance(max_card_json, str):
@@ -931,7 +931,7 @@ def spending_mbti(request):
                 max_value = list(max_values.values())[0]
 
                 # discount 값
-                discount = round(AmountNum * max_value * 0.01, 2)
+                discount = round(AmountNum * max_value * 0.01 / 10) * 10
 
                 # JSON 데이터가 문자열로 되어 있다면, 이를 변환
                 if isinstance(max_card_detail_json, str):
