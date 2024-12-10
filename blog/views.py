@@ -1609,6 +1609,7 @@ def search(request):
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=400)
     context = {
+        "user_name": user_name,
         "total_results": paginator.count,
         "total_pages": paginator.num_pages,
         "current_page": current_page.number,
