@@ -123,6 +123,7 @@
                     <div class="dropdown-content">
                         <a href="{% url 'top5' %}">신규상품추천</a>
                         <a href="{% url 'better' %}">기존상품비교</a>
+                        <a href="{% url 'search' %}">상품검색</a>
                     </div>
                 </div>
                 <a href="{% url 'spending_mbti' %}">슬기로운 소비생활</a>
@@ -165,16 +166,24 @@
         <div class="search-results">
             <h2>검색 결과닷 덕~ 🦆</h2>
             <ul id="results-list">
-                <!-- 검색 결과 표시 -->
                 {% for result in results %}
                 <li class="card">
                     <div class="card-content_n">
+                        <!-- 예적금 구분에 따른 이미지 렌더링 -->
+                        {% if result.Type == "적금" %}
+                            <img src="{% static 'img/적금.PNG' %}" alt="적금 로고" class="product-image">
+                        {% elif result.Type == "예금" %}
+                            <img src="{% static 'img/예금.PNG' %}" alt="예금 로고" class="product-image">
+                        {% else %}
+                            <img src="{% static 'img/천냥만덕2.png' %}" alt="기본 로고" class="product-image">
+                        {% endif %}
+            
+                        <!-- 텍스트 내용 -->
                         <h3 class="card-title">{{ result.Name }}</h3>
                         <p><strong>은행:</strong> {{ result.Bank }}</p>
                         <p><strong>기준 금리:</strong> {{ result.BaseR }}</p>
                         <p><strong>최대 금리:</strong> {{ result.MaxIR }}</p>
                         <p><strong>가입 방법:</strong> {{ result.Method }}</p>
-                        <a class="card-button" href="#">자세히 보기</a>
                     </div>
                 </li>
                 {% endfor %}

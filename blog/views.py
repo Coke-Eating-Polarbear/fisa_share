@@ -206,7 +206,7 @@ def  mypage(request):
             user_name = user.username  # 사용자 이름 설정
             category_totals = defaultdict(int)
             # MyDataDS 모델에서 해당 CustomerID에 연결된 계좌 정보 가져오기
-            accounts = MyDataDS.objects.filter(CustomerID=customer_id).values('CustomerID', 'balance','pname', 'ds_rate','end_date','dstype')
+            accounts = MyDataDS.objects.filter(CustomerID=customer_id).values('CustomerID','AccountID', 'balance','pname', 'ds_rate','end_date','dstype')
             # 오늘 날짜 계산
             today = timezone.now().date()
             now = datetime.now()
@@ -214,7 +214,7 @@ def  mypage(request):
             current_month = now.month
             mypay = MyDataPay.objects.filter(
                 CustomerID=customer_id,
-                pyear=current_year,
+                pyear=current_year, 
                 pmonth=current_month
             ).values('pdate', 'bizcode', 'price', 'pyear', 'pmonth')
 
@@ -1571,17 +1571,21 @@ def search(request):
             # Elasticsearch에서 검색 실행
             response = es.search(index="combined_product_index", body=search_body)
 
-            # 검색 결과 정리
-            results = [
-                {
-                    "Name": hit["_source"].get("Name"),
-                    "Bank": hit["_source"].get("Bank"),
-                    "BaseR": hit["_source"].get("BaseR"),
-                    "MaxIR": hit["_source"].get("MaxIR"),
-                    "Method": hit["_source"].get("Method"),
-                }
-                for hit in response["hits"]["hits"]
-            ]
+            seen = set()  # 중복 확인을 위한 집합
+
+            for hit in response["hits"]["hits"]:
+                # 중복 확인 기준 (Name과 Bank를 조합한 값)
+                identifier = (hit["_source"].get("Name"), hit["_source"].get("Bank"))
+                
+                if identifier not in seen:  # 중복되지 않은 경우에만 추가
+                    seen.add(identifier)
+                    results.append({
+                        "Name": hit["_source"].get("Name"),
+                        "Bank": hit["_source"].get("Bank"),
+                        "BaseR": hit["_source"].get("BaseR"),
+                        "MaxIR": hit["_source"].get("MaxIR"),
+                        "Method": hit["_source"].get("Method"),
+                    })
     
 
     # 페이지네이션 처리
