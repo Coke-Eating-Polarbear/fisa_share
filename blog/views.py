@@ -33,7 +33,7 @@ from copy import deepcopy
 from blog.main import *
 from django.contrib import messages
 from blog.default_recomment import *
-
+from blog.spending import *
 es = Elasticsearch([os.getenv('ES')])  # Elasticsearch 설정
 load_dotenv() 
 # openai.api_key = os.getenv('APIKEY')
@@ -472,78 +472,21 @@ def spending_mbti(request):
 
         # 현재 날짜 가져오기
         today = date.today()
-        
-        # 기간에 따라 시작 날짜 계산
-        if period == '1m':
-            # 직전 1달
-            # 현재 월에서 한 달을 빼고 그 월의 첫째 날 계산
-            if today.month == 1:
-                start_date = today.replace(year=today.year - 1, month=12)
-            else:
-                start_date = today.replace(month=today.month - 1)
-
-        elif period == '6m':
-            if today.month <= 6:
-                # 1월부터 6월 사이인 경우, 지난 해로 넘어가야 함
-                start_date = today.replace(year=today.year - 1, month=12 + (today.month - 6))
-            else:
-                # 7월 이후의 경우
-                start_date = today.replace(month=today.month - 6)
-        elif period == '1y':
-            # 최근 1년
-            start_date = today.replace(year=today.year - 1)
-        else:
-            # 직전 1달 디폴트
-            # 현재 월에서 한 달을 빼고 그 월의 첫째 날 계산
-            if today.month == 1:
-                start_date = today.replace(year=today.year - 1, month=12)
-            else:
-                start_date = today.replace(month=today.month - 1)
 
         # start_date에서 지난달
+        start_date = calculate_start_date(period, today)
         start_date = start_date - relativedelta(months=1)
 
-        # `SpendAmount`에서 기간에 맞는 데이터 필터링
-        spend_amounts = SpendAmount.objects.filter(
-            CustomerID=customer_id, 
-            SDate__gte=start_date  # 시작 날짜 이후의 데이터만 가져옴
-        )
         
             # 각 항목별로 총합을 구합니다.
-        category_totals = spend_amounts.aggregate(
-            total_eat_amount=Sum('eat_amount'),
-            total_transfer_amount=Sum('transfer_amount'),
-            total_utility_amount=Sum('utility_amount'),
-            total_phone_amount=Sum('phone_amount'),
-            total_home_amount=Sum('home_amount'),
-            total_hobby_amount=Sum('hobby_amount'),
-            total_fashion_amount=Sum('fashion_amount'),
-            total_party_amount=Sum('party_amount'),
-            total_allowance_amount=Sum('allowance_amount'),
-            total_study_amount=Sum('study_amount'),
-            total_medical_amount=Sum('medical_amount'),
-            total_total_amount=Sum('TotalAmount')  # 전체 합계
-        )
+        category_totals, category_dict = spend_amount_aggregate(customer_id, start_date)
 
         # 항목을 한국어로 맵핑한 딕셔너리로 저장
         category_total_dict = {
             '총합': category_totals['total_total_amount'],
         }
-        # 항목을 한국어로 맵핑한 딕셔너리로 저장
-        category_dict = {
-            '식비': category_totals['total_eat_amount'] or 0,
-            '교통비': category_totals['total_transfer_amount'] or 0,
-            '공과금': category_totals['total_utility_amount'] or 0,
-            '통신비': category_totals['total_phone_amount'] or 0,
-            '주거비': category_totals['total_home_amount'] or 0,
-            '여가/취미': category_totals['total_hobby_amount'] or 0,
-            '패션/잡화': category_totals['total_fashion_amount'] or 0,
-            '모임회비': category_totals['total_party_amount'] or 0,
-            '경조사': category_totals['total_allowance_amount'] or 0,
-            '교육비': category_totals['total_study_amount'] or 0,
-            '의료비': category_totals['total_medical_amount'] or 0,
-        }
 
+        
         # 항목을 값 기준으로 내림차순 정렬하여 상위 7개 항목을 추출
         sorted_categories = sorted(category_dict.items(), key=lambda x: x[1] or 0, reverse=True)
 
@@ -722,108 +665,50 @@ def spending_mbti(request):
         # 결과 확인
         top_card_list = [key for key, _ in sorted(new_prediction_dict.items(), key=lambda x: x[1], reverse=True)[1:4]]
 
-
-        # 식비 관련 키워드
-        eat_keywords = ['푸드', '카페', '편의점', '레스토랑', '패밀리레스토랑','배달']
-        # 교통비
-        transport_keywords = ['대중교통', '교통', '택시', '자동차', '기차', '고속버스', 'SRT', 'KTX']
-        # 모임회비
-        allowance_keywords = ['용돈', '지원금', '보조금', '수당', '환급', '혜택', '할인']
-        # 교육 관련 키워드
-        study_keywords = [
-            '교육', '학원', '학습', '유치원', '학교', '수업', '강의', '코칭', '레슨', '튜터링',
-            '등록금', '학비', '수업료', '수강료', '교육비 지원', '학자금', '장학금',
-            '도서', '서적', '온라인 강의', 'E-러닝', '강의 콘텐츠', '교육 콘텐츠', '디지털 학습',
-            '교육 프로그램', '학습 도구', '시험', '어학시험', '자격증'
-        ]
-
-        # 주거비 관련 키워드 (공과금 키워드 제외)
-        home_keywords = [
-            '주거', '임대', '전세', '월세', '매매', '아파트', '빌라', '주택', '부동산',
-            '주택자금', '주거비 지원', '대출', '임대료', '보증금', '리모델링'
-        ]
-        
-        # 공과금 관련 키워드
-        utility_keywords = ['전기료', '수도세', '가스비', '관리비', '유지비', '청소비', '공과금']
-        # 통신비 관련 키워드
-        phone_keywords = ['통신', '이동통신', '전화요금', '인터넷 요금', '휴대폰 요금', '모바일 데이터', '와이파이', '통신비']
-
-        # 취미/여가 관련 키워드
-        hobby_keywords = [
-            '영화', '공연', '뮤지컬', '음악', '콘서트', '전시', '미술관', '박물관',
-            '테마파크', '여행', '숙박', '캠핑', '글램핑', '낚시', '레저', '스포츠',
-            '헬스', '요가', '필라테스', '수영', '등산', '골프', '공연티켓', '놀이공원',
-            '액티비티', '도서', '책', '독서', '커뮤니티'
-        ]
-        # 키워드 필터링
-        fashion_keywords = [
-            '쇼핑', '온라인쇼핑', '백화점', '베이커리', '패션', '잡화', '의류', '액세서리', '가방', '신발', '구두',
-            '뷰티', '화장품', '악세사리', '의류브랜드', '브랜드샵', '패션아이템', '디자인샵', '라이프스타일샵',
-            '아울렛', '세일', '할인', '쿠폰', '바우처', '캐시백', '마트/편의점'
-        ]
-        medical_keywords = [
-            '병원', '약국', '병원/약국', '의료', '의료비', '의료기관', '건강관리', '헬스케어',
-            '진료비', '건강', '치료', '의료서비스', '클리닉', '재활', '약', '의약품',
-            '건강보험', '건강검진'
-        ]
         # for문과 if-elif 구조로 연결
         card_results = {}
         card_detail_results = {}
         max_card_json = None
         max_card_detail_json = None
+
         if isinstance(next_month_prediction_json, str):
-                try:
-                    next_month_prediction_json = json.loads(next_month_prediction_json)  # 문자열을 딕셔너리로 변환
-                except json.JSONDecodeError as e:
-                    print(f"JSON decoding error: {e}")
-                    next_month_prediction_json = {}  # 기본값 설정
-        for i, keyword in enumerate(top_card_list):
-            if keyword == '식비':
-                max_card_json, max_card_detail_json = card_top(eat_keywords)# 값 가져오기
-                AmountNum = next_month_prediction_json.get('eat', 0)  # 키가 없으면 기본값 0 반환
-            
-            elif keyword == '교통비':
-                max_card_json, max_card_detail_json = card_top(transport_keywords)# 값 가져오기
-                AmountNum = next_month_prediction_json.get('transport', 0)  # 키가 없으면 기본값 0 반환
+            try:
+                next_month_prediction_json = json.loads(next_month_prediction_json)  # 문자열을 딕셔너리로 변환
+            except json.JSONDecodeError as e:
+                print(f"JSON decoding error: {e}")
+                next_month_prediction_json = {}  # 기본값 설정
 
-            elif keyword == '모임회비':
-                max_card_json, max_card_detail_json = card_top(allowance_keywords)
-                AmountNum = next_month_prediction_json.get('allowance', 0)  # 키가 없으면 기본값 0 반환
-            
-            elif keyword == '교육':
-                max_card_json, max_card_detail_json = card_top(study_keywords)# 값 가져오기
-                AmountNum = next_month_prediction_json.get('study', 0)  # 키가 없으면 기본값 0 반환
-            
-            elif keyword == '주거비':
-                max_card_json, max_card_detail_json = card_top(home_keywords)# 값 가져오기
-                AmountNum = next_month_prediction_json.get('home', 0)  # 키가 없으면 기본값 0 반환
-            
-            elif keyword == '공과금':
-                max_card_json, max_card_detail_json = card_top(utility_keywords)
-                AmountNum = 0
-            
-            elif keyword == '통신비':
-                max_card_json, max_card_detail_json = card_top(phone_keywords)# 값 가져오기
-                AmountNum = next_month_prediction_json.get('phone', 0)  # 키가 없으면 기본값 0 반환
-            
-            elif keyword == '여가/취미':
-                max_card_json, max_card_detail_json = card_top(hobby_keywords)# 값 가져오기
-                AmountNum = next_month_prediction_json.get('hobby', 0)  # 키가 없으면 기본값 0 반환
-            
-            elif keyword == '패션/잡화/쇼핑':
-                max_card_json, max_card_detail_json = card_top(fashion_keywords)# 값 가져오기
-                AmountNum = next_month_prediction_json.get('fashion', 0)  # 키가 없으면 기본값 0 반환
+        # 카테고리 키와 next_month_prediction_json 키를 매핑
+        CATEGORY_MAPPING = {
+            '식비': 'eat',
+            '교통비': 'transport',
+            '모임회비': 'allowance',
+            '교육비': 'study',
+            '주거비': 'home',
+            '공과금': 'utility',
+            '통신비': 'phone',
+            '여가/취미': 'hobby',
+            '패션/잡화/쇼핑': 'fashion',
+            '의료비': 'medical',
+        }
 
-            elif keyword == '의료':
-                max_card_json, max_card_detail_json = card_top(medical_keywords)# 값 가져오기
-                AmountNum = next_month_prediction_json.get('medical', 0)  # 키가 없으면 기본값 0 반환
+        for keyword in top_card_list:
+            # 키워드에 해당하는 카테고리 키워드 목록 가져오기
+            keywords = get_keywords_for_category(keyword)
             
+            if keywords:
+                # 카드 정보 가져오기
+                max_card_json, max_card_detail_json = card_top(keywords)
+                
+                # AmountNum 계산
+                prediction_key = CATEGORY_MAPPING.get(keyword, None)
+                AmountNum = next_month_prediction_json.get(prediction_key, 0) if prediction_key else 0
             else:
                 max_card_json, max_card_detail_json = None, None
                 print(f"{keyword}에 해당하는 카테고리가 없습니다.")
 
-            #여기서 할인률, Freq, ammount, discount(할인률 * amount * 0.01)
-            AmountNum = round(AmountNum / 10) * 10
+            # 결과 처리
+            AmountNum = round(AmountNum / 10) * 10  # 반올림
             # 할인률
             # max_card_json가 JSON 문자열일 경우 파싱
             if isinstance(max_card_json, str):
@@ -919,20 +804,6 @@ def main(request):
 
     return render(request, 'main.html', context)
 
-@login_required_session
-def report_ex(request):
-    try:
-        # CustomerID로 UserProfile 조회
-        user = get_logged_in_user(request)
-        user_name = user.username  # 사용자 이름 설정
-    except UserProfile.DoesNotExist:
-        pass  # 사용자가 없을 경우 기본값 유지
-
-    context = {
-        'user_name': user_name,
-    }
-    return render(request, 'report_ex.html', context)
-
 # login_main.html
 @login_required_session
 def summary_view(request):
@@ -952,7 +823,6 @@ def summary_view(request):
     # 자산 조회 - 고객 순득 분위 기준 : 신한 평균 데이터 & 사용자 자산
     average_values, user_data = asset_check(customer_id, user)
     
-
     ## 디폴트 적금 추천 상품
     birth_year = user.Birth.year  # 주민번호 앞자리로 연도 추출
     current_year = datetime.now().year
@@ -1259,25 +1129,11 @@ def originreport_page(request):
         # 제외할 키를 명시적으로 정의
         excluded_keys = {'CustomerID', 'SDate', 'TotalAmount'}
 
-        # 함수 호출하여 JSON 데이터 생성
-        period = '1m'
-
-
-            # 현재 날짜 가져오기
+         # 현재 날짜 가져오기
         today = date.today()
-        
-
-        # 기간에 따라 시작 날짜 계산
-        if period == '1m':
-            # 직전 1달
-            # 현재 월에서 한 달을 빼고 그 월의 첫째 날 계산
-            if today.month == 1:
-                start_date = today.replace(year=today.year - 1, month=12)
-            else:
-                start_date = today.replace(month=today.month - 1)
-
 
         # start_date에서 지난달
+        start_date = calculate_start_date('1m', today)
         start_date = start_date - relativedelta(months=1)
         asset_data = MyDataAsset.objects.filter(CustomerID=customer_id).values('estate', 'financial', 'ect')
         mydata_assets_list = list(asset_data)  # QuerySet을 리스트로 변환
@@ -1290,42 +1146,9 @@ def originreport_page(request):
         # JSON으로 변환
         mydata_assets_json = json.dumps(mapped_assets, ensure_ascii=False)
         # `SpendAmount`에서 기간에 맞는 데이터 필터링
-        spend_amounts = SpendAmount.objects.filter(
-            CustomerID=customer_id, 
-            SDate__gte=start_date  # 시작 날짜 이후의 데이터만 가져옴
-        )
         
             # 각 항목별로 총합을 구합니다.
-        category_totals = spend_amounts.aggregate(
-            total_eat_amount=Sum('eat_amount'),
-            total_transfer_amount=Sum('transfer_amount'),
-            total_utility_amount=Sum('utility_amount'),
-            total_phone_amount=Sum('phone_amount'),
-            total_home_amount=Sum('home_amount'),
-            total_hobby_amount=Sum('hobby_amount'),
-            total_fashion_amount=Sum('fashion_amount'),
-            total_party_amount=Sum('party_amount'),
-            total_allowance_amount=Sum('allowance_amount'),
-            total_study_amount=Sum('study_amount'),
-            total_medical_amount=Sum('medical_amount'),
-            total_total_amount=Sum('TotalAmount')  # 전체 합계
-        )
-
-        # 항목을 한국어로 맵핑한 딕셔너리로 저장
-        # 항목을 한국어로 맵핑한 딕셔너리로 저장
-        category_dict = {
-            '식비': category_totals['total_eat_amount'] or 0,
-            '교통비': category_totals['total_transfer_amount'] or 0,
-            '공과금': category_totals['total_utility_amount'] or 0,
-            '통신비': category_totals['total_phone_amount'] or 0,
-            '주거비': category_totals['total_home_amount'] or 0,
-            '여가/취미': category_totals['total_hobby_amount'] or 0,
-            '패션/잡화': category_totals['total_fashion_amount'] or 0,
-            '모임회비': category_totals['total_party_amount'] or 0,
-            '경조사': category_totals['total_allowance_amount'] or 0,
-            '교육비': category_totals['total_study_amount'] or 0,
-            '의료비': category_totals['total_medical_amount'] or 0,
-        }
+        category_totals, category_dict = spend_amount_aggregate(customer_id, start_date)
 
         # 항목을 값 기준으로 내림차순 정렬하여 상위 7개 항목을 추출
         sorted_categories = sorted(category_dict.items(), key=lambda x: x[1] or 0, reverse=True)
