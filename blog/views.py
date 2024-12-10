@@ -33,6 +33,7 @@ from copy import deepcopy
 from blog.main import *
 from django.contrib import messages
 from blog.default_recomment import *
+from django.core.paginator import Paginator
 
 es = Elasticsearch([os.getenv('ES')])  # Elasticsearch 설정
 load_dotenv() 
@@ -189,7 +190,7 @@ def reverse_mapping_with_age(category, age):
             return {'marriage_status': None, 'children_status': None, 'children_age': None, 'age_range': '60대'}
 
 @login_required_session
-def mypage(request):
+def  mypage(request):
     customer_id = request.session.get('user_id')  # 세션에서 CustomerID 가져오기
     user_name = "사용자"
     accounts = []  # 사용자 계좌 정보 저장
@@ -205,7 +206,7 @@ def mypage(request):
             user_name = user.username  # 사용자 이름 설정
             category_totals = defaultdict(int)
             # MyDataDS 모델에서 해당 CustomerID에 연결된 계좌 정보 가져오기
-            accounts = MyDataDS.objects.filter(CustomerID=customer_id).values('AccountID', 'balance','pname', 'ds_rate','end_date','dstype')
+            accounts = MyDataDS.objects.filter(CustomerID=customer_id).values('CustomerID', 'balance','pname', 'ds_rate','end_date','dstype')
             # 오늘 날짜 계산
             today = timezone.now().date()
             now = datetime.now()
@@ -312,6 +313,7 @@ def fetch_sql_processed_data(mydata_pay):
     """
     # QuerySet을 Pandas DataFrame으로 변환
     df = pd.DataFrame(list(mydata_pay))
+    print('df',df)
     # df = pd.read_sql(query, engine)
     # 1. TotalPrice 계산: Pyear, Pmonth, Bizcode별로 Price 합산
     df_grouped = df.groupby(['pyear', 'pmonth', 'bizcode'], as_index=False)['price'].sum()
@@ -356,7 +358,8 @@ def predict_next_month(preprocessed_data, model_features):
     model_input = most_recent_data.drop(labels=['TotalSpending'], errors='ignore')
 
     # 모델 로드 및 예측
-    model = load('./models/Consumption_Prediction_rfm.joblib')
+    # model = load('./models/Consumption_Prediction_rfm.joblib')
+    model = os.path.join(settings.BASE_DIR, 'models', 'Consumption_prediction_rfm.joblib')
     X_test = model_input.values.reshape(1, -1)
     predicted_total = model.predict(X_test)[0]
 
@@ -610,7 +613,8 @@ def spending_mbti(request):
         # 소비 예측 모델 불러오기
         mydata_pay = MyDataPay.objects.filter(
             CustomerID=customer_id
-        ).values()     
+        ).values() 
+
         pd.options.display.float_format = '{:,.2f}'.format
         
         # series 타입을 직렬화
@@ -883,8 +887,9 @@ def spending_mbti(request):
             else:
                 card_results[key] = value  # 이미 Python 객체라면 그대로 저장
 
-        # JSON으로 변환하여 템플릿에 전달
-        card_results_json = json.dumps(card_results, ensure_ascii=False, indent=4)
+            # JSON으로 변환하여 템플릿에 전달
+            card_results_json = json.dumps(card_results, ensure_ascii=False, indent=4)
+            card_detail_results_json = json.dumps(card_detail_results, ensure_ascii=False)
 
     except UserProfile.DoesNotExist:
         pass  # 사용자가 없을 경우 기본값 유지
@@ -952,7 +957,6 @@ def summary_view(request):
     # 자산 조회 - 고객 순득 분위 기준 : 신한 평균 데이터 & 사용자 자산
     average_values, user_data = asset_check(customer_id, user)
     
-
     ## 디폴트 적금 추천 상품
     birth_year = user.Birth.year  # 주민번호 앞자리로 연도 추출
     current_year = datetime.now().year
@@ -967,8 +971,8 @@ def summary_view(request):
     top_clusters = DProduct_top(user)
 
     # 예금 상품 디폴트 추천
-    final_recommend_display, deposit_recommend_display = default_DProduct(request, top_clusters, final_recommend_json)
-    
+    deposit_recommend_dict, final_recommend_display, deposit_recommend_display = default_DProduct(top_clusters, final_recommend_json)
+    request.session['deposit_recommend'] = json.dumps(deposit_recommend_dict, cls=DjangoJSONEncoder)
     
     # 최종 데이터 전달
     context = {
@@ -979,8 +983,7 @@ def summary_view(request):
         'final_recommend': final_recommend_display,  # 적금 Top 3
         'deposit_recommend': deposit_recommend_display,  # 예금 Top 2
         'average_data': json.dumps(average_values, ensure_ascii=False),
-        'user_data': json.dumps(user_data, ensure_ascii=False),
-        
+        'user_data': json.dumps(user_data, ensure_ascii=False),    
     }
 
     return render(request, 'loginmain.html', context)
@@ -1075,6 +1078,8 @@ def info(request):
         elif saving_method == "목돈 굴리기":
             final_recommend = SProduct.objects.filter(s_bank_query & s_preference_query & s_cluster_query & s_period_query).order_by('-max_preferential_rate', '-bank_name').values()[:5]
             final_recommend = add_bank_logo(final_recommend, 'bank_name')
+
+
             
         elif saving_method == "목돈 모으기 + 목돈 굴리기":
             deposit_recommend = DProduct.objects.filter(d_preference_query & d_bank_query & d_cluster_query & d_period_query).order_by('-maxir', '-name').values()[:5]
@@ -1311,7 +1316,6 @@ def originreport_page(request):
             total_total_amount=Sum('TotalAmount')  # 전체 합계
         )
 
-        # 항목을 한국어로 맵핑한 딕셔너리로 저장
         # 항목을 한국어로 맵핑한 딕셔너리로 저장
         category_dict = {
             '식비': category_totals['total_eat_amount'] or 0,
@@ -1719,4 +1723,53 @@ def s_detail(request, dsid):
     return render(request, 's_detail.html', context)
 
 def search(request):
-    return render(request, 'search.html')
+    results = []  # results 기본값 초기화
+    page = 1  # 기본값 설정
+    page_size = 10  # 기본값 설정
+
+    if request.method == 'POST':  # POST 요청인지 확인
+        query = request.POST.get('question')  # POST 요청에서 'q' 값을 가져옴
+        page = int(request.GET.get('page', 1))  # 요청한 페이지 번호 (기본값: 1)
+        page_size = int(request.GET.get('size', 10))  # 한 페이지에 표시할 항목 수 (기본값: 10)
+
+        if query :
+            # Elasticsearch 검색 쿼리: 모든 필드 검색
+            search_body = {
+                "query": {
+                    "query_string": {
+                        "query": query,
+                        "fields": ["*"]  # 모든 필드 검색
+                    }
+                }
+            }
+
+            # Elasticsearch에서 검색 실행
+            response = es.search(index="combined_product_index", body=search_body)
+
+            # 검색 결과 정리
+            results = [
+                {
+                    "Name": hit["_source"].get("Name"),
+                    "Bank": hit["_source"].get("Bank"),
+                    "BaseR": hit["_source"].get("BaseR"),
+                    "MaxIR": hit["_source"].get("MaxIR"),
+                    "Method": hit["_source"].get("Method"),
+                }
+                for hit in response["hits"]["hits"]
+            ]
+    
+
+    # 페이지네이션 처리
+    paginator = Paginator(results, page_size)
+    try:
+        current_page = paginator.page(page)
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=400)
+    context = {
+        "total_results": paginator.count,
+        "total_pages": paginator.num_pages,
+        "current_page": current_page.number,
+        "page_size": page_size,
+        "results": list(current_page),
+    }
+    return render(request, 'search.html', context)
