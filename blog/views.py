@@ -1548,6 +1548,14 @@ def s_detail(request, dsid):
     return render(request, 's_detail.html', context)
 
 def search(request):
+    customer_id = request.session.get('user_id')  
+    if customer_id:
+        try:
+            # CustomerID로 UserProfile 조회
+            user = get_logged_in_user(request)
+            user_name = user.username  # 사용자 이름 설정
+        except UserProfile.DoesNotExist:
+            pass  # 사용자가 없을 경우 기본값 유지
     results = []  # results 기본값 초기화
     page = 1  # 기본값 설정
     page_size = 10  # 기본값 설정
