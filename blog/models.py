@@ -1,8 +1,5 @@
-from django.db.models import UniqueConstraint
 from django.db import models # type: ignore
 from django.contrib.auth.hashers import make_password # type: ignore
-from django.contrib.contenttypes.models import ContentType
-from django.contrib.contenttypes.fields import GenericForeignKey
 
 # UserProfile 모델 (회원 정보)
 class UserProfile(models.Model):
@@ -194,14 +191,12 @@ class MyDataDS(models.Model):
         return f"{self.CustomerID} - {self.AccountID}"
     
 class MyDataPay(models.Model):
-    CustomerID = models.CharField(max_length=256)  # CustomerID
-    pdate = models.DateField()  # Pdate
-    bizcode = models.CharField(max_length=256)  # Bizcode
-    store = models.CharField(max_length=256)  # Store
-    price = models.IntegerField()  # Price
-    type = models.CharField(max_length=256)  # Type
-    # CustomerID, Pdate, Bizcode, Price, Pyear, Pmonth
-
+    CustomerID = models.CharField(max_length=256, primary_key=True)  # CustomerID
+    pdate = models.DateField(null=True)  # Pdate (null 허용)
+    bizcode = models.CharField(max_length=256, null=True)  # Bizcode (null 허용)
+    price = models.BigIntegerField(null=True)  # Price (null 허용)
+    pyear = models.SmallIntegerField(null=True)  # Pyear (null 허용)
+    pmonth = models.SmallIntegerField(null=True)  # Pmonth (null 허용)
 
     def __str__(self):
         return f"{self.CustomerID} ({self.pyear}-{self.pmonth})"

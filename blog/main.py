@@ -25,7 +25,4 @@ def News_func():
             seen_titles.add(news.title)
             news_entries.append({'title': news.title, 'summary': news.summary, 'url': news.url })
 
-
-
-
     return image_base64, news_entries
