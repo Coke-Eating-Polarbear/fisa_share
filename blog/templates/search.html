@@ -147,7 +147,7 @@
         <h2>궁금한 상품을 검색해봐랏덕~ 🦆</h2>
         <div class="search-bar">
             <input type="text" id="search-input" placeholder="상품명을 입력하세요..." />
-            <button id="add-keyword-button">키워드 추가하기</button>
+            <button id="add-keyword-button" class="new-action-button">키워드 추가하기</button>
             <button id="search-button">검색</button>
         </div>
         <div class="keywords">
@@ -157,9 +157,38 @@
         <div class="container">
         <div class="search-results">
             <h2>검색 결과닷 덕~ 🦆</h2>
-            <div class="container"></div>
             <ul id="results-list">
                 <!-- 검색 결과가 여기에 동적으로 추가됩니다 -->
+                <li>
+                    <div class="container card">
+                        <img src="image_url" alt="상품 이미지">
+                        <div class="card-content_n">
+                            <h3 class="card-title">상품 제목</h3>
+                            <p>상품 설명 또는 간략한 내용</p>
+                            <a class="card-button" href="link_url">자세히 보기</a>
+                        </div>
+                        <div class="details-box">
+                            <button class="close-button">X</button>
+                            <p>상세 설명 내용</p>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+                <!-- 상품 컨테이너 -->
+<div class="existing-product-container">
+    {% if nearest_d %}
+        <div class="card">
+            <img src="{% static 'img/예금.PNG' %}" alt="예금 로고">
+            <div class="card-content_n">
+                <span class="card-title">{{ nearest_d.pname }}</span><br>
+                <p><strong>은행:</strong> {{ nearest_d.bank_name }}</p>
+                <p><strong>기준 금리:</strong> {{ nearest_d.ds_rate }}%</p>
+                <p><strong>만기일:</strong> {{ nearest_d.end_date }}</p>
+                <p><strong>남은 일수:</strong> {{ nearest_d.days_remaining }}일</p>
+            </div>
+        </div>
+    {% endif %}
+</div>
             </ul>
         </div>
         </div>
