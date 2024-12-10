@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>상품검색</title>
+    <link rel="stylesheet" href="{% static 'css/search.css' %}">
+    <link rel="stylesheet" href="{% static 'css/header.css' %}">
+
+    <script>
+
+        document.addEventListener("DOMContentLoaded", function () {
+            // 탭 동작 설정
+            const tabs = document.querySelectorAll(".tab");
+            const tabContents = document.querySelectorAll(".tab-content");
+
+            tabs.forEach((tab, index) => {
+                tab.addEventListener("click", () => {
+                    tabs.forEach(t => t.classList.remove("active"));
+                    tabContents.forEach(tc => tc.classList.remove("active"));
+
+                    tab.classList.add("active");
+                    tabContents[index].classList.add("active");
+                });
+            });
+
+            // 자세히보기 토글 설정
+            document.querySelectorAll(".card-button").forEach((button) => {
+                button.addEventListener("click", function () {
+                    const detailsBox = this.nextElementSibling;
+                    detailsBox.style.display = detailsBox.style.display === "block" ? "none" : "block";
+                });
+            });
+
+            // 닫기 버튼 동작 설정
+            document.querySelectorAll(".close-button").forEach((closeButton) => {
+                closeButton.addEventListener("click", function () {
+                    const detailsBox = this.parentElement;
+                    detailsBox.style.display = "none";
+                });
+            });
+
+            // 서버 통신 함수
+            function addToFavorites(productId) {
+                console.log("Added to favorites:", productId);
+            }
+
+            function removeFromFavorites(productId) {
+                console.log("Removed from favorites:", productId);
+            }
+        });
+
+
+        // 예적금 자세히 보기 로그 수집을 위한 자바 스크립트 코드 추가
+        document.addEventListener("DOMContentLoaded", function () {
+            document.querySelectorAll(".card-button").forEach(button => {
+                button.addEventListener("click", function () {
+                    const card = this.closest(".card");
+                    const productData = {
+                        product_name: card.querySelector(".card-title").innerText.trim(),
+                        bank: card.querySelector(".card-content p:nth-of-type(1)").innerText.replace("은행:", "").trim(),
+                        baser: card.querySelector(".card-content p:nth-of-type(2)").innerText.replace("기준 금리:", "").trim(),
+                        maxir: card.querySelector(".card-content p:nth-of-type(3)").innerText.replace("최대 금리:", "").trim(),
+                        method: card.querySelector(".card-content p:nth-of-type(4)").innerText.replace("가입 방법:", "").trim(),
+                    };
+                    console.log(JSON.stringify(productData,));
+
+                    // AJAX 요청으로 클릭 로그 저장
+                    fetch('/log_click/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': getCookie('csrftoken')  // CSRF 토큰 추가
+                        },
+                        body: JSON.stringify(productData)
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === "success") {
+                            console.log("Click logged successfully:", productData);
+                        } else {
+                            console.error("Error logging click:", data.message);
+                        }
+                    })
+                    .catch(error => console.error("Error:", error));
+                });
+            });
+
+            // CSRF 토큰 가져오기 함수
+            function getCookie(name) {
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    const cookies = document.cookie.split(';');
+                    for (let i = 0; i < cookies.length; i++) {
+                        const cookie = cookies[i].trim();
+                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+        });
+
+
+    </script>
+</head>
+<body>
+    {% csrf_token %}
+    <header>
+        <div class="navbar">
+            <!-- 로고 -->
+            <div class="logo">
+                <a href="{% url 'loginmain' %}">
+                    <img src="{% static 'img/header_logo.png' %}" alt="로고">
+                </a>
+            </div>
+            <!-- 네비게이션 -->
+            <div class="nav-links">
+                <a href="{% url 'originreport' %}">내 금융 바로보기</a>
+                <div class="dropdown">
+                    <a href="#">내 예/적금 찾기</a>
+                    <div class="dropdown-content">
+                        <a href="{% url 'top5' %}">신규상품추천</a>
+                        <a href="{% url 'better' %}">기존상품비교</a>
+                    </div>
+                </div>
+                <a href="{% url 'spending_mbti' %}">슬기로운 소비생활</a>
+            </div>
+            <!-- 회원 정보 및 마이페이지 -->
+            <div class="user-info">
+                <span>{{ user_name }}님</span>
+                <a href="./mypage">마이페이지</a>
+                <form method="POST" action="{% url 'logout' %}">
+                    {% csrf_token %}
+                    <button name="logout" style="margin-top: -8px;" >로그아웃</button>
+                </form>
+            </div>
+        </div>
+    </header>
+</body>
+</html>
+    <div class="container">
+        
+        <h2>궁금한 상품을 검색해봐랏덕~ 🦆</h2>
+        <div class="search-bar">
+            <input type="text" id="search-input" placeholder="상품명을 입력하세요..." />
+            <button id="add-keyword-button">키워드 추가하기</button>
+            <button id="search-button">검색</button>
+        </div>
+        <div class="keywords">
+            <!-- 추가된 키워드가 여기에 표시됩니다 -->
+        </div>
+    
+        <div class="container">
+        <div class="search-results">
+            <h2>검색 결과닷 덕~ 🦆</h2>
+            <div class="container"></div>
+            <ul id="results-list">
+                <!-- 검색 결과가 여기에 동적으로 추가됩니다 -->
+            </ul>
+        </div>
+        </div>
+        </div>
+    </div>
+<footer>
+    <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0; font-size: 0.8rem;">서울특별시 마포구 월드컵북로 434 상암IT타워 6층</p> 
+    <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0; font-size: 0.8rem;">고객지원 : 02-3151-7000 | 이메일: woorifis.lab44@gmail.com </p >
+    <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0; font-size: 0.8rem;">COPYRIGHT©우리천만해요</p >
+</footer >
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const searchInput = document.getElementById("search-input");
+    const addKeywordButton = document.getElementById("add-keyword-button"); // id 수정됨
+    const searchButton = document.getElementById("search-button");
+    const keywordsContainer = document.querySelector(".keywords");
+    const resultsList = document.getElementById("results-list");
+
+    let keywords = []; // 키워드를 저장하는 배열
+
+    // 키워드 추가하기 버튼 클릭
+    addKeywordButton.addEventListener("click", function () {
+        const keyword = searchInput.value.trim();
+
+        if (keyword && !keywords.includes(keyword)) {
+            keywords.push(keyword);
+            addKeywordToUI(keyword);
+            searchInput.value = ""; // 입력창 초기화
+        }
+    });
+
+    // 검색 버튼 클릭
+    searchButton.addEventListener("click", function () {
+        const keyword = searchInput.value.trim();
+        if (keyword && !keywords.includes(keyword)) {
+            keywords.push(keyword);
+        }
+        displayResults(keywords);
+        searchInput.value = ""; // 입력창 초기화
+    });
+
+    // 키워드 UI에 추가
+    function addKeywordToUI(keyword) {
+        const keywordBox = document.createElement("div");
+        keywordBox.classList.add("keyword-box");
+
+        const keywordText = document.createElement("span");
+        keywordText.textContent = keyword;
+
+        const deleteButton = document.createElement("button");
+        deleteButton.textContent = "x";
+        deleteButton.classList.add("delete-keyword");
+        deleteButton.addEventListener("click", function () {
+            // 키워드 삭제
+            keywords = keywords.filter(k => k !== keyword);
+            keywordsContainer.removeChild(keywordBox);
+        });
+
+        keywordBox.appendChild(keywordText);
+        keywordBox.appendChild(deleteButton);
+        keywordsContainer.appendChild(keywordBox);
+    }
+
+    // 검색 결과 표시
+    function displayResults(keywords) {
+        resultsList.innerHTML = ""; // 기존 결과 초기화
+
+        if (keywords.length > 0) {
+            keywords.forEach(keyword => {
+                const li = document.createElement("li");
+                li.textContent = `결과: ${keyword}`;
+                resultsList.appendChild(li);
+            });
+        } else {
+            const li = document.createElement("li");
+            li.textContent = "검색 결과가 없습니다.";
+            resultsList.appendChild(li);
+        }
+    }
+});
+
+</script>

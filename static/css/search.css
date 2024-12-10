@@ -1,0 +1,91 @@
+@font-face {
+    font-family: 'Pretendard-Regular';
+    src: url('https://fastly.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-Regular.woff') format('woff');
+    font-weight: 200;
+    font-style: normal;
+}
+
+/* 전체 페이지에 폰트 적용 */
+body {
+    font-family: 'Pretendard-Regular', sans-serif;
+}
+
+.container {
+    margin: 20px auto;
+    max-width: 800px;
+    text-align: center;
+}
+
+.search-bar {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+#search-input {
+    width: 70%;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+#search-button {
+    padding: 10px 15px;
+    font-size: 16px;
+    margin-left: 10px;
+    border: none;
+    background-color: #4747c5;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#search-button:hover {
+    background-color: #1b1c76;
+}
+
+.search-results {
+    margin-top: 20px;
+    text-align: center;
+}
+
+#results-list {
+    list-style: none;
+    padding: 0;
+}
+
+#results-list li {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+.keywords {
+    margin: 20px 0 0 20px; /* 위쪽 20px, 아래쪽 0px, 왼쪽 20px */
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding-left: 10px; /* 왼쪽에 여백 추가 */
+}
+
+.keyword-box {
+    display: flex;
+    align-items: center;
+    background-color: #f1f1f1;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 14px;
+    color: #333;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.keyword-box span {
+    margin-right: 10px;
+}
+
+.keyword-box .delete-keyword {
+    cursor: pointer;
+    color: red;
+    font-size: 14px;
+    border: none;
+    background: none;
+}

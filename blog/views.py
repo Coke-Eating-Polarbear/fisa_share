@@ -2156,3 +2156,6 @@ def add_bank_logo(recommend_list, bank_key):
         bank_name = item.get(bank_key)  # 은행 이름 가져오기
         item['logo'] = get_bank_logo(bank_name)  # 로고 경로 추가
     return updated_list
+
+def search(request):
+    return render(request, 'search.html')
