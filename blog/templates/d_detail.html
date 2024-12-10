@@ -37,7 +37,7 @@
                <!-- 회원 정보 및 마이페이지 -->
             <div class="user-info">
                 <span>{{ user_name }}님</span>
-                <a href="./mypage">마이페이지</a>
+                <a href="{% url 'mypage' %}">마이페이지</a>
                 <form method="POST" action="{% url 'logout' %}">
                     {% csrf_token %}
                     <button name="logout" style="margin-top: -7px";>로그아웃</button>
