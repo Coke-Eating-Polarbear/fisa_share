@@ -1551,6 +1551,8 @@ def search(request):
     results = []  # results 기본값 초기화
     page = 1  # 기본값 설정
     page_size = 10  # 기본값 설정
+    # 세션에서 keywords 가져오기 (없으면 빈 리스트)
+    keywords = request.session.get('keywords', [])
 
     if request.method == 'POST':  # POST 요청인지 확인
         query = request.POST.get('question')  # POST 요청에서 'q' 값을 가져옴
@@ -1558,6 +1560,10 @@ def search(request):
         page_size = int(request.GET.get('size', 10))  # 한 페이지에 표시할 항목 수 (기본값: 10)
 
         if query :
+            if query not in keywords:
+                keywords.append(query)
+                request.session['keywords'] = keywords  # 세션에 저장
+            
             # Elasticsearch 검색 쿼리: 모든 필드 검색
             search_body = {
                 "query": {
@@ -1600,5 +1606,6 @@ def search(request):
         "current_page": current_page.number,
         "page_size": page_size,
         "results": list(current_page),
+        "keywords": keywords,
     }
     return render(request, 'search.html', context)
