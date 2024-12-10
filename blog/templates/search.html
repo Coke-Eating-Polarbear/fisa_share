@@ -111,13 +111,11 @@
     {% csrf_token %}
     <header>
         <div class="navbar">
-            <!-- 로고 -->
             <div class="logo">
                 <a href="{% url 'loginmain' %}">
                     <img src="{% static 'img/header_logo.png' %}" alt="로고">
                 </a>
             </div>
-            <!-- 네비게이션 -->
             <div class="nav-links">
                 <a href="{% url 'originreport' %}">내 금융 바로보기</a>
                 <div class="dropdown">
@@ -129,7 +127,6 @@
                 </div>
                 <a href="{% url 'spending_mbti' %}">슬기로운 소비생활</a>
             </div>
-            <!-- 회원 정보 및 마이페이지 -->
             <div class="user-info">
                 <span>{{ user_name }}님</span>
                 <a href="./mypage">마이페이지</a>
@@ -140,65 +137,70 @@
             </div>
         </div>
     </header>
-</body>
-</html>
+
     <div class="container">
-        
-        <h2>궁금한 상품을 검색해봐랏덕~ 🦆</h2>
-        <div class="search-bar">
-            <input type="text" id="search-input" placeholder="상품명을 입력하세요..." />
-            <button id="add-keyword-button" class="new-action-button">키워드 추가하기</button>
-            <button id="search-button">검색</button>
-        </div>
-        <div class="keywords">
-            <!-- 추가된 키워드가 여기에 표시됩니다 -->
-        </div>
-    
-        <div class="container">
+        <form method="POST" action="{% url 'search' %}">
+            {% csrf_token %}
+            <h2>궁금한 상품을 검색해봐랏덕~ 🦆</h2>
+            <div class="search-bar">
+                <input type="text" id="search-input" name="question" placeholder="상품명을 입력하세요..." />
+                <button type="submit" id="search-button">검색</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="keywords">
+        <!-- 검색 키워드 표시 -->
+        {% if keywords %}
+            {% for keyword in keywords %}
+                <div class="keyword-box">
+                    <span>{{ keyword }}</span>
+                    <button class="delete-keyword">x</button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    <div class="container">
         <div class="search-results">
             <h2>검색 결과닷 덕~ 🦆</h2>
             <ul id="results-list">
-                <!-- 검색 결과가 여기에 동적으로 추가됩니다 -->
-                <li>
-                    <div class="container card">
-                        <img src="image_url" alt="상품 이미지">
-                        <div class="card-content_n">
-                            <h3 class="card-title">상품 제목</h3>
-                            <p>상품 설명 또는 간략한 내용</p>
-                            <a class="card-button" href="link_url">자세히 보기</a>
-                        </div>
-                        <div class="details-box">
-                            <button class="close-button">X</button>
-                            <p>상세 설명 내용</p>
-                        </div>
+                <!-- 검색 결과 표시 -->
+                {% for result in results %}
+                <li class="card">
+                    <div class="card-content_n">
+                        <h3 class="card-title">{{ result.Name }}</h3>
+                        <p><strong>은행:</strong> {{ result.Bank }}</p>
+                        <p><strong>기준 금리:</strong> {{ result.BaseR }}</p>
+                        <p><strong>최대 금리:</strong> {{ result.MaxIR }}</p>
+                        <p><strong>가입 방법:</strong> {{ result.Method }}</p>
+                        <a class="card-button" href="#">자세히 보기</a>
                     </div>
                 </li>
+                {% endfor %}
             </ul>
-                <!-- 상품 컨테이너 -->
-<div class="existing-product-container">
-    {% if nearest_d %}
-        <div class="card">
-            <img src="{% static 'img/예금.PNG' %}" alt="예금 로고">
-            <div class="card-content_n">
-                <span class="card-title">{{ nearest_d.pname }}</span><br>
-                <p><strong>은행:</strong> {{ nearest_d.bank_name }}</p>
-                <p><strong>기준 금리:</strong> {{ nearest_d.ds_rate }}%</p>
-                <p><strong>만기일:</strong> {{ nearest_d.end_date }}</p>
-                <p><strong>남은 일수:</strong> {{ nearest_d.days_remaining }}일</p>
+
+            <!-- 페이지네이션 -->
+            <div class="pagination">
+                {% for page in page_numbers %}
+                    {% if page == current_page %}
+                        <span class="item active">{{ page }}</span>
+                    {% else %}
+                        <a href="?page={{ page }}&size={{ page_size }}" class="item">{{ page }}</a>
+                    {% endif %}
+                {% endfor %}
             </div>
-        </div>
-    {% endif %}
-</div>
-            </ul>
-        </div>
-        </div>
+            <!-- 주석: 페이지네이션 추가 -->
         </div>
     </div>
-<footer>
-    <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0; font-size: 0.8rem;">서울특별시 마포구 월드컵북로 434 상암IT타워 6층</p> 
-    <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0; font-size: 0.8rem;">고객지원 : 02-3151-7000 | 이메일: woorifis.lab44@gmail.com </p >
-    <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0; font-size: 0.8rem;">COPYRIGHT©우리천만해요</p >
-</footer >
+
+    <footer>
+        <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0; font-size: 0.8rem;">서울특별시 마포구 월드컵북로 434 상암IT타워 6층</p> 
+        <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0; font-size: 0.8rem;">고객지원 : 02-3151-7000 | 이메일: woorifis.lab44@gmail.com </p >
+        <p style="margin: 5px; line-height: 1.2; text-decoration: none; color: #afafb0; font-size: 0.8rem;">COPYRIGHT©우리천만해요</p >
+    </footer>
+</body>
+
 
 <script>
 document.addEventListener("DOMContentLoaded", function () {

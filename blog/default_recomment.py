@@ -91,7 +91,7 @@ def DProduct_top(user):
 
 
 # 예금 상품 디폴트 추천
-def default_DProduct(request, top_clusters, final_recommend_json):
+def default_DProduct(top_clusters, final_recommend_json):
     filtered_results = []
 
     for cluster in top_clusters:
@@ -106,8 +106,7 @@ def default_DProduct(request, top_clusters, final_recommend_json):
     
     final_recommend_display = final_recommend_json[:2]  # 적금 2개
     deposit_recommend_display = deposit_recommend_dict[:3]  # 예금 3개
-    request.session['deposit_recommend'] = json.dumps(deposit_recommend_dict, cls=DjangoJSONEncoder)
-    return final_recommend_display, deposit_recommend_display
+    return deposit_recommend_dict, final_recommend_display, deposit_recommend_display
 
 
 
