@@ -1506,7 +1506,7 @@ def originreport_page(request):
             '지출': abs(spend_amount.TotalAmount)
         }
         average_values = {
-            '총자산': (average_data.asset + average_data.finance),
+            '총자산': average_data.asset,
             '현금자산': average_data.finance,
             '수입': average_data.income,
             '지출': average_data.spend
