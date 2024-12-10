@@ -35,6 +35,9 @@ from collections import Counter
 import requests
 from collections import defaultdict
 from copy import deepcopy
+from blog.main import *
+from blog.default_recomment import *
+
 es = Elasticsearch([os.getenv('ES')])  # Elasticsearch 설정
 load_dotenv() 
 # openai.api_key = os.getenv('APIKEY')
@@ -184,7 +187,7 @@ def reverse_mapping_with_age(category, age):
             return {'marriage_status': None, 'children_status': None, 'children_age': None, 'age_range': '60대'}
 
 @login_required_session
-def mypage(request):
+def  mypage(request):
     customer_id = request.session.get('user_id')  # 세션에서 CustomerID 가져오기
     user_name = "사용자"
     accounts = []  # 사용자 계좌 정보 저장
@@ -372,7 +375,8 @@ def predict_next_month(preprocessed_data, model_features):
     model_input = most_recent_data.drop(labels=['TotalSpending'], errors='ignore')
 
     # 모델 로드 및 예측
-    model = load('./models/Consumption_Prediction_rfm.joblib')
+    # model = load('./models/Consumption_Prediction_rfm.joblib')
+    model = os.path.join(settings.BASE_DIR, 'models', 'Consumption_prediction_rfm.joblib')
     X_test = model_input.values.reshape(1, -1)
     predicted_total = model.predict(X_test)[0]
 
@@ -756,8 +760,8 @@ def spending_mbti(request):
 
 
             # 월 추출
-            result = []
-            prev_year = None
+            #result = []
+            #prev_year = None
             # 마지막 달 계산 및 다음 달 추가
             last_month = months[-1]
             year, month = map(int, last_month.split('-'))
@@ -843,12 +847,12 @@ def spending_mbti(request):
                 '건강보험', '건강검진'
             ]
 
-            i = 0
+            #i = 0
             # for문과 if-elif 구조로 연결
             card_results = {}
-            card_list = {}
+            #card_list = {}
             card_detail_results = {}
-            card_list_detail ={}
+            #card_list_detail ={}
             max_card_json = None
             max_card_detail_json = None
             if isinstance(next_month_prediction_json, str):
@@ -975,7 +979,7 @@ def spending_mbti(request):
 
             # JSON으로 변환하여 템플릿에 전달
             card_results_json = json.dumps(card_results, ensure_ascii=False, indent=4)
-            card_detail_results_json = json.dumps(card_detail_results, ensure_ascii=False)
+            #card_detail_results_json = json.dumps(card_detail_results, ensure_ascii=False)
 
         except UserProfile.DoesNotExist:
             pass  # 사용자가 없을 경우 기본값 유지
@@ -1000,28 +1004,8 @@ def spending_mbti(request):
     return render(request, 'spending_mbti.html', context)
 
 def main(request):
-    today = timezone.now().date()
-    yesterday = today - timedelta(days=1)
-
-    # 어제 날짜의 이미지 데이터 가져오기
-    wc_entry = Wc.objects.filter(date=yesterday).first()
-    image_base64 = base64.b64encode(wc_entry.image).decode('utf-8') if wc_entry else None
-
-    # 어제 날짜의 뉴스 데이터 가져오기
-    news_entries_queryset = News.objects.filter(
-        ndate=yesterday, 
-        summary__isnull=False
-    )
-
-    # 중복 제거 로직
-    seen_titles = set()  # 이미 본 제목을 저장
-    news_entries = []
-    for news in news_entries_queryset:
-        if news.title not in seen_titles:
-            seen_titles.add(news.title)
-            news_entries.append({'title': news.title, 'summary': news.summary, 'url': news.url })
-
-    # 디버깅용 출력
+    # 메인 홈페이지 : 뉴스 데이터 가져오기
+    image_base64, news_entries = News_func()
 
     context = {
         'image_base64': image_base64,
@@ -1048,114 +1032,12 @@ def report_ex(request):
     }
     return render(request, 'report_ex.html', context)
 
-def assign_cluster(stage_class, sex, age):
-    if stage_class == 0:
-        if sex == 'M' and age in [19, 20, 21]:
-            return [5, 2, 1, 4]
-        else:
-            return [0, 1, 4]
-    else:
-        return [1, 4]
-
-def get_top_data_by_customer_class(stageclass, inlevel):
-    # Elasticsearch 연결
-    
-    
-    stageclass = stageclass
-    inlevel = inlevel
-    headers = {
-        "Content-Type": "application/json"
-    }
-    # Elasticsearch 쿼리
-    query = {
-        "query": {
-            "bool": {
-                "filter": [
-                    {"term": {"customer_class.Stageclass.keyword": stageclass}},  # keyword로 정확 매칭
-                    {"term": {"customer_class.Inlevel": inlevel}}
-                ]
-            }
-        },
-        "aggs": {
-            "group_by_data": {
-                "terms": {
-                    "script": {
-                    "source": """
-                        def data = doc['data.product_name.keyword'].value + '|' +
-                                doc['data.bank.keyword'].value + '|' +
-                                doc['data.baser.keyword'].value + '|' +
-                                doc['data.maxir.keyword'].value + '|' +
-                                doc['data.method.keyword'].value;
-                        return data;
-                    """,
-                    "lang": "painless"
-                    },
-                    "size": 3,
-                    "order": {"_count": "desc"}
-                },
-                "aggs": {
-                    "top_hits": {
-                        "top_hits": {
-                            "size": 1,
-                            "_source": {
-                            "includes": ["data", "customer_class", "timestamp"]
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "size": 0
-    }
-
-    try:
-        # Elasticsearch에서 데이터 가져오기
-        response = es.search(index="ps_product_click_logs", body=query)
-        # 집계 데이터 추출
-        aggs_results = response.get("aggregations", {}).get("group_by_data", {}).get("buckets", [])
-
-        # 상위 3개 데이터만 추출
-        top_data = []
-        for bucket in aggs_results:
-            top_hit = bucket.get("top_hits", {}).get("hits", {}).get("hits", [])
-            if top_hit:
-                top_data.append({
-                    "data": top_hit[0]["_source"]["data"],
-                    "count": bucket["doc_count"]  # 해당 데이터의 카운트
-                })
-
-        return top_data
-
-    except Exception as e:
-        # 오류 처리
-        return JsonResponse({"error": str(e)}, status=500)
-
-
-
-
-
+# login_main.html
 @login_required_session
 def summary_view(request):
     customer_id = request.session.get('user_id')  # 세션에서 CustomerID 가져오기
-    today = timezone.now().date()
-    yesterday = today - timezone.timedelta(days=1)
-
-    # 워드클라우드 이미지 가져오기
-    wc_entry = Wc.objects.filter(date=yesterday).first()
-    image_base64 = base64.b64encode(wc_entry.image).decode('utf-8') if wc_entry else None
-
-    # 어제 날짜의 뉴스 데이터 가져오기
-    news_entries_queryset = News.objects.filter(ndate=yesterday, summary__isnull=False)
-    seen_titles = set()
-    news_entries = []
-    for news in news_entries_queryset:
-        if news.title not in seen_titles:
-            seen_titles.add(news.title)
-            news_entries.append({
-                'title': news.title,
-                'summary': news.summary,
-                'url': news.url
-            })
+    ## 뉴스 정보 가져오기
+    image_base64, news_entries = News_func()
 
     # 사용자 정보 가져오기
     user_name = "사용자"  # 기본값 설정
@@ -1168,170 +1050,36 @@ def summary_view(request):
 
     if not customer_id:  # 로그인되지 않은 사용자는 로그인 페이지로 리디렉션
         return redirect('login')
+
+    # 자산 조회 - 고객 순득 분위 기준 : 신한 평균 데이터 & 사용자 자산
+    average_values, user_data = asset_check(customer_id, user)
     
-    # Average 테이블에서 고객 소득분위 기준 데이터 조회
-    average_data = Average.objects.filter(
-        stageclass=user.Stageclass,
-        inlevel=user.Inlevel
-    ).first()
-
-    user_asset_data = MyDataAsset.objects.filter(CustomerID=customer_id).first()
-
-    average_values = {
-    '총자산': (average_data.asset + average_data.finance),
-    '현금자산': average_data.finance,
-    '수입': average_data.income,
-    '지출': average_data.spend
-}
-    user_data = {
-    '총자산': user_asset_data.total,
-    '현금자산': user_asset_data.financial,
-    '수입': user_asset_data.monthly_income,
-    '지출': user_asset_data.expenses
-}
-    # 추천 상품 처리
-    recommended_products = Recommend.objects.filter(CustomerID=customer_id)
-    recommended_count = recommended_products.count()
-    recommended_dsid_list = {'dproduct': [], 'sproduct': []}
-
-    if recommended_count > 0:
-        # DProduct와 SProduct 각각 추천 가져오기
-        recommended_dsid_list['dproduct'] = list(recommended_products.filter(dproduct__isnull=False).values_list('dproduct', flat=True))
-        recommended_dsid_list['sproduct'] = list(recommended_products.filter(sproduct__isnull=False).values_list('sproduct', flat=True))
-
-    # 추천 상품 세부 정보 가져오기
-    recommended_product_details = list(
-        DProduct.objects.filter(dsid__in=recommended_dsid_list['dproduct']).values('dsid','dsname', 'bank', 'baser', 'maxir')
-    ) + [
-        {   
-            'dsid' : sp['dsid'],
-            'dsname': sp['product_name'],
-            'bank': sp['bank_name'],
-            'baser': sp['base_rate'],
-            'maxir': sp['max_preferential_rate']
-        }
-        for sp in SProduct.objects.filter(DSID__in=recommended_dsid_list['sproduct']).values('DSID','product_name', 'bank_name', 'base_rate', 'max_preferential_rate')
-    ]
-
-
-    # 랜덤 상품 추가
-    if recommended_count < 5:
-        remaining_count = 5 - recommended_count
-        random_dproducts = DProduct.objects.exclude(dsid__in=recommended_dsid_list['dproduct']).order_by('?')[:remaining_count]
-        random_sproducts = SProduct.objects.exclude(DSID__in=recommended_dsid_list['sproduct']).order_by('?')[:remaining_count]
-
-        random_product_details = list(random_dproducts.values('dsid','dsname', 'bank', 'baser', 'maxir')) + [
-            {
-                'dsid' : sp.DSID,
-                'dsname': sp.product_name,
-                'bank': sp.bank_name,
-                'baser': sp.base_rate,
-                'maxir': sp.max_preferential_rate
-            }
-            for sp in random_sproducts
-        ]
-
-        product_details = recommended_product_details + random_product_details
-    else:
-        product_details = recommended_product_details
-
-    # 중복 제거 및 최대 5개 제한
-    unique_product_details = {p['dsname']: p for p in product_details if p['dsname']}.values()
-    product_details = list(unique_product_details)[:5]
-
-
-    ## 적금 추천 상품 top 3
-    # Django ORM을 사용하여 데이터 가져오기
-    cluster_savings = SProduct.objects.all()
-
-    # 필요한 데이터를 Pandas DataFrame으로 변환
-    
-
-    data = list(cluster_savings.values())  # ORM QuerySet을 리스트로 변환
-    cluster_savings = pd.DataFrame(data)
-    # 결과를 저장할 빈 데이터프레임 생성 (모든 열 포함)
-    final_result = pd.DataFrame(columns=cluster_savings.columns)
-
-
+    ## 디폴트 적금 추천 상품
     birth_year = user.Birth.year  # 주민번호 앞자리로 연도 추출
     current_year = datetime.now().year
     age = current_year - birth_year
     cluster = assign_cluster(user.Stageclass, user.sex, age)
+    final_result, final_recommend_json = default_SProduct(user, birth_year, current_year, age, cluster)
 
-    for i in cluster:
-        filtered_df = cluster_savings[cluster_savings['cluster1'] == i]
-        if not filtered_df.empty:
-            sorted_df = filtered_df.sort_values(by=['max_preferential_rate', 'base_rate'], ascending=[False, False])
-            if not sorted_df.empty:
-                top_result = sorted_df.head(5)
-                final_result = pd.concat([final_result, top_result], ignore_index=True)
-
-    # 적금 최종 추천 3개로 제한
+    # 적금 최종 추천 
     final_recommend_json = final_result.head(5)[["DSID","product_name", "bank_name", "max_preferential_rate", "base_rate", "signup_method"]].to_dict(orient='records')
+
+    # 사용자 예금 top cluster
+    top_clusters = DProduct_top(user)
+
+    # 예금 상품 디폴트 추천
+    final_recommend_display, deposit_recommend_display = default_DProduct(top_clusters, final_recommend_json)
     
-
-    # 예금 추천 처리
-    cluster_scores = {i: 0 for i in range(7)}
-    if user.Stageclass in [0, 1, 2, 3]:
-        for cluster in [2, 4, 5, 6]:
-            cluster_scores[cluster] += 1
-    elif user.Stageclass in [4, 5, 6, 7]:
-        for cluster in [0, 1, 2, 3, 4, 5, 6]:
-            cluster_scores[cluster] += 1
-    if user.Inlevel in [0, 1]:
-        for cluster in [0, 1, 2, 6]:
-            cluster_scores[cluster] += 1
-    elif user.Inlevel in [2, 3, 4]:
-        for cluster in [3, 4, 5]:
-            cluster_scores[cluster] += 1
-
-    sorted_clusters = sorted(cluster_scores.items(), key=lambda x: x[1], reverse=True)[:2]
-    top_clusters = [cluster[0] for cluster in sorted_clusters]
-    filtered_results = []
-
-    for cluster in top_clusters:
-        filtered_deposits_query = DProduct.objects.filter(cluster=cluster).values('dsid', 'name', 'bank', 'baser', 'maxir','method')
-        filtered_results.append(pd.DataFrame(filtered_deposits_query))
-    request.session['clusters'] = top_clusters
-    final_recommendations = pd.concat(filtered_results, ignore_index=True)
-    # 중복 제거
-    final_recommendations_drop_duplicates = final_recommendations.drop_duplicates(subset=["name", "bank", "baser", "maxir", "method"])
-    top2 = final_recommendations_drop_duplicates.sort_values(by='maxir', ascending=False).head(5)
-    deposit_recommend_dict = top2.to_dict(orient='records')
-    final_recommend_with_logo = [
-        {**item, "logo": get_bank_logo(item.get("bank_name", ""))} for item in final_recommend_json
-    ]
-    deposit_recommend_with_logo = [
-        {**item, "logo": get_bank_logo(item.get("bank", ""))} for item in deposit_recommend_dict
-    ]
-    request.session['final_recommend'] = final_recommend_with_logo[:5]  # 적금 Top 5
-    request.session['deposit_recommend'] = deposit_recommend_with_logo[:5]  # 예금 Top 5
-
-    final_recommend_display = final_recommend_json[:2]  # 적금 2개
-    deposit_recommend_display = deposit_recommend_dict[:3]  # 예금 3개
-    
-    
-    # 로그 데이터 확인 
-    log_cluster = get_top_data_by_customer_class(user.Stageclass, user.Inlevel)
-
-    # "data" 부분만 추출
-    filtered_data = [item['data'] for item in log_cluster]
-
-    # JSON으로 변환
-    filtered_data_json = json.dumps(filtered_data, ensure_ascii=False)
-
-
     # 최종 데이터 전달
     context = {
-        'product_details': product_details,
+        # 'product_details': product_details,
         'image_base64': image_base64,
         'news_entries': news_entries,
         'user_name': user_name,
         'final_recommend': final_recommend_display,  # 적금 Top 3
         'deposit_recommend': deposit_recommend_display,  # 예금 Top 2
         'average_data': json.dumps(average_values, ensure_ascii=False),
-        'user_data': json.dumps(user_data, ensure_ascii=False),
-        
+        'user_data': json.dumps(user_data, ensure_ascii=False),    
     }
 
     return render(request, 'loginmain.html', context)
@@ -1434,8 +1182,7 @@ def info(request):
             final_recommend = SProduct.objects.filter(s_bank_query & s_preference_query & s_cluster_query & s_period_query).order_by('-max_preferential_rate', '-bank_name').values()[:5]
             final_recommend = add_bank_logo(final_recommend, 'bank_name')
 
-
-            
+           
         elif saving_method == "목돈 모으기 + 목돈 굴리기":
             deposit_recommend = DProduct.objects.filter(d_preference_query & d_bank_query & d_cluster_query & d_period_query).order_by('-maxir', '-name').values()[:5]
             deposit_recommend = add_bank_logo(deposit_recommend, 'bank')
@@ -1505,28 +1252,13 @@ def top5(request):
         deposit_recommend = []
 
     # 로그 데이터 확인 
-    log_cluster = get_top_data_by_customer_class(user.Stageclass, user.Inlevel)
+    log_cluster = get_top_data_by_customer_class(es,user.Stageclass, user.Inlevel)
     # "data" 부분만 추출
     filtered_data = list([item['data'] for item in log_cluster])
     # 은행 이름에 해당하는 로고 파일명을 매핑
     filtered_data_with_logo = [
         {**item, "logo": get_bank_logo(item.get("bank", ""))} for item in filtered_data
     ]
-
-
-    # # JSON으로 변환
-    # # filtered_data_json = json.dumps(filtered_data, ensure_ascii=False)
-    # try:
-    #     filtered_data = json.loads(filtered_data) if isinstance(filtered_data, str) else filtered_data
-    
-    # except json.JSONDecodeError:
-    #     filtered_data = []
-    # print('filtered_data',filtered_data)
-
-    # request.session['filtered_data'] = filtered_data
-
-    # filtered_data_json = json.dumps(filtered_data, ensure_ascii=False)
-
 
     # Context에 데이터 추가
     context = {
@@ -1702,7 +1434,6 @@ def originreport_page(request):
             total_total_amount=Sum('TotalAmount')  # 전체 합계
         )
 
-        # 항목을 한국어로 맵핑한 딕셔너리로 저장
         # 항목을 한국어로 맵핑한 딕셔너리로 저장
         category_dict = {
             '식비': category_totals['total_eat_amount'] or 0,
@@ -1919,9 +1650,6 @@ def originreport_page(request):
             'mydata_assets_json' : mydata_assets_json,
         }
         return render(request, 'report_origin.html', context)
-
-    # except Exception as e:
-    #     return render(request, "error.html", {"message": str(e)})
 
     except UserProfile.DoesNotExist:
         return render(request, 'report_origin.html', {'error': '사용자 정보를 찾을 수 없습니다.'})

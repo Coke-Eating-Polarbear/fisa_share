@@ -47,7 +47,7 @@ body {
 .report-summary {
     max-width: 90%; /* 차트 박스와 동일한 너비 설정 */
     margin: 20px auto; /* 중앙 정렬 */
-    background-color: #ffffff;pieChart1
+    background-color: #ffffff;
     border: 1px solid #ddd;
     border-radius: 10px;
     padding: 20px;
@@ -109,9 +109,9 @@ canvas {
 }
 /* 금융분석 리포트 박스 스타일 */
 .box#analysis-score {
-    color: #5950d6;
+    color: #1100ff;
     font-size: 60px;
-    font-weight: bolder;
+    /* font-weight: bolder; */
     margin-left: 0px;
     min-width: 75%;
     min-height: 72%;
@@ -142,7 +142,7 @@ canvas {
     white-space: pre-line;
     margin-right: 0%;
     margin-left: 0%;
-    font-size: 25;
+    font-size: 20;
 }
 /* 메인 컨테이너 스타일 */
 .main-container {

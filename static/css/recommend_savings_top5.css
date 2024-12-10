@@ -185,7 +185,7 @@ body {
     display: block; /* 숨겨지지 않도록 설정 */
     visibility: visible; /* 가시성 보장 */
     margin-top: 10px; /* 버튼과 텍스트 간격 */
-    font-size: 14px; /* 텍스트 크기 */
+    font-size: 17px; /* 텍스트 크기 */
     color: #333; /* 텍스트 색상 */
     text-align: center; /* 텍스트 중앙 정렬 */
 }

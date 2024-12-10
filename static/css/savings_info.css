@@ -28,7 +28,7 @@ header, footer {
 header {
     position: fixed !important;
     top: 0 !important;
-    z-index: 1 !important;
+    z-index: 3 !important;
     padding: 0 !important;
     box-sizing: border-box !important;
     width: 100% !important;
@@ -163,7 +163,7 @@ footer {
         background-color: #f4f4f6;
         padding: 10px; /* 내부 여백 */
         min-width: 100%;
-        z-index: 0; /* 헤더 아래로 배치 */
+        z-index: 1; /* 헤더 아래로 배치 */
         gap: 20px; /* 내부 요소 간 간격 */
         margin-top: -21px;
 
@@ -175,8 +175,9 @@ footer {
         transform: translate(-50%, -50%); /* 가운데 정렬 */
         cursor: pointer;
         transition: opacity 0.3s ease-in-out;
-        max-width: 20%;
+        max-width: 70%;
         height: auto;
+        z-index:0;
     }
     .title {
         font-size: 20px;
@@ -202,33 +203,25 @@ footer {
         gap: 10px;
         margin-bottom: 20px;
     }
-    .goal-options button, .saving-method-options button {
-        padding: 10px 15px;
-        background-color: #e9ecef;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        cursor: pointer;
-    }
-    .goal-options button.active, .saving-method-options button.active {
-        background-color: #181b7caf;
-        color: white;
-    }
+
     .custom-input {
         display: none;
         margin-top: 10px;
     }
+    .select-container {
+        border: 1px solid #dee2e6;
+        padding: 20px;
+        border-radius: 10px;
+        margin-top: 20px;
+    }
+
     .saving-method-container {
         border: 1px solid #dee2e6;
         padding: 20px;
         border-radius: 10px;
         margin-top: 20px;
     }
-    .saving-method {
-        text-align: center;
-        margin-bottom: 20px;
-        font-weight: bold;
-        font-size: 20px;
-    }
+
     .saving-method-options {
         display: flex;
         justify-content: center;
@@ -247,6 +240,8 @@ footer {
         color: #fff;
         border: none;
         border-radius: 5px;
+        font-size: 1rem;
+        font-weight: bold;
         cursor: pointer;
     }
     @keyframes fadeIn {
@@ -275,17 +270,18 @@ footer {
         text-align: center;
     }
     .option h3 {
-        font-size: 35px;
+        font-size: 50px;
         /* color: #fff; */
         /* background-color: #181b7caf; */
         padding: 8px;
         border-radius: 5px;
         /* display: inline-block; */
+        margin-bottom: 0;
         margin-top: 0;
     }
     .option p {
         font-size: 12px;
-        color: #555;
+        color: #000000;
         margin: 10px 0;
         line-height: 1.5;
     }
@@ -318,11 +314,11 @@ footer {
         /* border: 1px solid #ccc; */
         border-radius: 10px;
         padding: 20px;
-        margin-top: 20px;
     }
     .preference-box h3 {
         font-size: 1.2rem;
         font-weight: bold;
+        margin-top: 0;
         margin-bottom: 15px;
     }
     .preference-options {
@@ -340,6 +336,9 @@ footer {
         display: flex;
         align-items: center;
         gap: 5px;
+        border: 1px solid #ccc;
+        border-radius: 5px; 
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
 
     .progress-bar-container {
@@ -376,20 +375,21 @@ footer {
         white-space: nowrap;
 }
 
-    .goal-options button {
-        padding: 10px 15px;
-        background-color: #e9ecef;
-        border: 1px solid transparent; /* 기본 상태에서 테두리는 투명 */
-        border-radius: 5px;
+    .select-button {
+        padding: 10px 18px;
+        font-family: 'Pretendard-Regular', sans-serif;
+        background-color: #ffffff;
         cursor: pointer;
-        transition: border-color 0.3s ease-in-out; /* 테두리 변화 애니메이션 */
+        font-size: 0.8rem;
+        border: 1px solid #ccc;
+        border-radius: 5px; 
+        font-size: 18px;
+        color: #121212;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: background-color 0.3s;
+        /* font-weight: bold; */
     }
 
-    .goal-options button.active {
-        border: 2px solid #7c5118af !important; /* 테두리 추가 */
-        border-radius: 5px; /* 둥근 모서리 */
-        color: inherit; /* 버튼 글씨 색상을 상속 */
-        background-color: inherit; /* 배경색 상속 */
-        font-size: inherit; /* 글씨 크기 유지 */
-        text-align: center; /* 텍스트 정렬 */
+    .select-button.active {
+        background-color: #baddff;
     }
