@@ -18,4 +18,5 @@ urlpatterns = [
     path('better', views.better_option, name='better'),
     path('s-detail/<int:dsid>/', views.s_detail, name='s-detail'),
     path('d-detail/<int:dsid>/', views.d_detail, name='d-detail'),
+    path('search',views.search, name='search')
 ]
