@@ -206,7 +206,7 @@ def  mypage(request):
             user_name = user.username  # 사용자 이름 설정
             category_totals = defaultdict(int)
             # MyDataDS 모델에서 해당 CustomerID에 연결된 계좌 정보 가져오기
-            accounts = MyDataDS.objects.filter(CustomerID=customer_id).values('CustomerID', 'balance','pname', 'ds_rate','end_date','dstype')
+            accounts = MyDataDS.objects.filter(CustomerID=customer_id).values('CustomerID','AccountID', 'balance','pname', 'ds_rate','end_date','dstype')
             # 오늘 날짜 계산
             today = timezone.now().date()
             now = datetime.now()
