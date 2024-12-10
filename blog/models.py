@@ -1,8 +1,5 @@
-from django.db.models import UniqueConstraint
 from django.db import models # type: ignore
 from django.contrib.auth.hashers import make_password # type: ignore
-from django.contrib.contenttypes.models import ContentType
-from django.contrib.contenttypes.fields import GenericForeignKey
 
 # UserProfile 모델 (회원 정보)
 class UserProfile(models.Model):
